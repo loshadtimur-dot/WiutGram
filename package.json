@@ -18,7 +18,7 @@
     "test": "npm run test:api && npm run test:e2e"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.4.1",
     "compression": "^1.7.5",
     "cookie-parser": "^1.4.7",
