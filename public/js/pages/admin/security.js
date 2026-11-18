@@ -1,7 +1,7 @@
-import { api } from '../../api.js?v=21';
-import { el, button, toast, openModal } from '../../ui.js?v=21';
-import { icon } from '../../icons.js?v=21';
-import { sectionHead, fmtDateTime } from './shared.js?v=21';
+import { api } from '../../api.js?v=23';
+import { el, button, toast, openModal } from '../../ui.js?v=23';
+import { icon } from '../../icons.js?v=23';
+import { sectionHead, fmtDateTime } from './shared.js?v=23';
 
 function copyButton(text, label = 'Копировать') {
   return button(label, {

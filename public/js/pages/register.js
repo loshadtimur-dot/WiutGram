@@ -1,8 +1,8 @@
-import { api, compressImage, setToken } from '../api.js?v=21';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=21';
-import { setUser } from '../state.js?v=21';
-import { navigate } from '../router.js?v=21';
-import { icon } from '../icons.js?v=21';
+import { api, compressImage, setToken } from '../api.js?v=23';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=23';
+import { setUser } from '../state.js?v=23';
+import { navigate } from '../router.js?v=23';
+import { icon } from '../icons.js?v=23';
 
 const FALLBACK_DISTRICTS = [
   'Алмазарский', 'Бектемирский', 'Мирабадский', 'Мирзо-Улугбекский', 'Сергелийский', 'Учтепинский',
@@ -83,6 +83,7 @@ export default async function RegisterPage(ctx) {
   let universities = [];
   let interests = FALLBACK_INTERESTS;
   let firstUser = false;
+  let minOwnerPassword = 10;
   let stepIndex = 0;
   let busy = false;
 
@@ -98,9 +99,19 @@ export default async function RegisterPage(ctx) {
     // Wiutgram has exactly one campus, so preselect it for the student.
     if (universities.length === 1) data.university_id = universities[0].id;
     firstUser = !!firstInfo.first;
+    if (firstInfo.min_owner_password) minOwnerPassword = Number(firstInfo.min_owner_password) || 10;
   } catch (err) {
     districts = FALLBACK_DISTRICTS;
     interests = FALLBACK_INTERESTS;
+    // A slow settings request must not leave the student stuck on the study step:
+    // the server falls back to WIUT when university_id is missing.
+    try {
+      const universityList = await api.get('/universities');
+      universities = universityList.universities || [];
+      if (universities.length === 1 && !data.university_id) data.university_id = universities[0].id;
+    } catch (universityErr) {
+      universities = [];
+    }
   }
 
   const root = el('div', { class: 'auth' });
@@ -209,7 +220,10 @@ export default async function RegisterPage(ctx) {
     emailField.append(emailInput);
     frag.append(emailField);
 
-    const pass = passwordField('Пароль', { autocomplete: 'new-password', hint: 'Минимум 8 символов' });
+    const passHint = firstUser
+      ? `Минимум ${minOwnerPassword} символов — это будущий пароль владельца сайта`
+      : 'Минимум 8 символов';
+    const pass = passwordField('Пароль', { autocomplete: 'new-password', hint: passHint });
     pass.input.value = data.password;
     const meter = el('div', { class: 'password-meter' });
     const bars = [];
@@ -621,7 +635,12 @@ export default async function RegisterPage(ctx) {
     if (index === 0) {
       const email = data.email.trim();
       if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email)) return 'Введите корректный email';
-      if (data.password.length < 8) return 'Пароль должен содержать минимум 8 символов';
+      const minLength = firstUser ? Math.max(8, minOwnerPassword) : 8;
+      if (data.password.length < minLength) {
+        return firstUser
+          ? `Пароль владельца сайта должен быть не короче ${minLength} символов`
+          : `Пароль должен содержать минимум ${minLength} символов`;
+      }
       if (!/^[a-z0-9._]{3,20}$/.test(data.username)) {
         return 'Username: 3–20 символов, латиница, цифры, точка или _';
       }
@@ -645,7 +664,9 @@ export default async function RegisterPage(ctx) {
       if (!data.interested_in) return 'Выберите, кого показывать';
     }
     if (index === 3 && !data.looking_for) return 'Выберите, что вы ищете';
-    if (index === 4 && !data.university_id) return 'Регистрация доступна только для студентов WIUT';
+    if (index === 4 && universities.length && !data.university_id) {
+      return 'Регистрация доступна только для студентов WIUT';
+    }
     if (index === 5 && data.interests.length < 3) return 'Выберите минимум 3 интереса';
     if (index === 6 && data.photos.length < 1) return 'Добавьте хотя бы одно фото';
     return null;
@@ -685,7 +706,7 @@ export default async function RegisterPage(ctx) {
       variant: 'btn-primary',
       onClick: () => next()
     });
-    if (busy) nextBtn.disabled = true;
+    nextBtn.disabled = !!busy;
     actions.append(nextBtn);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -799,6 +820,7 @@ export default async function RegisterPage(ctx) {
       submitBtn.textContent = 'Создаём аккаунт…';
     }
     errorBox.classList.add('hidden');
+    errorBox.textContent = '';
     try {
       const birthdate = `${data.birth_year}-${String(data.birth_month).padStart(2, '0')}-${String(
         data.birth_day
@@ -833,9 +855,17 @@ export default async function RegisterPage(ctx) {
       if (field === 'university_id' || field === 'course' || field === 'district') stepIndex = 4;
       if (field === 'birthdate') stepIndex = 1;
       if (field === 'email' || field === 'username' || field === 'password') stepIndex = 0;
+      // Release the form before re-rendering: otherwise the new submit button is
+      // created disabled and the user cannot retry after a validation error.
+      busy = false;
       renderStep();
-      errorBox.textContent = err.message || 'Не удалось создать аккаунт';
+      const message = err.message || 'Не удалось создать аккаунт';
+      errorBox.textContent = message;
       errorBox.classList.remove('hidden');
+      toast(message, 'error');
+      errorBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const submitAgain = actions.querySelector('.btn-primary');
+      if (submitAgain) submitAgain.disabled = false;
     } finally {
       busy = false;
     }

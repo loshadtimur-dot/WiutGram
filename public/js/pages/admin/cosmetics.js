@@ -1,7 +1,7 @@
-import { api } from '../../api.js?v=21';
-import { el, button, toast, formatNumber } from '../../ui.js?v=21';
-import { sectionHead, emptyState } from './shared.js?v=21';
-import { badgeNode, giftNode } from '../../components/cosmetics.js?v=21';
+import { api } from '../../api.js?v=23';
+import { el, button, toast, formatNumber } from '../../ui.js?v=23';
+import { sectionHead, emptyState } from './shared.js?v=23';
+import { badgeNode, giftNode } from '../../components/cosmetics.js?v=23';
 
 const DURATIONS = [
   ['1', 'на месяц'],

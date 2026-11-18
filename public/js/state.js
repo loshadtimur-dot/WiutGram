@@ -1,4 +1,4 @@
-import { api } from './api.js?v=21';
+import { api } from './api.js?v=23';
 
 const listeners = new Set();
 

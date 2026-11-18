@@ -73,6 +73,11 @@ async function request(path, method = 'GET', body) {
   const data = contentType.includes('application/json') ? await response.json().catch(() => ({})) : {};
 
   if (!response.ok) {
+    if (!data.error) {
+      if (response.status === 413) data.error = 'Фото слишком большие. Выберите меньше фото или сожмите их.';
+      else if (response.status === 429) data.error = 'Слишком много попыток. Подождите немного и попробуйте снова.';
+      else if (response.status >= 500) data.error = 'Сервер временно недоступен. Попробуйте через минуту.';
+    }
     if (response.status === 401) {
       if (!path.startsWith('/auth/login')) clearToken();
       window.dispatchEvent(new CustomEvent('uni:unauthorized', { detail: data }));
