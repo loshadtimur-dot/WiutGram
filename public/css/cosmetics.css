@@ -168,13 +168,13 @@
   background-image: radial-gradient(70% 100% at 50% 0, rgba(230, 180, 34, 0.24), transparent 72%);
 }
 .profile-page.has-gift-bg[data-gift-rarity='admin'] {
-  background-image: radial-gradient(2px 2px at 12% 10%, #ffe9a8 45%, transparent 50%),
-    radial-gradient(2.5px 2.5px at 32% 22%, #fff 45%, transparent 50%),
-    radial-gradient(2px 2px at 58% 7%, #ffe9a8 45%, transparent 50%),
-    radial-gradient(2px 2px at 74% 26%, #fff 45%, transparent 50%),
-    radial-gradient(2.5px 2.5px at 90% 12%, #ffe9a8 45%, transparent 50%),
-    radial-gradient(1.5px 1.5px at 47% 32%, #fff 45%, transparent 50%),
-    radial-gradient(60% 90% at 50% 0, rgba(18, 15, 30, 0.34), rgba(18, 15, 30, 0) 72%);
+  background-image: radial-gradient(2.5px 2.5px at 12% 42%, #f5d489 45%, transparent 50%),
+    radial-gradient(3px 3px at 30% 55%, #fff6dd 45%, transparent 50%),
+    radial-gradient(2px 2px at 44% 39%, #f5d489 45%, transparent 50%),
+    radial-gradient(3px 3px at 63% 62%, #fff6dd 45%, transparent 50%),
+    radial-gradient(2.5px 2.5px at 79% 44%, #f5d489 45%, transparent 50%),
+    radial-gradient(2px 2px at 90% 58%, #fff6dd 45%, transparent 50%),
+    radial-gradient(2px 2px at 54% 72%, #f5d489 45%, transparent 50%);
   animation: profile-stars 7s ease-in-out infinite alternate;
 }
 @keyframes profile-stars {
