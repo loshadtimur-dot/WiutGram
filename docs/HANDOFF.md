@@ -8,8 +8,8 @@
 | Этап | Статус | Комментарий |
 | --- | --- | --- |
 | A. Аудит и реклама | **Сделано** (браузерный прогон — нет) | ESLint, npm audit, API-тесты 23/23, найдено и исправлено 4 дефекта, реквизиты оплаты и Telegram в рекламе |
-| B. GitHub и CI | **Сделано, кроме push** | `.gitignore`, `.gitattributes`, LICENSE, SECURITY.md, dependabot, `ci.yml`, `deploy.yml`, бейдж; push заблокирован правами токена |
-| C. Деплой на VPS | **Скрипты и документы готовы**, на реальном VPS не запускалось | install.sh, deploy.sh, rollback.sh, systemd, Caddyfile, logrotate, `.env.production.example`, `docs/DEPLOY.md` |
+| B. GitHub и CI | **Сделано** | Код в `main` (репозиторий `loshadtimur-dot/uni-lovers`), тег `v1.0.0` и релиз, CI зелёный: lint, API-тесты, E2E в Chromium, audit |
+| C. Деплой на VPS | **Скрипты и документы готовы**, на реальном VPS не запускалось | install.sh, deploy.sh, rollback.sh, systemd, Caddyfile, logrotate, `.env.production.example`, `docs/DEPLOY.md`; для Railway — `Dockerfile`, `railway.json`, `docs/RAILWAY.md` |
 | D. Бэкапы и алерты | **Скрипты готовы и проверены на копии**, алерты — только для бэкапа | backup.sh (7/4/3, integrity, offsite), restore.sh, systemd timer, `docs/BACKUP_RESTORE.md`, `docs/RUNBOOK.md` |
 | E. Приватность фото | **Не сделано** | Требует `sharp`, перекодирования, приватного хранилища и `/media/:id` |
 | F. 18+, политика, хостинг | **Частично** | `docs/HOSTING_DECISION.md` готов; версии согласия, жалобы на возраст, экспорт/удаление данных — не сделаны |
@@ -41,7 +41,7 @@
   (~174 МБ) не скачивается в песочнице, обрывается на ~10 МБ. В CI workflow это
   шаг `npx playwright install --with-deps chromium`.
 - **Визуальный аудит** на ширинах 360–1920 и в тёмной теме — не выполнен.
-- **Реальный push в GitHub** — токен не имеет права записи (см. ниже).
+- **Визуальная вычитка** интерфейса глазами на всех ширинах — автотесты E2E проходят, но эстетику проверяет только человек.
 - **Реальный VPS, DNS, HTTPS, systemd, Caddy** — скрипты написаны и проверены
   статически, но не запускались на живой машине.
 - **Реальная отправка почты, Telegram-алертов, web push** — нет ключей.
@@ -49,13 +49,7 @@
 
 ## Что должен сделать владелец руками
 
-1. **GitHub-токен.** Откройте https://github.com/settings/personal-access-tokens,
-   выберите токен → *Repository access*: добавьте `loshadtimur-dot/uni-lovers`
-   (или *All repositories*) → *Permissions → Contents: Read and write* → Save.
-   Значение токена не меняется, секрет `GITHUB_TOKEN` обновлять не нужно. После
-   этого скажите «готово» — push выполнится: `main`, тег `v1.0.0`.
-   Альтернатива: `gh auth login --hostname github.com --git-protocol https --web`.
-2. **Приватность репозитория.** Сейчас репозиторий публичный. Секретов и данных
+1. **Приватность репозитория.** Сейчас репозиторий публичный. Секретов и данных
    пользователей в нём нет (проверено списком файлов), но рекомендуется сделать
    его приватным: Settings → General → Danger Zone → Change visibility.
 3. **Домен и VPS.** Купить домен, арендовать VPS, прописать A-записи, выполнить
