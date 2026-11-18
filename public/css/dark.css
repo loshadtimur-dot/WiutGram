@@ -1,0 +1,116 @@
+/* Dark theme built on the same calm tokens. */
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --accent: #7c8cff;
+  --accent-hover: #6d7cf0;
+  --accent-soft: #23264a;
+  --like: #4cc38a;
+  --nope: #9aa0a8;
+  --nope-hover: #e06a6a;
+  --super: #6aa9f7;
+  --rewind: #d6a63a;
+  --boost: #a68cf0;
+  --danger: #e06a6a;
+  --success: #4cc38a;
+
+  --brand-1: var(--accent);
+  --brand-2: var(--accent-hover);
+  --brand-gradient: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  --brand-soft: var(--accent-soft);
+
+  --bg: #0f1012;
+  --surface: #17181b;
+  --surface-2: #1f2024;
+  --surface-3: #26272c;
+  --text: #ececee;
+  --text-2: #a1a4ab;
+  --text-3: #6e7178;
+  --muted: #6e7178;
+  --border: #2a2b30;
+  --border-strong: #3a3b42;
+  --overlay: rgba(0, 0, 0, 0.62);
+
+  --shadow-sm: none;
+  --shadow: none;
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --ring-shadow: 0 0 0 3px rgba(124, 140, 255, 0.22);
+}
+
+html[data-theme='dark'] body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+html[data-theme='dark'] .card,
+html[data-theme='dark'] .panel,
+html[data-theme='dark'] .settings-section,
+html[data-theme='dark'] .chart-card,
+html[data-theme='dark'] .admin-panel,
+html[data-theme='dark'] .legal__card,
+html[data-theme='dark'] .auth__panel,
+html[data-theme='dark'] .sidebar,
+html[data-theme='dark'] .topbar,
+html[data-theme='dark'] .tabbar,
+html[data-theme='dark'] .modal-card,
+html[data-theme='dark'] .modal__card {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+html[data-theme='dark'] .kpi,
+html[data-theme='dark'] .swipe-card {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+html[data-theme='dark'] .input,
+html[data-theme='dark'] .select,
+html[data-theme='dark'] .textarea {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+html[data-theme='dark'] .btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+html[data-theme='dark'] .btn-secondary:hover { background: var(--surface-3); }
+
+html[data-theme='dark'] .segmented { background: var(--surface-2); border-color: var(--border); }
+html[data-theme='dark'] .segmented__item.is-active { background: var(--surface-3); color: var(--text); }
+
+html[data-theme='dark'] .admin-table th { background: var(--surface-2); color: var(--text-2); }
+html[data-theme='dark'] .admin-table td { border-color: var(--border); }
+html[data-theme='dark'] .admin-table tr:hover td { background: var(--surface-2); }
+
+html[data-theme='dark'] .toast {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+html[data-theme='dark'] .story-bubble__ring { border-color: var(--accent); }
+html[data-theme='dark'] .story-bubble.is-seen .story-bubble__ring { border-color: var(--border-strong); }
+
+html[data-theme='dark'] .stamp {
+  background: rgba(23, 24, 27, 0.9);
+}
+
+html[data-theme='dark'] .landing,
+html[data-theme='dark'] .landing__hero,
+html[data-theme='dark'] .auth {
+  background: var(--bg) !important;
+}
+
+html[data-theme='dark'] .swipe-card__gradient,
+html[data-theme='dark'] .swipe-card__overlay,
+html[data-theme='dark'] .swipe-card__scrim {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.85) 100%);
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="UNI Lovers">
+  <rect width="64" height="64" rx="16" fill="#4C5FD7"/>
+  <circle cx="26" cy="32" r="11" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.92"/>
+  <circle cx="38" cy="32" r="11" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.92"/>
+  <circle cx="38" cy="32" r="3" fill="#FFFFFF"/>
+</svg>

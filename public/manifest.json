@@ -1,0 +1,26 @@
+{
+  "name": "UNI Lovers — знакомства для студентов",
+  "short_name": "UNI Lovers",
+  "description": "Знакомства для студентов Ташкента. Только 18+.",
+  "lang": "ru",
+  "start_url": "/swipe",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F7F5",
+  "theme_color": "#F7F7F5",
+  "icons": [
+    {
+      "src": "/img/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "uni-lovers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UNI Lovers - dating app with Tinder-style swipes and Instagram-style profiles",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node db/seed.js",
+    "test:api": "node --test tests/api.test.js",
+    "test:e2e": "node --test tests/e2e.test.js",
+    "test": "npm run test:api && npm run test:e2e"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.4.1",
+    "compression": "^1.7.5",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

@@ -1,0 +1,22 @@
+[Unit]
+Description=UNI Lovers (Node.js)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/uni-lovers
+EnvironmentFile=/srv/uni-lovers/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/srv/uni-lovers/data /srv/uni-lovers/uploads /srv/uni-lovers/logs /srv/uni-lovers/backups
+
+[Install]
+WantedBy=multi-user.target
