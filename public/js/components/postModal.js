@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=23';
+import { api } from '../api.js?v=24';
 import {
   el,
   avatarNode,
@@ -9,11 +9,11 @@ import {
   timeAgo,
   svgIcon,
   ruleBadges
-} from '../ui.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { getState } from '../state.js?v=23';
-import { navigate } from '../router.js?v=23';
-import { likesLabel } from './postCard.js?v=23';
+} from '../ui.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { getState } from '../state.js?v=24';
+import { navigate } from '../router.js?v=24';
+import { likesLabel } from './postCard.js?v=24';
 
 // Full Instagram-style post modal with comments, likes and views.
 export function openPostModal(post, options = {}) {

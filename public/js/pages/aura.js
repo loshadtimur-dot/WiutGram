@@ -1,8 +1,8 @@
-import { api } from '../api.js?v=23';
-import { el, avatarNode, loadingRow, formatNumber } from '../ui.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { getState } from '../state.js?v=23';
-import { badgeNode } from '../components/cosmetics.js?v=23';
+import { api } from '../api.js?v=24';
+import { el, avatarNode, loadingRow, formatNumber } from '../ui.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { getState } from '../state.js?v=24';
+import { badgeNode } from '../components/cosmetics.js?v=24';
 
 export default async function AuraPage() {
   const root = el('div', { class: 'aura-page' });

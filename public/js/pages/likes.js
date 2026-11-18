@@ -1,9 +1,9 @@
-import { api } from '../api.js?v=23';
-import { el, button, toast, emptyState, skeletonGrid, initials, gradientFor, timeAgo } from '../ui.js?v=23';
-import { getState, setCounts, incrementCount } from '../state.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { showMatchScreen } from '../components/match.js?v=23';
-import { navigate } from '../router.js?v=23';
+import { api } from '../api.js?v=24';
+import { el, button, toast, emptyState, skeletonGrid, initials, gradientFor, timeAgo } from '../ui.js?v=24';
+import { getState, setCounts, incrementCount } from '../state.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { showMatchScreen } from '../components/match.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 const TABS = [
   { id: 'likes', label: 'Лайкнули меня', endpoint: '/swipes/likes-me' },

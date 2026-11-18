@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=23';
+import { api, compressImage, toFormData } from '../api.js?v=24';
 import {
   el,
   avatarNode,
@@ -12,13 +12,13 @@ import {
   initials,
   gradientFor,
   svgIcon
-} from '../ui.js?v=23';
-import { PREFERRED_EMOJI, icon } from '../icons.js?v=23';
-import { getState, setOnline, setCounts } from '../state.js?v=23';
-import { onSocket, startTyping, stopTyping } from '../socket.js?v=23';
-import { openReportDialog, openBlockConfirm } from './report.js?v=23';
-import { loadCosmetics, giftMeta, giftNode, openGiftPicker } from './cosmetics.js?v=23';
-import { navigate } from '../router.js?v=23';
+} from '../ui.js?v=24';
+import { PREFERRED_EMOJI, icon } from '../icons.js?v=24';
+import { getState, setOnline, setCounts } from '../state.js?v=24';
+import { onSocket, startTyping, stopTyping } from '../socket.js?v=24';
+import { openReportDialog, openBlockConfirm } from './report.js?v=24';
+import { loadCosmetics, giftMeta, giftNode, openGiftPicker } from './cosmetics.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 export function createChatWindow(matchId, options = {}) {
   const root = el('div', { class: 'chat-window' });

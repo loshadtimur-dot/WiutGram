@@ -1,7 +1,7 @@
-import { el } from '../ui.js?v=23';
-import { createChatList } from '../components/chatList.js?v=23';
-import { createChatWindow } from '../components/chatWindow.js?v=23';
-import { navigate } from '../router.js?v=23';
+import { el } from '../ui.js?v=24';
+import { createChatList } from '../components/chatList.js?v=24';
+import { createChatWindow } from '../components/chatWindow.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 export default function ChatPage(ctx) {
   const matchId = Number(ctx.params.id);

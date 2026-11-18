@@ -1,6 +1,6 @@
-import { el, svgIcon } from '../ui.js?v=23';
-import { getState } from '../state.js?v=23';
-import { navigate } from '../router.js?v=23';
+import { el, svgIcon } from '../ui.js?v=24';
+import { getState } from '../state.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 const RULES = {
   title: 'Правила сообщества',

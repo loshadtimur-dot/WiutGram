@@ -1,7 +1,7 @@
-import { api } from '../api.js?v=23';
-import { el, button, toast, svgIcon } from '../ui.js?v=23';
-import { navigate } from '../router.js?v=23';
-import { getState } from '../state.js?v=23';
+import { api } from '../api.js?v=24';
+import { el, button, toast, svgIcon } from '../ui.js?v=24';
+import { navigate } from '../router.js?v=24';
+import { getState } from '../state.js?v=24';
 
 const STATUS_LABELS = {
   new: 'Ожидает оплаты',

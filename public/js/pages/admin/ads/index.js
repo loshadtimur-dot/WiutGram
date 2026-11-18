@@ -1,14 +1,14 @@
-import { api } from '../../../api.js?v=23';
-import { el, button, toast } from '../../../ui.js?v=23';
-import { icon } from '../../../icons.js?v=23';
-import { sectionHead } from '../shared.js?v=23';
-import { formatSum } from '../../../ads-utils.js?v=23';
-import calendarSection from './calendar.js?v=23';
-import requestsSection from './requests.js?v=23';
-import campaignsSection from './campaigns.js?v=23';
-import bannersSection from './banners.js?v=23';
-import revenueSection from './revenue.js?v=23';
-import adsSettingsSection from './settings.js?v=23';
+import { api } from '../../../api.js?v=24';
+import { el, button, toast } from '../../../ui.js?v=24';
+import { icon } from '../../../icons.js?v=24';
+import { sectionHead } from '../shared.js?v=24';
+import { formatSum } from '../../../ads-utils.js?v=24';
+import calendarSection from './calendar.js?v=24';
+import requestsSection from './requests.js?v=24';
+import campaignsSection from './campaigns.js?v=24';
+import bannersSection from './banners.js?v=24';
+import revenueSection from './revenue.js?v=24';
+import adsSettingsSection from './settings.js?v=24';
 
 const TABS = [
   { id: 'calendar', label: 'Календарь' },

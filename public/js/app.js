@@ -1,6 +1,6 @@
-import { api, setToken, clearToken } from './api.js?v=23';
-import { storageGet } from './storage.js?v=23';
-import { icon } from './icons.js?v=23';
+import { api, setToken, clearToken } from './api.js?v=24';
+import { storageGet } from './storage.js?v=24';
+import { icon } from './icons.js?v=24';
 import {
   getState,
   setUser,
@@ -12,30 +12,30 @@ import {
   applyTheme,
   watchSystemTheme,
   isOwner
-} from './state.js?v=23';
-import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=23';
-import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=23';
-import { initSocket, onSocket, disconnectSocket } from './socket.js?v=23';
-import { showMatchScreen } from './components/match.js?v=23';
+} from './state.js?v=24';
+import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=24';
+import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=24';
+import { initSocket, onSocket, disconnectSocket } from './socket.js?v=24';
+import { showMatchScreen } from './components/match.js?v=24';
 
-import Landing from './pages/landing.js?v=23';
-import LoginPage from './pages/login.js?v=23';
-import RegisterPage from './pages/register.js?v=23';
-import WelcomePage from './pages/welcome.js?v=23';
-import SwipePage from './pages/swipe.js?v=23';
-import LikesPage from './pages/likes.js?v=23';
-import ChatsPage from './pages/chats.js?v=23';
-import ChatPage from './pages/chat.js?v=23';
-import ProfilePage from './pages/profile.js?v=23';
-import EditProfilePage from './pages/edit-profile.js?v=23';
-import ExplorePage from './pages/explore.js?v=23';
-import NotificationsPage from './pages/notifications.js?v=23';
-import SettingsPage from './pages/settings.js?v=23';
-import SuperlikesPage from './pages/superlikes.js?v=23';
-import LegalPage from './pages/legal.js?v=23';
-import AdvertisePage from './pages/advertise.js?v=23';
-import AdReportPage from './pages/ad-report.js?v=23';
-import AuraPage from './pages/aura.js?v=23';
+import Landing from './pages/landing.js?v=24';
+import LoginPage from './pages/login.js?v=24';
+import RegisterPage from './pages/register.js?v=24';
+import WelcomePage from './pages/welcome.js?v=24';
+import SwipePage from './pages/swipe.js?v=24';
+import LikesPage from './pages/likes.js?v=24';
+import ChatsPage from './pages/chats.js?v=24';
+import ChatPage from './pages/chat.js?v=24';
+import ProfilePage from './pages/profile.js?v=24';
+import EditProfilePage from './pages/edit-profile.js?v=24';
+import ExplorePage from './pages/explore.js?v=24';
+import NotificationsPage from './pages/notifications.js?v=24';
+import SettingsPage from './pages/settings.js?v=24';
+import SuperlikesPage from './pages/superlikes.js?v=24';
+import LegalPage from './pages/legal.js?v=24';
+import AdvertisePage from './pages/advertise.js?v=24';
+import AdReportPage from './pages/ad-report.js?v=24';
+import AuraPage from './pages/aura.js?v=24';
 
 const NAV_ITEMS = [
   { path: '/swipe', label: 'Свайпы', icon: 'layers' },
@@ -66,7 +66,7 @@ const ROUTES = [
   {
     path: '/admin',
     page: async (ctx) => {
-      const module = await import('./pages/admin/index.js?v=23');
+      const module = await import('./pages/admin/index.js?v=24');
       return module.default(ctx);
     },
     auth: true,

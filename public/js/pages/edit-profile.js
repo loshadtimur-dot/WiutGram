@@ -1,8 +1,8 @@
-import { api, compressImage, toFormData } from '../api.js?v=23';
-import { el, button, toast, confirmDialog, svgIcon, initials } from '../ui.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { getState, refreshMe, patchUser } from '../state.js?v=23';
-import { navigate } from '../router.js?v=23';
+import { api, compressImage, toFormData } from '../api.js?v=24';
+import { el, button, toast, confirmDialog, svgIcon, initials } from '../ui.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { getState, refreshMe, patchUser } from '../state.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 const LOOKING_FOR = [
   ['relationship', 'Отношения'],

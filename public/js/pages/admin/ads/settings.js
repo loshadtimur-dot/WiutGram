@@ -1,7 +1,7 @@
-import { api } from '../../../api.js?v=23';
-import { el, button, toast } from '../../../ui.js?v=23';
-import { icon } from '../../../icons.js?v=23';
-import { sectionHead } from '../shared.js?v=23';
+import { api } from '../../../api.js?v=24';
+import { el, button, toast } from '../../../ui.js?v=24';
+import { icon } from '../../../icons.js?v=24';
+import { sectionHead } from '../shared.js?v=24';
 
 export default async function adsSettingsSection({ refresh }) {
   let data;

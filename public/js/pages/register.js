@@ -1,8 +1,8 @@
-import { api, compressImage, setToken } from '../api.js?v=23';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=23';
-import { setUser } from '../state.js?v=23';
-import { navigate } from '../router.js?v=23';
-import { icon } from '../icons.js?v=23';
+import { api, compressImage, setToken } from '../api.js?v=24';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=24';
+import { setUser } from '../state.js?v=24';
+import { navigate } from '../router.js?v=24';
+import { icon } from '../icons.js?v=24';
 
 const FALLBACK_DISTRICTS = [
   'Алмазарский', 'Бектемирский', 'Мирабадский', 'Мирзо-Улугбекский', 'Сергелийский', 'Учтепинский',
@@ -55,6 +55,24 @@ function passwordScore(value) {
   if (/[A-Za-zа-яА-Я]/.test(value) && /\d/.test(value)) score += 1;
   if (/[^A-Za-z0-9а-яА-Я]/.test(value)) score += 1;
   return Math.min(4, score);
+}
+
+// Usernames are Latin-only, but students naturally type their name in Russian.
+// Transliterate instead of silently deleting the letters they typed.
+const TRANSLIT = {
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i',
+  й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't',
+  у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '',
+  э: 'e', ю: 'yu', я: 'ya'
+};
+
+function normalizeUsername(raw) {
+  const transliterated = String(raw || '')
+    .toLowerCase()
+    .split('')
+    .map((char) => (TRANSLIT[char] !== undefined ? TRANSLIT[char] : char))
+    .join('');
+  return transliterated.replace(/[^a-z0-9._]/g, '').slice(0, 20);
 }
 
 export default async function RegisterPage(ctx) {
@@ -214,9 +232,11 @@ export default async function RegisterPage(ctx) {
       attrs: { type: 'email', placeholder: 'you@example.com', autocomplete: 'email', inputmode: 'email' }
     });
     emailInput.value = data.email;
-    emailInput.addEventListener('input', () => {
+    const syncEmail = () => {
       data.email = emailInput.value.trim();
-    });
+    };
+    emailInput.addEventListener('input', syncEmail);
+    emailInput.addEventListener('change', syncEmail);
     emailField.append(emailInput);
     frag.append(emailField);
 
@@ -233,6 +253,9 @@ export default async function RegisterPage(ctx) {
       meter.append(bar);
     }
     pass.field.append(meter);
+    const passCount = el('span', { class: 'field__hint' });
+    pass.field.append(passCount);
+    const minLength = firstUser ? Math.max(8, minOwnerPassword) : 8;
     const updateMeter = () => {
       const score = passwordScore(pass.input.value);
       bars.forEach((bar, index) => {
@@ -242,11 +265,27 @@ export default async function RegisterPage(ctx) {
         }
       });
     };
-    pass.input.addEventListener('input', () => {
+    const syncPassword = () => {
       data.password = pass.input.value;
       updateMeter();
-    });
+      const length = pass.input.value.length;
+      passCount.classList.remove('is-error', 'copy-ok');
+      if (!length) {
+        passCount.textContent = firstUser
+          ? `Пароль владельца сайта: нужно минимум ${minLength} символов`
+          : '';
+      } else if (length < minLength) {
+        passCount.textContent = `Ещё ${minLength - length} символ(а) — минимум ${minLength}`;
+        passCount.classList.add('is-error');
+      } else {
+        passCount.textContent = firstUser ? 'Длина пароля подходит' : '';
+        if (firstUser) passCount.classList.add('copy-ok');
+      }
+    };
+    pass.input.addEventListener('input', syncPassword);
+    pass.input.addEventListener('change', syncPassword);
     updateMeter();
+    syncPassword();
     frag.append(pass.field);
 
     const usernameField = el('label', { class: 'field' });
@@ -267,25 +306,33 @@ export default async function RegisterPage(ctx) {
     });
     usernameInput.value = data.username;
     let checkTimer = null;
-    usernameInput.addEventListener('input', () => {
-      const value = usernameInput.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
+    const syncUsername = () => {
+      const value = normalizeUsername(usernameInput.value);
       if (usernameInput.value !== value) usernameInput.value = value;
       data.username = value;
       usernameHint.textContent = '';
-      usernameHint.classList.remove('copy-ok');
+      usernameHint.classList.remove('copy-ok', 'is-error');
       clearTimeout(checkTimer);
       if (value.length < 3) return;
       usernameHint.textContent = 'Проверяем…';
       checkTimer = setTimeout(async () => {
         try {
           const result = await api.get(`/auth/username-check?username=${encodeURIComponent(value)}`);
-          usernameHint.textContent = result.available ? 'свободен' : 'занят';
-          usernameHint.classList.toggle('copy-ok', !!result.available);
+          if (result.available) {
+            usernameHint.textContent = 'свободен';
+            usernameHint.classList.add('copy-ok');
+          } else {
+            const suggestion = `${value}${value.length > 18 ? '' : '_1'}`.slice(0, 20);
+            usernameHint.textContent = `занят — попробуйте ${suggestion}`;
+            usernameHint.classList.add('is-error');
+          }
         } catch (err) {
           usernameHint.textContent = '';
         }
       }, 400);
-    });
+    };
+    usernameInput.addEventListener('input', syncUsername);
+    usernameInput.addEventListener('change', syncUsername);
     usernameField.append(usernameInput);
     usernameField.append(el('span', { class: 'field__hint', text: '3–20 символов: латиница, цифры, точка, _' }));
     frag.append(usernameField);
@@ -633,13 +680,21 @@ export default async function RegisterPage(ctx) {
 
   function validate(index) {
     if (index === 0) {
+      // Password managers can fill fields without firing "input"; read the DOM
+      // so a valid autofilled value is never reported as too short.
+      const livePass = document.querySelector('.wizard input[autocomplete="new-password"]');
+      if (livePass) data.password = livePass.value;
+      const liveEmail = document.querySelector('.wizard input[type="email"]');
+      if (liveEmail) data.email = liveEmail.value.trim();
+      const liveUser = document.querySelector('.wizard input[autocomplete="username"]');
+      if (liveUser) data.username = normalizeUsername(liveUser.value);
       const email = data.email.trim();
       if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email)) return 'Введите корректный email';
       const minLength = firstUser ? Math.max(8, minOwnerPassword) : 8;
       if (data.password.length < minLength) {
         return firstUser
-          ? `Пароль владельца сайта должен быть не короче ${minLength} символов`
-          : `Пароль должен содержать минимум ${minLength} символов`;
+          ? `Пароль владельца сайта: минимум ${minLength} символов, сейчас ${data.password.length}`
+          : `Пароль: минимум ${minLength} символов, сейчас ${data.password.length}`;
       }
       if (!/^[a-z0-9._]{3,20}$/.test(data.username)) {
         return 'Username: 3–20 символов, латиница, цифры, точка или _';

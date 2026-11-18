@@ -1,6 +1,6 @@
-import { el, button } from '../ui.js?v=23';
-import { createChatList } from '../components/chatList.js?v=23';
-import { navigate } from '../router.js?v=23';
+import { el, button } from '../ui.js?v=24';
+import { createChatList } from '../components/chatList.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 export default function ChatsPage() {
   const root = el('div', { class: 'chats-page chats-page--list' });

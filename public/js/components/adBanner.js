@@ -1,7 +1,7 @@
-import { api } from '../api.js?v=23';
-import { el } from '../ui.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { formatSum } from '../ads-utils.js?v=23';
+import { api } from '../api.js?v=24';
+import { el } from '../ui.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { formatSum } from '../ads-utils.js?v=24';
 
 // Renders the paid banner (or the house fallback) for one placement.
 // Returns a controller with destroy() so pages can clean timers up.

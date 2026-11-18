@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=23';
+import { api } from '../api.js?v=24';
 import {
   el,
   avatarNode,
@@ -6,11 +6,11 @@ import {
   timeAgo,
   svgIcon,
   toast
-} from '../ui.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { getState } from '../state.js?v=23';
-import { navigate } from '../router.js?v=23';
-import { openPostModal } from './postModal.js?v=23';
+} from '../ui.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { getState } from '../state.js?v=24';
+import { navigate } from '../router.js?v=24';
+import { openPostModal } from './postModal.js?v=24';
 
 // Instagram-like feed card.
 export function createPostCard(post, options = {}) {

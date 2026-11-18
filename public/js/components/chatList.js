@@ -1,9 +1,9 @@
-import { api } from '../api.js?v=23';
-import { el, avatarNode, emptyState, button, shortTimeAgo, loadingRow } from '../ui.js?v=23';
-import { getState } from '../state.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { onSocket } from '../socket.js?v=23';
-import { navigate } from '../router.js?v=23';
+import { api } from '../api.js?v=24';
+import { el, avatarNode, emptyState, button, shortTimeAgo, loadingRow } from '../ui.js?v=24';
+import { getState } from '../state.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { onSocket } from '../socket.js?v=24';
+import { navigate } from '../router.js?v=24';
 
 export function previewText(match) {
   const last = match.last_message;

@@ -1,9 +1,9 @@
-import { api } from '../../../api.js?v=23';
-import { el, button, toast } from '../../../ui.js?v=23';
-import { dayLabel, dayChipLabel, formatSum } from '../../../ads-utils.js?v=23';
-import { sectionHead, emptyState } from '../shared.js?v=23';
-import { campaignColor, openCampaignDetail, paymentChip, groupHoursText, openPreviewModal } from './shared.js?v=23';
-import { openBookingModal } from './booking.js?v=23';
+import { api } from '../../../api.js?v=24';
+import { el, button, toast } from '../../../ui.js?v=24';
+import { dayLabel, dayChipLabel, formatSum } from '../../../ads-utils.js?v=24';
+import { sectionHead, emptyState } from '../shared.js?v=24';
+import { campaignColor, openCampaignDetail, paymentChip, groupHoursText, openPreviewModal } from './shared.js?v=24';
+import { openBookingModal } from './booking.js?v=24';
 
 function hourKey(dayKey, hour) {
   return `${dayKey}:${hour}`;

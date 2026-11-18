@@ -1,5 +1,5 @@
-import { api } from '../../../api.js?v=23';
-import { el, button, toast, openModal } from '../../../ui.js?v=23';
+import { api } from '../../../api.js?v=24';
+import { el, button, toast, openModal } from '../../../ui.js?v=24';
 import {
   TASHKENT_OFFSET,
   tashkentParts,
@@ -10,8 +10,8 @@ import {
   formatSum,
   groupHours,
   groupLabel
-} from '../../../ads-utils.js?v=23';
-import { openCropModal } from './crop.js?v=23';
+} from '../../../ads-utils.js?v=24';
+import { openCropModal } from './crop.js?v=24';
 
 function dayStartUnix(dayKey) {
   return Math.floor(Date.parse(`${dayKey}T00:00:00.000Z`) / 1000) - TASHKENT_OFFSET;

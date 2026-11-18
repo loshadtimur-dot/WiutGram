@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=23';
+import { api, compressImage, toFormData } from '../api.js?v=24';
 import {
   el,
   avatarNode,
@@ -18,24 +18,24 @@ import {
   gradientFor,
   svgIcon,
   plural
-} from '../ui.js?v=23';
-import { icon } from '../icons.js?v=23';
-import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=23';
-import { navigate } from '../router.js?v=23';
-import { openPostModal } from '../components/postModal.js?v=23';
-import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=23';
-import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=23';
-import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=23';
-import { openReportDialog, openBlockConfirm } from '../components/report.js?v=23';
-import { showMatchScreen } from '../components/match.js?v=23';
-import { mountAdBanner } from '../components/adBanner.js?v=23';
+} from '../ui.js?v=24';
+import { icon } from '../icons.js?v=24';
+import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=24';
+import { navigate } from '../router.js?v=24';
+import { openPostModal } from '../components/postModal.js?v=24';
+import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=24';
+import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=24';
+import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=24';
+import { openReportDialog, openBlockConfirm } from '../components/report.js?v=24';
+import { showMatchScreen } from '../components/match.js?v=24';
+import { mountAdBanner } from '../components/adBanner.js?v=24';
 import {
   bannerBackdrop,
   badgeNode,
   giftNode,
   applyNameGift,
   openCosmeticsStudio
-} from '../components/cosmetics.js?v=23';
+} from '../components/cosmetics.js?v=24';
 
 export default async function ProfilePage(ctx) {
   const me = getState().user;
