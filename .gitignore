@@ -26,6 +26,8 @@ vapid.json
 # Logs and diagnostics
 logs/
 *.log
+artifacts/
+uni-lovers-source.zip
 npm-debug.log*
 screenshots/
 playwright-report/

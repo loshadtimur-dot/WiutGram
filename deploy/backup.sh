@@ -28,7 +28,7 @@ notify_failure() {
     curl -fsS --max-time 10 \
       "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
       -d "chat_id=${TELEGRAM_CHAT_ID}" \
-      -d "text=⚠️ UNI Lovers backup: ${message}" >/dev/null || true
+      -d "text=⚠️ Wiutgram backup: ${message}" >/dev/null || true
   fi
 }
 

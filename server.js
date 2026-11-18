@@ -34,6 +34,7 @@ const ads = require('./lib/ads');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const cosmeticsRoutes = require('./routes/cosmetics');
 const discoverRoutes = require('./routes/discover');
 const swipeRoutes = require('./routes/swipes');
 const matchRoutes = require('./routes/matches');
@@ -175,6 +176,7 @@ app.use('/api', postRoutes);
 app.use('/api', storyRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api', cosmeticsRoutes);
 
 app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Маршрут API не найден' });
@@ -346,7 +348,7 @@ process.on('unhandledRejection', (reason) => logger.error('unhandledRejection', 
 process.on('uncaughtException', (err) => logger.error('uncaughtException', err.stack || err.message));
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`UNI Lovers server running on http://localhost:${PORT} (db: ${db.driver})`);
+  console.log(`Wiutgram server running on http://localhost:${PORT} (db: ${db.driver})`);
 });
 
 module.exports = { app, server, io };

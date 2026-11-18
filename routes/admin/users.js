@@ -26,6 +26,7 @@ const { normalizeList } = require('../../utils/sanitize');
 const { nowIso } = require('../../utils/time');
 const { meView } = require('../../lib/userView');
 const { deleteUpload } = require('../../utils/files');
+const cosmeticsStore = require('../../lib/cosmetics/store');
 
 const router = express.Router();
 
@@ -295,6 +296,9 @@ router.get('/:id', (req, res) => {
       reports_count: reports.filter((r) => r.status === 'new').length
     },
     counts: userCounts(id),
+    cosmetics: cosmeticsStore.profileCosmetics(id, { self: true }),
+    gifts: cosmeticsStore.giftInventory(id),
+    telegram: db.getSetting('owner_telegram', ''),
     reports,
     bans
   });

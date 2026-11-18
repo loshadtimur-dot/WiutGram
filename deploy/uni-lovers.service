@@ -1,5 +1,5 @@
 [Unit]
-Description=UNI Lovers (Node.js)
+Description=Wiutgram (Node.js)
 Documentation=file:///srv/uni-lovers/docs/RUNBOOK.md
 After=network-online.target
 Wants=network-online.target

@@ -1,12 +1,12 @@
-import { el, svgIcon } from '../ui.js?v=19';
-import { getState } from '../state.js?v=19';
-import { navigate } from '../router.js?v=19';
+import { el, svgIcon } from '../ui.js?v=21';
+import { getState } from '../state.js?v=21';
+import { navigate } from '../router.js?v=21';
 
 const RULES = {
   title: 'Правила сообщества',
   updated: 'Последнее обновление: 1 ноября 2026 года',
   intro:
-    'UNI Lovers — пространство знакомств для студентов и молодёжи Ташкента. Сайт доступен только пользователям старше 18 лет. Мы хотим, чтобы здесь было безопасно и уважительно. Эти правила обязательны для всех аккаунтов.',
+    'Wiutgram — пространство знакомств для студентов и молодёжи Ташкента. Сайт доступен только пользователям старше 18 лет. Мы хотим, чтобы здесь было безопасно и уважительно. Эти правила обязательны для всех аккаунтов.',
   sections: [
     {
       title: '1. Только 18+',
@@ -69,7 +69,7 @@ const PRIVACY = {
   title: 'Политика конфиденциальности',
   updated: 'Последнее обновление: 1 ноября 2026 года',
   intro:
-    'Настоящая политика описывает, какие данные UNI Lovers собирает, как использует и как вы можете управлять ими. Используя сайт, вы соглашаетесь с этой политикой.',
+    'Настоящая политика описывает, какие данные Wiutgram собирает, как использует и как вы можете управлять ими. Используя сайт, вы соглашаетесь с этой политикой.',
   sections: [
     {
       title: '1. Какие данные мы собираем',
@@ -165,7 +165,7 @@ export default function LegalPage(ctx) {
   root.append(card);
 
   const switcher = el('div', { class: 'row' });
-  const here = el('span', { class: 'tag', text: '18+ · UNI Lovers' });
+  const here = el('span', { class: 'tag', text: '18+ · Wiutgram' });
   switcher.append(here);
   switcher.append(
     el('a', {

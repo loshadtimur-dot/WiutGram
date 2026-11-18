@@ -1,5 +1,5 @@
 // Socket.IO wrapper with a tiny local event bus and connection fallbacks.
-import { getToken } from './api.js?v=19';
+import { getToken } from './api.js?v=21';
 
 const handlers = new Map();
 

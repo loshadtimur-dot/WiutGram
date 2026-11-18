@@ -1,6 +1,6 @@
 'use strict';
 
-// Full relational schema for UNI Lovers. Every statement is idempotent.
+// Full relational schema for Wiutgram. Every statement is idempotent.
 const TABLES = [
   `CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -342,11 +342,11 @@ const EXTRA_COLUMNS = {
 };
 
 const DEFAULT_SETTINGS = {
-  site_name: 'UNI Lovers',
+  site_name: 'Wiutgram',
   registration_open: '1',
   min_age: '18',
   maintenance_mode: '0',
-  welcome_message: 'Добро пожаловать в UNI Lovers. Заполните профиль и находите студентов Ташкента.',
+  welcome_message: 'Добро пожаловать в Wiutgram — сообщество студентов WIUT.',
   max_photos: '9',
   max_bio: '500',
   super_likes_per_day: '5',

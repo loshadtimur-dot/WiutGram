@@ -1,8 +1,8 @@
-import { api, compressImage, setToken } from '../api.js?v=19';
-import { el, button, passwordField, toast, svgIcon, openModal } from '../ui.js?v=19';
-import { setUser, getState } from '../state.js?v=19';
-import { navigate } from '../router.js?v=19';
-import { icon } from '../icons.js?v=19';
+import { api, compressImage, setToken } from '../api.js?v=21';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=21';
+import { setUser } from '../state.js?v=21';
+import { navigate } from '../router.js?v=21';
+import { icon } from '../icons.js?v=21';
 
 const FALLBACK_DISTRICTS = [
   'Алмазарский', 'Бектемирский', 'Мирабадский', 'Мирзо-Улугбекский', 'Сергелийский', 'Учтепинский',
@@ -95,6 +95,8 @@ export default async function RegisterPage(ctx) {
     if (reference.districts && reference.districts.length) districts = reference.districts;
     if (reference.interests && reference.interests.length) interests = reference.interests;
     universities = universityList.universities || [];
+    // Wiutgram has exactly one campus, so preselect it for the student.
+    if (universities.length === 1) data.university_id = universities[0].id;
     firstUser = !!firstInfo.first;
   } catch (err) {
     districts = FALLBACK_DISTRICTS;
@@ -104,18 +106,18 @@ export default async function RegisterPage(ctx) {
   const root = el('div', { class: 'auth' });
   const intro = el('div', { class: 'auth__intro' });
   const introTitle = el('h1');
-  introTitle.innerHTML = 'Создайте профиль<br /><span>для знакомств в Ташкенте</span>';
+  introTitle.innerHTML = 'Создайте профиль<br /><span>сообщества WIUT</span>';
   intro.append(introTitle);
   intro.append(
     el('p', {
-      text: '8 коротких шагов: контакты, учёба, интересы и фото. Всё занимает пару минут.'
+      text: '8 коротких шагов: контакты, учёба, интересы и фото. Wiutgram создан только для студентов Westminster International University in Tashkent.'
     })
   );
   const introPoints = el('div', { class: 'auth__points' });
   for (const [iconName, text] of [
     ['shield', 'Только 18+ и настоящие люди'],
     ['camera', 'До 9 фото, первое — главное'],
-    ['graduation', 'Студенты из разных университетов']
+    ['graduation', 'Только студенты WIUT']
   ]) {
     const point = el('div', { class: 'auth__point' });
     const iconWrap = el('div', { class: 'auth__point-icon' });
@@ -384,54 +386,26 @@ export default async function RegisterPage(ctx) {
 
   function stepUniversity() {
     const frag = document.createDocumentFragment();
-    frag.append(stepTitle('Где вы учитесь', 'Город: Ташкент. Найдите свой университет в списке.'));
+    frag.append(
+      stepTitle('Где вы учитесь', 'Wiutgram — закрытое сообщество Westminster International University in Tashkent.')
+    );
 
-    const search = el('input', {
-      class: 'input',
-      attrs: { type: 'search', placeholder: 'Поиск по названию или аббревиатуре', 'aria-label': 'Поиск университета' }
-    });
-    frag.append(search);
-
-    const list = el('div', { class: 'university-list', attrs: { role: 'radiogroup', 'aria-label': 'Университеты' } });
-    const renderList = () => {
-      const query = search.value.trim().toLowerCase();
-      list.innerHTML = '';
-      const filtered = universities.filter((university) => {
-        if (!query) return true;
-        return (
-          university.short_name.toLowerCase().includes(query) ||
-          university.name.toLowerCase().includes(query) ||
-          (university.name_en || '').toLowerCase().includes(query)
-        );
-      });
-      if (!filtered.length) {
-        list.append(el('p', { class: 'field__hint', text: 'Ничего не найдено. Попробуйте другой запрос.' }));
-        return;
-      }
-      for (const university of filtered) {
-        const item = el('button', {
-          class: `university-option ${data.university_id === university.id ? 'is-selected' : ''}`,
-          attrs: { type: 'button', role: 'radio', 'aria-checked': String(data.university_id === university.id) }
-        });
-        item.append(el('span', { class: 'university-option__short', text: university.short_name }));
-        item.append(el('span', { class: 'university-option__name', text: university.name }));
-        item.addEventListener('click', () => {
-          data.university_id = university.id;
-          if (university.is_system) data.course = '';
-          renderList();
-        });
-        list.append(item);
-      }
-    };
-    search.addEventListener('input', renderList);
-    renderList();
-    frag.append(list);
-
-    if (getState().site.allow_university_requests) {
-      const requestLink = el('button', { class: 'link-btn', attrs: { type: 'button' }, text: 'Нет моего университета?' });
-      requestLink.addEventListener('click', () => openUniversityRequest());
-      frag.append(requestLink);
+    if (universities.length) {
+      data.university_id = data.university_id || universities[0].id;
+      const university = universities.find((item) => item.id === data.university_id) || universities[0];
+      const card = el('div', { class: 'university-option is-selected', attrs: { role: 'radio', 'aria-checked': 'true' } });
+      card.append(el('span', { class: 'university-option__short', text: university.short_name }));
+      card.append(el('span', { class: 'university-option__name', text: university.name }));
+      frag.append(card);
+    } else {
+      frag.append(el('p', { class: 'field__hint', text: 'Не удалось загрузить WIUT. Обновите страницу.' }));
     }
+    frag.append(
+      el('p', {
+        class: 'field__hint',
+        text: 'Других университетов в списке нет: сайт создан только для студентов WIUT.'
+      })
+    );
 
     const facultyLabel = el('div', { class: 'field__label', text: 'Факультет (необязательно)' });
     const faculty = el('input', { class: 'input', attrs: { maxlength: '80', placeholder: 'Например, информационные технологии' } });
@@ -457,32 +431,6 @@ export default async function RegisterPage(ctx) {
 
     frag.append(el('p', { class: 'field__hint', text: 'Университет и район видны в профиле. Район можно скрыть в настройках.' }));
     return frag;
-  }
-
-  function openUniversityRequest() {
-    const body = el('div', { class: 'col', style: { gap: '12px' } });
-    const name = el('input', { class: 'input', attrs: { maxlength: '120', placeholder: 'Полное название университета' } });
-    const short = el('input', { class: 'input', attrs: { maxlength: '12', placeholder: 'Аббревиатура' } });
-    body.append(name, short);
-    const footer = el('div', { class: 'row' });
-    const modal = openModal({ title: 'Заявка на университет', body, footer });
-    footer.append(button('Отмена', { variant: 'btn-ghost', onClick: () => modal.close() }));
-    footer.append(
-      button('Отправить', {
-        variant: 'btn-primary',
-        onClick: async (event) => {
-          event.target.disabled = true;
-          try {
-            await api.post('/universities/requests', { name: name.value, short_name: short.value });
-            toast('Заявка отправлена владельцу', 'success');
-            modal.close();
-          } catch (err) {
-            toast(err.message || 'Не удалось отправить заявку', 'error');
-            event.target.disabled = false;
-          }
-        }
-      })
-    );
   }
 
   function stepInterests() {
@@ -697,7 +645,7 @@ export default async function RegisterPage(ctx) {
       if (!data.interested_in) return 'Выберите, кого показывать';
     }
     if (index === 3 && !data.looking_for) return 'Выберите, что вы ищете';
-    if (index === 4 && !data.university_id) return 'Выберите университет';
+    if (index === 4 && !data.university_id) return 'Регистрация доступна только для студентов WIUT';
     if (index === 5 && data.interests.length < 3) return 'Выберите минимум 3 интереса';
     if (index === 6 && data.photos.length < 1) return 'Добавьте хотя бы одно фото';
     return null;
@@ -747,6 +695,7 @@ export default async function RegisterPage(ctx) {
     if (error) {
       errorBox.textContent = error;
       errorBox.classList.remove('hidden');
+      errorBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
     if (stepIndex < STEPS.length - 1) {
@@ -769,7 +718,7 @@ export default async function RegisterPage(ctx) {
   // Explicit confirmation instead of silently jumping to another page.
   function showSuccess(response) {
     const user = response.user || {};
-    document.title = 'Аккаунт создан — UNI Lovers';
+    document.title = 'Аккаунт создан — Wiutgram';
     panel.innerHTML = '';
     const wrap = el('div', { class: 'wizard', style: { padding: '28px 22px', textAlign: 'center' } });
     const badge = el('div', {

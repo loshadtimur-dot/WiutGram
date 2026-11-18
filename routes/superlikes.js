@@ -40,7 +40,7 @@ router.post('/orders', superlikeOrderLimiter, (req, res) => {
   const settings = result.settings;
   const order = result.order;
   const lines = [
-    `Здравствуйте! Хочу купить суперлайки на UNI Lovers.`,
+    `Здравствуйте! Хочу купить суперлайки на Wiutgram.`,
     `Заявка ${order.code}.`,
     `Пакет: ${order.quantity} суперлайков за ${order.price.toLocaleString('ru-RU')} сум.`
   ];

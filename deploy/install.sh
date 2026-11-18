@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup of a clean Ubuntu LTS server for UNI Lovers.
+# One-time setup of a clean Ubuntu LTS server for Wiutgram.
 # Run as root:  sudo bash deploy/install.sh
 # It installs Node.js LTS, Caddy, sqlite3 and creates the service user.
 set -euo pipefail

@@ -26,6 +26,7 @@ const contentRouter = require('./content');
 const reportsRouter = require('./reports');
 const adsRouter = require('./ads');
 const superlikesRouter = require('./superlikes');
+const cosmeticsRouter = require('./cosmetics');
 
 /* ---------- Re-authentication ---------- */
 
@@ -160,7 +161,7 @@ router.put('/settings', (req, res) => {
     } else if (key === 'super_likes_per_day') {
       db.setSetting(key, String(clamp(toInt(body[key], 5), 0, 50)));
     } else if (key === 'site_name') {
-      db.setSetting(key, cleaned(body[key], 40) || 'UNI Lovers');
+      db.setSetting(key, cleaned(body[key], 40) || 'Wiutgram');
     } else if (key === 'welcome_message') {
       db.setSetting(key, cleaned(body[key], 300));
     }
@@ -368,6 +369,7 @@ router.use('/content', contentRouter);
 router.use('/reports', reportsRouter);
 router.use('/ads', adsRouter);
 router.use('/superlikes', superlikesRouter);
+router.use('/cosmetics', cosmeticsRouter);
 
 /* ---------- Global content moderation ---------- */
 

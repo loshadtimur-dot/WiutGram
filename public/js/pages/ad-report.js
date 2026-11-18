@@ -1,6 +1,6 @@
-import { api } from '../api.js?v=19';
-import { el, formatNumber } from '../ui.js?v=19';
-import { formatSum, dayLabel } from '../ads-utils.js?v=19';
+import { api } from '../api.js?v=21';
+import { el, formatNumber } from '../ui.js?v=21';
+import { formatSum, dayLabel } from '../ads-utils.js?v=21';
 
 const PAYMENT_LABELS = { paid: 'Оплачено', unpaid: 'Не оплачено', refunded: 'Возврат' };
 
@@ -20,7 +20,7 @@ export default async function AdReportPage(ctx) {
   }
 
   const head = el('div', { class: 'ad-report__head' });
-  head.append(el('span', { class: 'ad-report__eyebrow', text: 'Отчёт о рекламе · UNI Lovers' }));
+  head.append(el('span', { class: 'ad-report__eyebrow', text: 'Отчёт о рекламе · Wiutgram' }));
   head.append(el('h1', { class: 'ad-report__title', text: report.advertiser_name }));
   const metaBits = [];
   if (report.placements && report.placements.length) metaBits.push(report.placements.join(' и '));

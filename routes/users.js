@@ -15,6 +15,7 @@ const { notifyDaily, logActivity } = require('../lib/notify');
 const { hasBlocked, isBlockedBetween } = require('../lib/blocks');
 const { nowIso, lastDays } = require('../utils/time');
 const { oneOf, toInt, clamp } = require('../middleware/validate');
+const cosmeticsStore = require('../lib/cosmetics/store');
 
 const router = express.Router();
 
@@ -241,10 +242,13 @@ router.put('/me', (req, res) => {
     if (body.university_id === null || body.university_id === '') {
       updates.university_id = null;
     } else {
-      const university = db.get('SELECT * FROM universities WHERE id = ? AND is_active = 1', [
-        toInt(body.university_id, 0)
-      ]);
-      if (!university) return res.status(400).json({ error: 'Выберите университет из списка' });
+      const university = db.get(
+        "SELECT * FROM universities WHERE id = ? AND is_active = 1 AND short_name = 'WIUT' COLLATE NOCASE",
+        [toInt(body.university_id, 0)]
+      );
+      if (!university) {
+        return res.status(400).json({ error: 'Wiutgram доступен только студентам WIUT' });
+      }
       updates.university_id = university.id;
     }
   }
@@ -554,10 +558,17 @@ router.get('/:username', (req, res) => {
   const counts = { posts: db.get('SELECT COUNT(*) AS t FROM posts WHERE user_id = ?', [target.id]).t };
   if (isSelf) Object.assign(counts, profileCounts(target.id));
 
+  const cosmetics = cosmeticsStore.profileCosmetics(target.id, { self: isSelf });
+  const isFollowing = cosmeticsStore.isFollowing(req.user.id, target.id);
+
   res.json({
     user: view,
     is_self: isSelf,
     counts,
+    cosmetics,
+    is_following: isFollowing,
+    follower_count: cosmetics.follow.followers,
+    following_count: cosmetics.follow.following,
     recorded_view: recordedView,
     distance_km: null,
     my_swipe: mySwipe ? mySwipe.action : null,

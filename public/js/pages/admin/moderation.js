@@ -1,6 +1,6 @@
-import { api } from '../../api.js?v=19';
-import { el, button, toast, openModal } from '../../ui.js?v=19';
-import { sectionHead, emptyState, fmtDateTime, chip } from './shared.js?v=19';
+import { api } from '../../api.js?v=21';
+import { el, button, toast, openModal } from '../../ui.js?v=21';
+import { sectionHead, emptyState, fmtDateTime, chip } from './shared.js?v=21';
 
 export default async function moderationSection({ active }) {
   const root = el('div', { class: 'col', style: { gap: '16px' } });

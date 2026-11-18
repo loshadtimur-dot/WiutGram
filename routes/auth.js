@@ -44,10 +44,22 @@ function parseBirthdate(body) {
   return null;
 }
 
+// Wiutgram is open to Westminster International University in Tashkent only.
+// A missing id defaults to WIUT so an older cached form can still register.
 function resolveUniversity(rawId) {
   const id = Number(rawId);
-  if (!Number.isInteger(id) || id <= 0) return null;
-  return db.get('SELECT * FROM universities WHERE id = ? AND is_active = 1', [id]);
+  if (rawId !== undefined && rawId !== null && rawId !== '' && (!Number.isInteger(id) || id <= 0)) {
+    return null;
+  }
+  if (!Number.isInteger(id) || id <= 0) {
+    return db.get(
+      "SELECT * FROM universities WHERE is_active = 1 AND short_name = 'WIUT' COLLATE NOCASE LIMIT 1"
+    );
+  }
+  return db.get(
+    "SELECT * FROM universities WHERE id = ? AND is_active = 1 AND short_name = 'WIUT' COLLATE NOCASE",
+    [id]
+  );
 }
 
 function startSession(req, res, user) {
@@ -82,7 +94,7 @@ router.get('/first-user', (req, res) => {
     first: realUsers === 0,
     real_users: realUsers,
     registration_open: settings.registration_open === '1' || realUsers === 0,
-    site_name: settings.site_name || 'UNI Lovers',
+    site_name: settings.site_name || 'Wiutgram',
     city: CITY,
     min_owner_password: MIN_OWNER_PASSWORD
   });
@@ -146,7 +158,10 @@ router.post('/register', registerLimiter, (req, res) => {
 
   const university = resolveUniversity(body.university_id);
   if (!university) {
-    return res.status(400).json({ error: 'Выберите университет из списка', field: 'university_id' });
+    return res.status(400).json({
+      error: 'Регистрация доступна только для студентов университета Westminster International University in Tashkent (WIUT)',
+      field: 'university_id'
+    });
   }
 
   const courseInput = body.course === '' || body.course === null || body.course === undefined
@@ -254,7 +269,7 @@ router.post('/register', registerLimiter, (req, res) => {
   }
 
   const user = db.get('SELECT * FROM users WHERE id = ?', [userId]);
-  const welcome = db.getSetting('welcome_message', 'Добро пожаловать в UNI Lovers!');
+  const welcome = db.getSetting('welcome_message', 'Добро пожаловать в Wiutgram!');
   notify({ userId, type: 'system', text: welcome });
   sessions.recordLogin({ userId, identifier: email, success: true, req });
   db.run('UPDATE users SET last_login_at = ?, login_count = login_count + 1 WHERE id = ?', [createdAt, userId]);

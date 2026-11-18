@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=19';
+import { api } from '../api.js?v=21';
 import {
   el,
   button,
@@ -12,12 +12,12 @@ import {
   emptyState,
   passwordField,
   ruleBadges
-} from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
-import { getState, isOwner, patchUser } from '../state.js?v=19';
-import { lineChartNode, barChartNode } from '../components/charts.js?v=19';
-import { openReportDialog } from '../components/report.js?v=19';
-import { navigate } from '../router.js?v=19';
+} from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
+import { getState, isOwner, patchUser } from '../state.js?v=21';
+import { lineChartNode, barChartNode } from '../components/charts.js?v=21';
+import { openReportDialog } from '../components/report.js?v=21';
+import { navigate } from '../router.js?v=21';
 
 const TABS = [
   { id: 'dashboard', label: 'Дашборд', icon: 'chart' },
@@ -722,7 +722,7 @@ export default async function AdminPage() {
     const nameField = el('label', { class: 'field' });
     nameField.append(el('span', { class: 'field__label', text: 'Название сайта' }));
     const nameInput = el('input', { class: 'input', attrs: { maxlength: '40' } });
-    nameInput.value = settings.site_name || 'UNI Lovers';
+    nameInput.value = settings.site_name || 'Wiutgram';
     nameField.append(nameInput);
     wrap.append(nameField);
 

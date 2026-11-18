@@ -1,9 +1,9 @@
-import { api } from '../../../api.js?v=19';
-import { el, button, toast, openModal } from '../../../ui.js?v=19';
-import { formatSum } from '../../../ads-utils.js?v=19';
-import { sectionHead, emptyState } from '../shared.js?v=19';
-import { REQUEST_STATUS, statusChip, reasonDialog, groupHoursText } from './shared.js?v=19';
-import { openBookingModal } from './booking.js?v=19';
+import { api } from '../../../api.js?v=21';
+import { el, button, toast, openModal } from '../../../ui.js?v=21';
+import { formatSum } from '../../../ads-utils.js?v=21';
+import { sectionHead, emptyState } from '../shared.js?v=21';
+import { REQUEST_STATUS, statusChip, reasonDialog, groupHoursText } from './shared.js?v=21';
+import { openBookingModal } from './booking.js?v=21';
 
 const FILTERS = [
   ['', 'Все'],

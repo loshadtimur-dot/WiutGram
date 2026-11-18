@@ -49,12 +49,24 @@ function buildOptions(method, body) {
   return options;
 }
 
+// A stalled request must never leave a button spinning forever.
+const REQUEST_TIMEOUT_MS = 60000;
+
 async function request(path, method = 'GET', body) {
   let response;
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS) : null;
   try {
-    response = await fetch(`/api${path}`, buildOptions(method, body));
+    const options = buildOptions(method, body);
+    if (controller) options.signal = controller.signal;
+    response = await fetch(`/api${path}`, options);
   } catch (err) {
+    if (err && err.name === 'AbortError') {
+      throw new ApiError('Сервер долго не отвечает. Проверьте соединение и попробуйте снова.', 0, {});
+    }
     throw new ApiError('Нет соединения с сервером', 0, {});
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 
   const contentType = response.headers.get('content-type') || '';

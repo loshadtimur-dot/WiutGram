@@ -1,6 +1,6 @@
-import { api } from '../../api.js?v=19';
-import { el, button, toast, openModal } from '../../ui.js?v=19';
-import { sectionHead, emptyState, fmtDateTime, sudoConfirm, pager } from './shared.js?v=19';
+import { api } from '../../api.js?v=21';
+import { el, button, toast, openModal } from '../../ui.js?v=21';
+import { sectionHead, emptyState, fmtDateTime, sudoConfirm, pager } from './shared.js?v=21';
 
 function formatSize(bytes) {
   if (!bytes) return '0 Б';

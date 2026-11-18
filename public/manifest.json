@@ -1,7 +1,7 @@
 {
-  "name": "UNI Lovers — знакомства для студентов",
-  "short_name": "UNI Lovers",
-  "description": "Знакомства для студентов Ташкента. Только 18+.",
+  "name": "Wiutgram — сообщество студентов WIUT",
+  "short_name": "Wiutgram",
+  "description": "Закрытое сообщество Westminster International University in Tashkent. Только 18+.",
   "lang": "ru",
   "start_url": "/swipe",
   "scope": "/",

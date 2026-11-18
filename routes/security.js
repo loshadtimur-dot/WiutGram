@@ -120,7 +120,7 @@ router.post('/2fa/setup', async (req, res) => {
     nowIso(),
     req.user.id
   ]);
-  const url = totp.otpauthUrl({ secret, account: req.user.email, issuer: 'UNI Lovers' });
+  const url = totp.otpauthUrl({ secret, account: req.user.email, issuer: 'Wiutgram' });
   let qr = '';
   try {
     qr = await QRCode.toDataURL(url, { margin: 1, width: 240, color: { dark: '#1d1e22', light: '#ffffff' } });

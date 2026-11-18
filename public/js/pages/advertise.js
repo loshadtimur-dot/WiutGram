@@ -1,6 +1,6 @@
-import { api } from '../api.js?v=19';
-import { el, button, toast, openModal } from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
+import { api } from '../api.js?v=21';
+import { el, button, toast, openModal } from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
 import {
   TASHKENT_OFFSET,
   tashkentParts,
@@ -14,7 +14,7 @@ import {
   groupHours,
   groupLabel,
   copyText
-} from '../ads-utils.js?v=19';
+} from '../ads-utils.js?v=21';
 
 const QUICK_RANGES = [
   { label: 'Утро 08–12', from: 8, to: 12 },
@@ -109,7 +109,7 @@ export default async function AdvertisePage() {
   if (!config.enabled) {
     const empty = el('div', { class: 'empty' });
     empty.append(el('div', { class: 'empty__title', text: 'Реклама временно недоступна' }));
-    empty.append(el('p', { class: 'empty__text', text: 'Мы скоро вернёмся. Спасибо за интерес к UNI Lovers.' }));
+    empty.append(el('p', { class: 'empty__text', text: 'Мы скоро вернёмся. Спасибо за интерес к Wiutgram.' }));
     empty.append(button('На главную', { onClick: () => { window.location.href = '/'; } }));
     root.append(empty);
     return root;
@@ -168,7 +168,7 @@ export default async function AdvertisePage() {
 
   const hero = el('section', { class: 'adv-hero' });
   hero.append(el('span', { class: 'adv-hero__eyebrow', text: 'Реклама' }));
-  hero.append(el('h1', { class: 'adv-hero__title', text: 'Реклама на UNI Lovers' }));
+  hero.append(el('h1', { class: 'adv-hero__title', text: 'Реклама на Wiutgram' }));
   hero.append(el('p', { class: 'adv-hero__subtitle', text: 'Показывайте рекламу студентам Ташкента' }));
   const heroRow = el('div', { class: 'adv-hero__row' });
   heroRow.append(el('span', { class: 'adv-hero__price', text: `От ${formatSum(config.price_per_hour)} за час` }));

@@ -4,7 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const { TABLES, INDEXES, EXTRA_COLUMNS, DEFAULT_SETTINGS, POST_MIGRATION } = require('./schema');
 const { ADS_TABLES, ADS_INDEXES, ADS_USER_COLUMNS, ADS_DEFAULT_SETTINGS } = require('./ads-schema');
-const { CITY, UNIVERSITY_SEED, SYSTEM_UNIVERSITY } = require('../config');
+const {
+  COSMETICS_TABLES,
+  COSMETICS_INDEXES,
+  COSMETICS_USER_COLUMNS,
+  COSMETICS_DEFAULT_SETTINGS
+} = require('./cosmetics-schema');
+const { CITY, UNIVERSITY_SEED, UNIVERSITY_NAME_EN } = require('../config');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 // UNI_DB_FILE lets tests run against a disposable copy without touching real data.
@@ -140,28 +146,26 @@ function ensureColumns(table, columns) {
   }
 }
 
-// Makes sure the default Tashkent university list exists. Owners can edit it later.
+// Wiutgram is a single-campus community. Keep exactly one active university
+// and hide every other row without deleting it, so existing profiles stay valid.
 function seedUniversities() {
   const now = new Date().toISOString();
-  const total = get('SELECT COUNT(*) AS t FROM universities').t;
-  if (total === 0) {
-    UNIVERSITY_SEED.forEach(([shortName, name], index) => {
-      run(
-        `INSERT INTO universities (short_name, name, name_en, sort_order, is_active, is_system, created_at, updated_at)
-         VALUES (?, ?, '', ?, 1, 0, ?, ?)`,
-        [shortName, name, (index + 1) * 10, now, now]
-      );
-    });
-  }
-  const system = get('SELECT id FROM universities WHERE is_system = 1 LIMIT 1');
-  if (!system) {
-    const maxOrder = get('SELECT COALESCE(MAX(sort_order), 0) AS t FROM universities').t;
-    run(
+  const [shortName, name] = UNIVERSITY_SEED[0];
+  let wiut = get("SELECT * FROM universities WHERE short_name = ? COLLATE NOCASE LIMIT 1", [shortName]);
+  if (!wiut) {
+    const result = run(
       `INSERT INTO universities (short_name, name, name_en, sort_order, is_active, is_system, created_at, updated_at)
-       VALUES (?, ?, '', ?, 1, 1, ?, ?)`,
-      [SYSTEM_UNIVERSITY[0], SYSTEM_UNIVERSITY[1], maxOrder + 10, now, now]
+       VALUES (?, ?, ?, 10, 1, 0, ?, ?)`,
+      [shortName, name, UNIVERSITY_NAME_EN, now, now]
+    );
+    wiut = { id: Number(result.lastInsertRowid) };
+  } else {
+    run(
+      `UPDATE universities SET name = ?, name_en = ?, is_system = 0, updated_at = ? WHERE id = ?`,
+      [name, UNIVERSITY_NAME_EN, now, wiut.id]
     );
   }
+  run('UPDATE universities SET is_active = CASE WHEN id = ? THEN 1 ELSE 0 END', [wiut.id]);
 }
 
 function migrate() {
@@ -181,6 +185,14 @@ function migrate() {
     run('INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)', [key, value]);
   }
 
+  // Follows, banners, badges and gifts are additive as well.
+  for (const sql of COSMETICS_TABLES) exec(sql);
+  ensureColumns('users', COSMETICS_USER_COLUMNS);
+  for (const sql of COSMETICS_INDEXES) exec(sql);
+  for (const [key, value] of Object.entries(COSMETICS_DEFAULT_SETTINGS)) {
+    run('INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)', [key, value]);
+  }
+
   // Admins are not a separate role anymore.
   run("UPDATE users SET role = 'user' WHERE role = 'admin'");
   // The whole product is Tashkent-only now; distances are not used.
@@ -189,8 +201,13 @@ function migrate() {
 
   seedUniversities();
 
+  // Rebrand existing installations once; owners can still rename the site later.
+  const siteName = getSetting('site_name', '');
+  if (!siteName || /uni\s*lovers/i.test(siteName)) setSetting('site_name', DEFAULT_SETTINGS.site_name);
   const welcome = getSetting('welcome_message', '');
-  if (welcome && welcome.includes('искру')) setSetting('welcome_message', DEFAULT_SETTINGS.welcome_message);
+  if (!welcome || /uni\s*lovers|искру/i.test(welcome)) {
+    setSetting('welcome_message', DEFAULT_SETTINGS.welcome_message);
+  }
 }
 
 migrate();

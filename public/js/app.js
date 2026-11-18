@@ -1,6 +1,6 @@
-import { api, setToken, clearToken } from './api.js?v=19';
-import { storageGet } from './storage.js?v=19';
-import { icon } from './icons.js?v=19';
+import { api, setToken, clearToken } from './api.js?v=21';
+import { storageGet } from './storage.js?v=21';
+import { icon } from './icons.js?v=21';
 import {
   getState,
   setUser,
@@ -12,40 +12,42 @@ import {
   applyTheme,
   watchSystemTheme,
   isOwner
-} from './state.js?v=19';
-import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=19';
-import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=19';
-import { initSocket, onSocket, disconnectSocket } from './socket.js?v=19';
-import { showMatchScreen } from './components/match.js?v=19';
+} from './state.js?v=21';
+import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=21';
+import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=21';
+import { initSocket, onSocket, disconnectSocket } from './socket.js?v=21';
+import { showMatchScreen } from './components/match.js?v=21';
 
-import Landing from './pages/landing.js?v=19';
-import LoginPage from './pages/login.js?v=19';
-import RegisterPage from './pages/register.js?v=19';
-import WelcomePage from './pages/welcome.js?v=19';
-import SwipePage from './pages/swipe.js?v=19';
-import LikesPage from './pages/likes.js?v=19';
-import ChatsPage from './pages/chats.js?v=19';
-import ChatPage from './pages/chat.js?v=19';
-import ProfilePage from './pages/profile.js?v=19';
-import EditProfilePage from './pages/edit-profile.js?v=19';
-import ExplorePage from './pages/explore.js?v=19';
-import NotificationsPage from './pages/notifications.js?v=19';
-import SettingsPage from './pages/settings.js?v=19';
-import SuperlikesPage from './pages/superlikes.js?v=19';
-import LegalPage from './pages/legal.js?v=19';
-import AdvertisePage from './pages/advertise.js?v=19';
-import AdReportPage from './pages/ad-report.js?v=19';
+import Landing from './pages/landing.js?v=21';
+import LoginPage from './pages/login.js?v=21';
+import RegisterPage from './pages/register.js?v=21';
+import WelcomePage from './pages/welcome.js?v=21';
+import SwipePage from './pages/swipe.js?v=21';
+import LikesPage from './pages/likes.js?v=21';
+import ChatsPage from './pages/chats.js?v=21';
+import ChatPage from './pages/chat.js?v=21';
+import ProfilePage from './pages/profile.js?v=21';
+import EditProfilePage from './pages/edit-profile.js?v=21';
+import ExplorePage from './pages/explore.js?v=21';
+import NotificationsPage from './pages/notifications.js?v=21';
+import SettingsPage from './pages/settings.js?v=21';
+import SuperlikesPage from './pages/superlikes.js?v=21';
+import LegalPage from './pages/legal.js?v=21';
+import AdvertisePage from './pages/advertise.js?v=21';
+import AdReportPage from './pages/ad-report.js?v=21';
+import AuraPage from './pages/aura.js?v=21';
 
 const NAV_ITEMS = [
   { path: '/swipe', label: 'Свайпы', icon: 'layers' },
   { path: '/explore', label: 'Обзор', icon: 'compass' },
   { path: '/likes', label: 'Лайки', icon: 'heart', badge: 'likes' },
   { path: '/chats', label: 'Чаты', icon: 'chat', badge: 'messages' },
+  { path: '/aura', label: 'Aura', icon: 'star' },
   { path: '/profile', label: 'Профиль', icon: 'user' }
 ];
 
 const ROUTES = [
-  { path: '/', page: Landing, layout: 'public', guestOnly: true, title: 'Знакомства для студентов Ташкента' },
+  { path: '/', page: Landing, layout: 'public', guestOnly: true, title: 'Сообщество студентов WIUT' },
   { path: '/login', page: LoginPage, layout: 'public', guestOnly: true, title: 'Вход' },
   { path: '/register', page: RegisterPage, layout: 'public', guestOnly: true, title: 'Регистрация' },
   { path: '/welcome', page: WelcomePage, auth: true },
@@ -57,13 +59,14 @@ const ROUTES = [
   { path: '/profile/edit', page: EditProfilePage, auth: true, title: 'Редактирование профиля' },
   { path: '/u/:username', page: ProfilePage, auth: true, title: 'Профиль' },
   { path: '/explore', page: ExplorePage, auth: true, title: 'Обзор' },
+  { path: '/aura', page: AuraPage, auth: true, title: 'Aura Table' },
   { path: '/notifications', page: NotificationsPage, auth: true, title: 'Уведомления' },
   { path: '/settings', page: SettingsPage, auth: true, title: 'Настройки' },
   { path: '/superlikes', page: SuperlikesPage, auth: true, title: 'Суперлайки' },
   {
     path: '/admin',
     page: async (ctx) => {
-      const module = await import('./pages/admin/index.js?v=19');
+      const module = await import('./pages/admin/index.js?v=21');
       return module.default(ctx);
     },
     auth: true,
@@ -99,7 +102,7 @@ function publicShell() {
     <div class="public-topbar">
       <a class="landing__brand" href="/" data-link>
         <img src="/img/logo.svg" alt="" width="36" height="36" />
-        <span class="sidebar__brand-text">UNI<span>Lovers</span></span>
+        <span class="sidebar__brand-text">Wiut<span>gram</span></span>
       </a>
       <div class="public-topbar__spacer"></div>
       <a class="landing__link" href="/advertise" data-link>Реклама</a>
@@ -119,8 +122,8 @@ function appShell() {
   app.innerHTML = `
     <aside class="sidebar">
       <a class="sidebar__brand" href="/swipe" data-link>
-        <img src="/img/logo.svg" alt="UNI Lovers" width="38" height="38" />
-        <span class="sidebar__brand-text">UNI<span>Lovers</span></span>
+        <img src="/img/logo.svg" alt="Wiutgram" width="38" height="38" />
+        <span class="sidebar__brand-text">Wiut<span>gram</span></span>
       </a>
       <a class="sidebar__profile" href="/profile" data-link>
         <span id="sidebar-avatar"></span>
@@ -138,7 +141,7 @@ function appShell() {
         <div class="sidebar__chat-list" id="sidebar-chats"></div>
       </div>
       <div class="sidebar__footer">
-        <span>${icon('sparkles', { size: 14 })} ${state.site.site_name || 'UNI Lovers'}</span>
+        <span>${icon('sparkles', { size: 14 })} ${state.site.site_name || 'Wiutgram'}</span>
         <span style="flex:1"></span>
         <a href="/settings" data-link class="icon-btn-plain" aria-label="Настройки">${icon('sliders', { size: 17 })}</a>
         ${isOwner() ? `<a href="/admin" data-link class="icon-btn-plain" aria-label="Центр управления">${icon('shield', { size: 17 })}</a>` : ''}
@@ -147,7 +150,7 @@ function appShell() {
     <div class="main">
       <header class="topbar">
         <a class="topbar__brand" href="/swipe" data-link>
-          <img src="/img/logo.svg" alt="" /><span>UNI Lovers</span>
+          <img src="/img/logo.svg" alt="" /><span>Wiutgram</span>
         </a>
         <span class="topbar__title" id="topbar-title"></span>
         <div class="topbar__spacer"></div>
@@ -541,6 +544,10 @@ async function render(matched) {
   if (!view) return null;
   view.innerHTML = '';
   view.append(loadingRow());
+  // Every page starts at the top; otherwise a long profile keeps the previous scroll.
+  window.scrollTo({ top: 0, left: 0 });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 
   const ctx = {
     params,
@@ -556,8 +563,8 @@ async function render(matched) {
     if (!document.body.contains(view)) return result;
     view.innerHTML = '';
     if (node) view.append(node);
-    const site = getState().site.site_name || 'UNI Lovers';
-    // Avoid titles like "UNI Lovers — UNI Lovers" when a page has no own heading.
+    const site = getState().site.site_name || 'Wiutgram';
+    // Avoid titles like "Wiutgram — Wiutgram" when a page has no own heading.
     document.title = !route.title || route.title === site ? site : `${route.title} — ${site}`;
     if (route.layout !== 'public') loadSidebarChats();
     return result;
@@ -644,7 +651,7 @@ function registerRealtime() {
       toast(notificationLabel(notification));
       playMessageSound();
     }
-    browserNotify('UNI Lovers', notificationLabel(notification));
+    browserNotify('Wiutgram', notificationLabel(notification));
   });
   onSocket('notification:count', ({ unread }) => setCounts({ unread_notifications: unread || 0 }));
   onSocket('message:new', ({ message, match_id }) => {

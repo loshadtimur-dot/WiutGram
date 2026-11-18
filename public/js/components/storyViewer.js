@@ -1,7 +1,7 @@
-import { api } from '../api.js?v=19';
-import { el, avatarNode, timeAgo, toast, emptyState } from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
-import { getState } from '../state.js?v=19';
+import { api } from '../api.js?v=21';
+import { el, avatarNode, timeAgo, toast, emptyState } from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
+import { getState } from '../state.js?v=21';
 
 const STORY_DURATION = 5000;
 

@@ -1,22 +1,24 @@
-import { el, button, toast } from '../../ui.js?v=19';
-import { icon } from '../../icons.js?v=19';
-import { api } from '../../api.js?v=19';
-import { navigate } from '../../router.js?v=19';
-import { getState } from '../../state.js?v=19';
-import overviewSection from './overview.js?v=19';
-import usersSection from './users.js?v=19';
-import universitiesSection from './universities.js?v=19';
-import moderationSection from './moderation.js?v=19';
-import systemSection from './system.js?v=19';
-import adsSection from './ads/index.js?v=19';
-import superlikesSection from './superlikes.js?v=19';
-import securitySection from './security.js?v=19';
+import { el, button, toast } from '../../ui.js?v=21';
+import { icon } from '../../icons.js?v=21';
+import { api } from '../../api.js?v=21';
+import { navigate } from '../../router.js?v=21';
+import { getState } from '../../state.js?v=21';
+import overviewSection from './overview.js?v=21';
+import usersSection from './users.js?v=21';
+import universitiesSection from './universities.js?v=21';
+import moderationSection from './moderation.js?v=21';
+import systemSection from './system.js?v=21';
+import adsSection from './ads/index.js?v=21';
+import superlikesSection from './superlikes.js?v=21';
+import cosmeticsSection from './cosmetics.js?v=21';
+import securitySection from './security.js?v=21';
 
 const SECTIONS = [
   { id: 'overview', label: 'Обзор', icon: 'chart' },
   { id: 'ads', label: 'Реклама', icon: 'image' },
   { id: 'superlikes', label: 'Суперлайки', icon: 'star' },
   { id: 'users', label: 'Пользователи', icon: 'users' },
+  { id: 'cosmetics', label: 'Косметика', icon: 'gift' },
   { id: 'universities', label: 'Университеты', icon: 'graduation' },
   { id: 'content', label: 'Контент и жалобы', icon: 'file' },
   { id: 'settings', label: 'Настройки', icon: 'sliders' },
@@ -31,6 +33,7 @@ const SECTIONS_MAP = {
   superlikes: superlikesSection,
   security: securitySection,
   users: usersSection,
+  cosmetics: cosmeticsSection,
   universities: universitiesSection,
   content: moderationSection,
   reports: moderationSection,

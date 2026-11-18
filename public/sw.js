@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'uni-lovers-v3';
+const CACHE_NAME = 'wiutgram-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

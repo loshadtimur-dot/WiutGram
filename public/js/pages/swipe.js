@@ -1,12 +1,12 @@
-import { api } from '../api.js?v=19';
-import { el, button, toast, iconButton, svgIcon } from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
-import { getState, patchUser, setCounts } from '../state.js?v=19';
-import { createSwipeDeck } from '../components/swipeDeck.js?v=19';
-import { openFiltersModal } from '../components/filters.js?v=19';
-import { showMatchScreen } from '../components/match.js?v=19';
-import { mountAdBanner } from '../components/adBanner.js?v=19';
-import { navigate } from '../router.js?v=19';
+import { api } from '../api.js?v=21';
+import { el, button, toast, iconButton, svgIcon } from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
+import { getState, patchUser, setCounts } from '../state.js?v=21';
+import { createSwipeDeck } from '../components/swipeDeck.js?v=21';
+import { openFiltersModal } from '../components/filters.js?v=21';
+import { showMatchScreen } from '../components/match.js?v=21';
+import { mountAdBanner } from '../components/adBanner.js?v=21';
+import { navigate } from '../router.js?v=21';
 
 function boostRemaining(boost) {
   if (!boost || !boost.until) return 0;

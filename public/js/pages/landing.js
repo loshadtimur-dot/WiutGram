@@ -1,23 +1,23 @@
-import { api } from '../api.js?v=19';
-import { el, button } from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
-import { navigate } from '../router.js?v=19';
+import { api } from '../api.js?v=21';
+import { el, button } from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
+import { navigate } from '../router.js?v=21';
 
 const FEATURES = [
   {
     icon: 'graduation',
-    title: 'Свой университет',
-    text: 'Укажите вуз, факультет и курс — находите людей из своего университета или из любого другого в Ташкенте.'
+    title: 'Только WIUT',
+    text: 'Закрытое сообщество Westminster International University in Tashkent: факультет, курс и район вместо чужих вузов.'
   },
   {
     icon: 'users',
-    title: 'Реальные профили',
-    text: 'Только пользователи 18+. Верифицированные студенты отмечены галочкой, демо-профили помечены.'
+    title: 'Aura Table',
+    text: 'Таблица популярности по подписчикам. Подписывайтесь, растите ауру и попадайте в топ сообщества.'
   },
   {
-    icon: 'lock',
-    title: 'Приватность под контролем',
-    text: 'Скрывайте район, возраст и онлайн-статус. Район и университет видны только так, как вы разрешите.'
+    icon: 'star',
+    title: 'Баннеры, значки и подарки',
+    text: 'Оформляйте профиль как в Discord и Telegram: редкие подарки, значки и баннеры от владельца.'
   }
 ];
 
@@ -26,14 +26,14 @@ export default async function LandingPage() {
 
   const hero = el('div', { class: 'landing__hero' });
   const copy = el('div', { class: 'landing__copy' });
-  copy.append(el('div', { class: 'landing__eyebrow', text: '18+ · Знакомства для студентов Ташкента' }));
+  copy.append(el('div', { class: 'landing__eyebrow', text: '18+ · Только Westminster International University in Tashkent' }));
   const title = el('h1', { class: 'landing__title' });
-  title.innerHTML = 'Знакомства для студентов <span>Ташкента</span>';
+  title.innerHTML = 'Сообщество студентов <span>WIUT</span>';
   copy.append(title);
   copy.append(
     el('p', {
       class: 'landing__sub',
-      text: 'Находите людей из своего и других университетов. Только 18+.'
+      text: 'Знакомства, чаты и подарки внутри одного кампуса. Только 18+.'
     })
   );
 
@@ -50,18 +50,18 @@ export default async function LandingPage() {
 
   const stats = el('div', { class: 'landing__stats' });
   stats.innerHTML = `
-    <div class="landing__stat"><strong>Ташкент</strong>один город</div>
-    <div class="landing__stat"><strong>17+</strong>университетов</div>
-    <div class="landing__stat"><strong>18+</strong>только взрослые</div>
+    <div class="landing__stat"><strong>WIUT</strong>один кампус</div>
+    <div class="landing__stat"><strong>10</strong>значков</div>
+    <div class="landing__stat"><strong>20</strong>подарков</div>
   `;
   copy.append(stats);
   hero.append(copy);
 
   const visual = el('div', { class: 'landing__visual landing__visual--calm' });
   const cards = [
-    { cls: 'back', name: 'Тимур, 22', meta: 'TUIT · 3 курс', tone: 'var(--surface-2)' },
+    { cls: 'back', name: 'Тимур, 22', meta: 'WIUT · 3 курс', tone: 'var(--surface-2)' },
     { cls: 'mid', name: 'Мадина, 21', meta: 'WIUT · 2 курс', tone: 'var(--accent-soft)' },
-    { cls: 'front', name: 'Дилноза, 23', meta: 'NUUz · магистратура', tone: 'var(--surface)' }
+    { cls: 'front', name: 'Дилноза, 23', meta: 'WIUT · магистратура', tone: 'var(--surface)' }
   ];
   for (const card of cards) {
     const node = el('div', { class: `landing__card landing__card--${card.cls}` });
@@ -96,7 +96,7 @@ export default async function LandingPage() {
 
   const foot = el('div', { class: 'landing__foot' });
   foot.innerHTML = `
-    <span>© ${new Date().getFullYear()} UNI Lovers</span>
+    <span>© ${new Date().getFullYear()} Wiutgram</span>
     <a href="/rules">Правила сообщества</a>
     <a href="/privacy">Политика конфиденциальности</a>
     <a href="/advertise">Реклама на сайте</a>

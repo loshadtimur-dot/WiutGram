@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=19';
+import { api } from '../api.js?v=21';
 import {
   el,
   avatarNode,
@@ -8,11 +8,11 @@ import {
   formatDayLabel,
   timeAgo,
   toast
-} from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
-import { setCounts, getState } from '../state.js?v=19';
-import { onSocket } from '../socket.js?v=19';
-import { navigate } from '../router.js?v=19';
+} from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
+import { setCounts, getState } from '../state.js?v=21';
+import { onSocket } from '../socket.js?v=21';
+import { navigate } from '../router.js?v=21';
 
 const ICONS = {
   like: 'heart',
@@ -23,6 +23,10 @@ const ICONS = {
   post_like: 'heart',
   profile_view: 'eye',
   story_view: 'eye',
+  follow: 'users',
+  gift: 'gift',
+  badge: 'star',
+  banner: 'image',
   system: 'info'
 };
 
@@ -34,7 +38,11 @@ const TEXTS = {
   comment: 'оставил(а) комментарий',
   post_like: 'лайкнул(а) ваш пост',
   profile_view: 'посмотрел(а) ваш профиль',
-  story_view: 'посмотрел(а) вашу историю'
+  story_view: 'посмотрел(а) вашу историю',
+  follow: 'подписался(ась) на ваш профиль',
+  gift: 'подарил(а) вам подарок',
+  badge: 'выдал(а) вам значок',
+  banner: 'выдал(а) вам баннер'
 };
 
 export default async function NotificationsPage() {
@@ -69,7 +77,12 @@ export default async function NotificationsPage() {
       case 'story_view':
       case 'post_like':
       case 'comment':
+      case 'follow':
         return `/u/${actor.username}`;
+      case 'gift':
+      case 'badge':
+      case 'banner':
+        return '/profile';
       default:
         return null;
     }

@@ -1,7 +1,7 @@
-import { el, button, avatarNode } from '../ui.js?v=19';
-import { getState } from '../state.js?v=19';
-import { navigate } from '../router.js?v=19';
-import { icon } from '../icons.js?v=19';
+import { el, button, avatarNode } from '../ui.js?v=21';
+import { getState } from '../state.js?v=21';
+import { navigate } from '../router.js?v=21';
+import { icon } from '../icons.js?v=21';
 
 export default function WelcomePage() {
   const user = getState().user;
@@ -52,7 +52,7 @@ export default function WelcomePage() {
     const badge = el('div', { class: 'role-icon role-icon--owner' });
     badge.innerHTML = icon('crown', { size: 34, fill: true });
     ownerCard.append(badge);
-    ownerCard.append(el('h3', { text: 'Вы — владелец UNI Lovers', style: { margin: '8px 0 6px' } }));
+    ownerCard.append(el('h3', { text: 'Вы — владелец Wiutgram', style: { margin: '8px 0 6px' } }));
     ownerCard.append(
       el('p', {
         class: 'muted',

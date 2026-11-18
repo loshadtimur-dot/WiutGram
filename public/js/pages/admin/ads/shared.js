@@ -1,7 +1,7 @@
-import { api } from '../../../api.js?v=19';
-import { el, button, toast, openModal } from '../../../ui.js?v=19';
-import { icon } from '../../../icons.js?v=19';
-import { formatSum, describeGroups, groupHours, groupLabel } from '../../../ads-utils.js?v=19';
+import { api } from '../../../api.js?v=21';
+import { el, button, toast, openModal } from '../../../ui.js?v=21';
+import { icon } from '../../../icons.js?v=21';
+import { formatSum, describeGroups, groupHours, groupLabel } from '../../../ads-utils.js?v=21';
 
 export const PAYMENT_LABELS = { paid: 'Оплачено', unpaid: 'Не оплачено', refunded: 'Возврат' };
 export const STATUS_LABELS = { active: 'Активна', cancelled: 'Отменена' };

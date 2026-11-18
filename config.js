@@ -49,27 +49,11 @@ const LIMITS = {
   maxBio: 500
 };
 
-// Default university list for Tashkent. Owners can rename, hide or merge these.
-const UNIVERSITY_SEED = [
-  ['WIUT', 'Вестминстерский международный университет в Ташкенте'],
-  ['TUIT', 'Ташкентский университет информационных технологий имени Мухаммада аль-Хорезми'],
-  ['TSUE', 'Ташкентский государственный экономический университет'],
-  ['NUUz', 'Национальный университет Узбекистана имени Мирзо Улугбека'],
-  ['TSTU', 'Ташкентский государственный технический университет'],
-  ['TSUL', 'Ташкентский государственный юридический университет'],
-  ['UWED', 'Университет мировой экономики и дипломатии'],
-  ['TMA', 'Ташкентская медицинская академия'],
-  ['TSUOS', 'Ташкентский государственный университет востоковедения'],
-  ['TSPU', 'Ташкентский государственный педагогический университет имени Низами'],
-  ['TFI', 'Ташкентский финансовый институт'],
-  ['Inha', 'Inha University in Tashkent'],
-  ['Turin', 'Turin Polytechnic University in Tashkent'],
-  ['Webster', 'Webster University in Tashkent'],
-  ['MDIS', 'MDIS Tashkent'],
-  ['Akfa', 'Akfa University'],
-  ['KIUT', 'Kimyo International University in Tashkent']
-];
-const SYSTEM_UNIVERSITY = ['Другое', 'Другой / не учусь'];
+// Wiutgram belongs to one campus only: Westminster International University
+// in Tashkent. The list is intentionally a single entry.
+const UNIVERSITY_SEED = [['WIUT', 'Вестминстерский международный университет в Ташкенте']];
+const UNIVERSITY_NAME_EN = 'Westminster International University in Tashkent';
+const SYSTEM_UNIVERSITY = null;
 
 module.exports = {
   CITY,
@@ -82,5 +66,6 @@ module.exports = {
   MIN_OWNER_PASSWORD,
   LIMITS,
   UNIVERSITY_SEED,
+  UNIVERSITY_NAME_EN,
   SYSTEM_UNIVERSITY
 };

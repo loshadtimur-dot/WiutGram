@@ -1,11 +1,11 @@
-import { api } from './api.js?v=19';
+import { api } from './api.js?v=21';
 
 const listeners = new Set();
 
 export const state = {
   user: null,
   site: {
-    site_name: 'UNI Lovers',
+    site_name: 'Wiutgram',
     registration_open: true,
     maintenance_mode: false,
     welcome_message: ''

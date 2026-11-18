@@ -116,7 +116,7 @@ function gradientPost(label, seed) {
   <text x="450" y="470" font-family="Inter, Segoe UI, Roboto, sans-serif" font-size="42"
     font-weight="600" fill="rgba(255,255,255,0.94)" text-anchor="middle">${escapeXml(label)}</text>
   <text x="450" y="525" font-family="Inter, Segoe UI, Roboto, sans-serif" font-size="24"
-    fill="rgba(255,255,255,0.7)" text-anchor="middle">UNI Lovers</text>
+    fill="rgba(255,255,255,0.7)" text-anchor="middle">Wiutgram</text>
 </svg>`;
 }
 

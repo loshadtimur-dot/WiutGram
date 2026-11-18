@@ -1,8 +1,8 @@
-import { api, setToken } from '../api.js?v=19';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=19';
-import { setUser } from '../state.js?v=19';
-import { navigate } from '../router.js?v=19';
-import { icon } from '../icons.js?v=19';
+import { api, setToken } from '../api.js?v=21';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=21';
+import { setUser } from '../state.js?v=21';
+import { navigate } from '../router.js?v=21';
+import { icon } from '../icons.js?v=21';
 
 export default function LoginPage(ctx) {
   const root = el('div', { class: 'auth' });
@@ -10,7 +10,7 @@ export default function LoginPage(ctx) {
   const intro = el('div', { class: 'auth__intro' });
   intro.append(el('div', { class: 'auth__eyebrow' }));
   const title = el('h1');
-  title.innerHTML = 'С возвращением в <span>UNI Lovers</span>';
+  title.innerHTML = 'С возвращением в <span>Wiutgram</span>';
   intro.append(title);
   intro.append(
     el('p', {

@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=19';
+import { api, compressImage, toFormData } from '../api.js?v=21';
 import {
   el,
   avatarNode,
@@ -18,17 +18,24 @@ import {
   gradientFor,
   svgIcon,
   plural
-} from '../ui.js?v=19';
-import { icon } from '../icons.js?v=19';
-import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=19';
-import { navigate } from '../router.js?v=19';
-import { openPostModal } from '../components/postModal.js?v=19';
-import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=19';
-import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=19';
-import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=19';
-import { openReportDialog, openBlockConfirm } from '../components/report.js?v=19';
-import { showMatchScreen } from '../components/match.js?v=19';
-import { mountAdBanner } from '../components/adBanner.js?v=19';
+} from '../ui.js?v=21';
+import { icon } from '../icons.js?v=21';
+import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=21';
+import { navigate } from '../router.js?v=21';
+import { openPostModal } from '../components/postModal.js?v=21';
+import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=21';
+import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=21';
+import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=21';
+import { openReportDialog, openBlockConfirm } from '../components/report.js?v=21';
+import { showMatchScreen } from '../components/match.js?v=21';
+import { mountAdBanner } from '../components/adBanner.js?v=21';
+import {
+  bannerBackdrop,
+  badgeNode,
+  giftNode,
+  applyNameGift,
+  openCosmeticsStudio
+} from '../components/cosmetics.js?v=21';
 
 export default async function ProfilePage(ctx) {
   const me = getState().user;
@@ -51,6 +58,19 @@ export default async function ProfilePage(ctx) {
   const profile = profileData.user;
   const counts = profileData.counts || { posts: 0 };
   const root = el('div', { class: 'profile-page' });
+  const cosmetics = profileData.cosmetics || {
+    banner: null,
+    badges: [],
+    gifts: [],
+    equipped_gift: null,
+    follow: { followers: 0, following: 0 }
+  };
+  const profileGift = cosmetics.equipped_gift || null;
+  if (profileGift) {
+    root.dataset.giftRarity = profileGift.rarity;
+    root.classList.add('has-gift-bg');
+  }
+  let following = !!profileData.is_following;
 
   let posts = [];
   let feeds = [];
@@ -76,7 +96,9 @@ export default async function ProfilePage(ctx) {
 
   const info = el('div', { class: 'profile-info' });
   const nameRow = el('div', { class: 'profile-name-row' });
-  nameRow.append(el('div', { class: 'profile-username', text: profile.display_name }));
+  const nameText = el('div', { class: 'profile-username', text: profile.display_name });
+  if (cosmetics.equipped_gift) applyNameGift(nameText, cosmetics.equipped_gift);
+  nameRow.append(nameText);
   nameRow.append(ruleBadges(profile));
   if (getState().online.get(profile.id)) {
     const online = el('span', { class: 'tag' });
@@ -86,6 +108,11 @@ export default async function ProfilePage(ctx) {
   }
   info.append(nameRow);
   info.append(el('div', { class: 'field__hint', text: `@${profile.username}` }));
+  if (cosmetics.badges.length) {
+    const badgeRow = el('div', { class: 'profile-badges' });
+    cosmetics.badges.forEach((badge) => badgeRow.append(badgeNode(badge, 'md')));
+    info.append(badgeRow);
+  }
 
   const stats = el('div', { class: 'profile-stats' });
   const statValue = {};
@@ -100,14 +127,12 @@ export default async function ProfilePage(ctx) {
   };
   if (isSelf) {
     addStat('posts', 'Посты', counts.posts || 0).addEventListener('click', () => switchTab('posts'));
-    addStat('likes', 'Лайки', counts.likes || 0).addEventListener('click', () => switchTab('stats'));
-    addStat('views', 'Просмотры', counts.views || 0).addEventListener('click', () => {
-      switchTab('stats');
-      setTimeout(() => document.getElementById('stats-viewers')?.scrollIntoView({ behavior: 'smooth' }), 300);
-    });
+    addStat('followers', 'Подписчики', cosmetics.follow.followers || 0);
+    addStat('following', 'Подписки', cosmetics.follow.following || 0);
     addStat('matches', 'Матчи', counts.matches || 0).addEventListener('click', () => navigate('/chats'));
   } else {
     addStat('posts', 'Публикации', counts.posts || 0);
+    addStat('followers', 'Подписчики', cosmetics.follow.followers || 0);
     if (profile.age) addStat('age', 'Возраст', profile.age);
     if (profile.university_chip || profile.university) {
       const uniStat = el('div', { class: 'stat' });
@@ -141,6 +166,16 @@ export default async function ProfilePage(ctx) {
     });
     actions.append(shareBtn);
     actions.append(button('Настройки', { variant: 'btn-ghost', onClick: () => navigate('/settings') }));
+    actions.append(
+      button('Косметика', {
+        variant: 'btn-secondary',
+        icon: 'gift',
+        onClick: () =>
+          openCosmeticsStudio(() => {
+            window.location.reload();
+          })
+      })
+    );
     if (me.role === 'owner') {
       actions.append(
         button('Админ-панель', {
@@ -165,6 +200,27 @@ export default async function ProfilePage(ctx) {
       likeBtn.textContent = profileData.my_swipe === 'nope' ? 'Вы пропустили' : 'Вы лайкнули';
       superBtn.classList.add('hidden');
     }
+    const followBtn = button(following ? 'Вы подписаны' : 'Подписаться', {
+      variant: following ? 'btn-ghost' : 'btn-secondary',
+      icon: 'users'
+    });
+    followBtn.addEventListener('click', async () => {
+      followBtn.disabled = true;
+      try {
+        const result = following
+          ? await api.delete(`/follows/${encodeURIComponent(profile.username)}`)
+          : await api.post(`/follows/${encodeURIComponent(profile.username)}`);
+        following = !!result.following;
+        followBtn.textContent = following ? 'Вы подписаны' : 'Подписаться';
+        followBtn.className = `btn ${following ? 'btn-ghost' : 'btn-secondary'}`;
+        if (statValue.followers) statValue.followers.textContent = formatNumber(result.followers || 0);
+      } catch (err) {
+        toast(err.message || 'Не удалось изменить подписку', 'error');
+      } finally {
+        followBtn.disabled = false;
+      }
+    });
+    actions.append(followBtn);
     actions.append(likeBtn, superBtn);
     if (profileData.match) {
       actions.append(
@@ -262,7 +318,37 @@ export default async function ProfilePage(ctx) {
   }
   info.append(bio);
   header.append(info);
+  if (cosmetics.banner) {
+    const bannerWrap = el('div', { class: 'profile-banner-wrap' });
+    bannerWrap.append(bannerBackdrop(cosmetics.banner));
+    root.append(bannerWrap);
+  }
   root.append(header);
+
+  // Gifts are grouped by type, so a large collection stays compact.
+  const visibleGifts = cosmetics.gifts.filter((gift) => isSelf || !gift.is_hidden);
+  const giftsSection = el('div', { class: 'profile-gifts' });
+  const giftsHead = el('div', { class: 'profile-gifts__head' });
+  giftsHead.innerHTML = icon('gift', { size: 18 });
+  giftsHead.append(el('span', { text: `Подарки${visibleGifts.length ? ` · ${visibleGifts.length}` : ''}` }));
+  giftsSection.append(giftsHead);
+  if (visibleGifts.length) {
+    const grid = el('div', { class: 'profile-gifts__grid' });
+    visibleGifts.forEach((gift) => {
+      grid.append(giftNode(gift, { count: gift.count, regifted: gift.has_regifted, size: 'sm' }));
+    });
+    giftsSection.append(grid);
+  } else {
+    giftsSection.append(
+      el('div', {
+        class: 'profile-gifts__empty',
+        text: isSelf
+          ? 'Пока нет подарков. Их можно купить у владельца в Telegram и поставить на имя.'
+          : 'У пользователя пока нет открытых подарков.'
+      })
+    );
+  }
+  root.append(giftsSection);
 
   if (isSelf) root.append(superlikesCard());
 

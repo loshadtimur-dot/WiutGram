@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="UNI Lovers">
-  <rect width="64" height="64" rx="16" fill="#4C5FD7"/>
-  <circle cx="26" cy="32" r="11" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.92"/>
-  <circle cx="38" cy="32" r="11" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.92"/>
-  <circle cx="38" cy="32" r="3" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Wiutgram">
+  <defs>
+    <linearGradient id="wg-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FD267A"/>
+      <stop offset="0.55" stop-color="#A637C9"/>
+      <stop offset="1" stop-color="#5B4CFF"/>
+    </linearGradient>
+    <linearGradient id="wg-b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F1E6FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="17" fill="url(#wg-a)"/>
+  <path d="M14 21l7.4 23h6.2l4.4-15.2L36.4 44h6.2L50 21h-6.2l-4.7 16.4L34.7 21h-5.4l-4.4 16.4L20.2 21H14Z" fill="url(#wg-b)"/>
+  <circle cx="49.5" cy="49.5" r="7.5" fill="#FFFFFF"/>
+  <path d="M49.5 45.4c-1.9-1.6-5.2-.9-5.2 2 0 2.4 2.7 4.3 5.2 6 2.5-1.7 5.2-3.6 5.2-6 0-2.9-3.3-3.6-5.2-2Z" fill="#FD267A"/>
 </svg>

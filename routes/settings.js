@@ -11,13 +11,17 @@ const router = express.Router();
 router.get('/site', (req, res) => {
   const settings = db.listSettings();
   res.json({
-    site_name: settings.site_name || 'UNI Lovers',
+    site_name: settings.site_name || 'Wiutgram',
     registration_open: settings.registration_open === '1',
     maintenance_mode: settings.maintenance_mode === '1',
     welcome_message: settings.welcome_message || '',
     min_age: 18,
     city: CITY,
-    allow_university_requests: settings.allow_university_requests === '1',
+    allow_university_requests: false,
+    owner_telegram: settings.owner_telegram || '',
+    gifts_enabled: settings.gifts_enabled !== '0',
+    badges_enabled: settings.badges_enabled !== '0',
+    banners_enabled: settings.banners_enabled !== '0',
     max_photos: Number(settings.max_photos) || 9,
     max_bio: Number(settings.max_bio) || 500
   });

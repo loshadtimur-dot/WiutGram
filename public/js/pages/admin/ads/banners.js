@@ -1,8 +1,8 @@
-import { api } from '../../../api.js?v=19';
-import { el, button, toast } from '../../../ui.js?v=19';
-import { sectionHead, emptyState } from '../shared.js?v=19';
-import { openCropModal } from './crop.js?v=19';
-import { withSudo } from './campaigns.js?v=19';
+import { api } from '../../../api.js?v=21';
+import { el, button, toast } from '../../../ui.js?v=21';
+import { sectionHead, emptyState } from '../shared.js?v=21';
+import { openCropModal } from './crop.js?v=21';
+import { withSudo } from './campaigns.js?v=21';
 
 function formatSize(bytes) {
   if (!bytes) return '—';

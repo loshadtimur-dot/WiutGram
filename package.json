@@ -2,7 +2,7 @@
   "name": "uni-lovers",
   "version": "1.0.0",
   "private": true,
-  "description": "UNI Lovers - dating app with Tinder-style swipes and Instagram-style profiles",
+  "description": "Wiutgram - dating app with Tinder-style swipes and Instagram-style profiles",
   "main": "server.js",
   "engines": {
     "node": ">=18"

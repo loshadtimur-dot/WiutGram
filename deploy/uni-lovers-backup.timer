@@ -1,5 +1,5 @@
 [Unit]
-Description=Run the UNI Lovers backup every night at 03:15 (Asia/Tashkent)
+Description=Run the Wiutgram backup every night at 03:15 (Asia/Tashkent)
 
 [Timer]
 OnCalendar=*-*-* 03:15:00 Asia/Tashkent

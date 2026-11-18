@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=19';
+import { api, compressImage, toFormData } from '../api.js?v=21';
 import {
   el,
   avatarNode,
@@ -12,12 +12,13 @@ import {
   initials,
   gradientFor,
   svgIcon
-} from '../ui.js?v=19';
-import { PREFERRED_EMOJI, icon } from '../icons.js?v=19';
-import { getState, setOnline, setCounts } from '../state.js?v=19';
-import { onSocket, startTyping, stopTyping } from '../socket.js?v=19';
-import { openReportDialog, openBlockConfirm } from './report.js?v=19';
-import { navigate } from '../router.js?v=19';
+} from '../ui.js?v=21';
+import { PREFERRED_EMOJI, icon } from '../icons.js?v=21';
+import { getState, setOnline, setCounts } from '../state.js?v=21';
+import { onSocket, startTyping, stopTyping } from '../socket.js?v=21';
+import { openReportDialog, openBlockConfirm } from './report.js?v=21';
+import { loadCosmetics, giftMeta, giftNode, openGiftPicker } from './cosmetics.js?v=21';
+import { navigate } from '../router.js?v=21';
 
 export function createChatWindow(matchId, options = {}) {
   const root = el('div', { class: 'chat-window' });
@@ -28,6 +29,12 @@ export function createChatWindow(matchId, options = {}) {
   let hasMore = false;
   let loadingOlder = false;
   let pendingImage = null;
+  // Gift artwork arrives with the cosmetics catalog; refresh the chat when ready.
+  loadCosmetics()
+    .then(() => {
+      if (messages.length) renderMessages();
+    })
+    .catch(() => {});
   let typingTimer = null;
   let lastTypingSent = 0;
   let peerTypingTimer = null;
@@ -167,6 +174,34 @@ export function createChatWindow(matchId, options = {}) {
   emojiBtn.innerHTML = icon('sparkles', { size: 19 });
   emojiBtn.addEventListener('click', () => emojiPanel.classList.toggle('hidden'));
 
+  const giftBtn = el('button', { class: 'btn-icon', attrs: { type: 'button', 'aria-label': 'Подарить подарок' } });
+  giftBtn.style.width = '38px';
+  giftBtn.style.height = '38px';
+  giftBtn.innerHTML = icon('gift', { size: 19 });
+  giftBtn.addEventListener('click', async () => {
+    try {
+      const data = await loadCosmetics(true);
+      const isOwner = getState().user && getState().user.role === 'owner';
+      const gifts = data.catalog.gifts.filter((gift) => gift.count > 0 || isOwner);
+      openGiftPicker({
+        gifts,
+        title: 'Подарить подарок',
+        onPick: async (gift) => {
+          try {
+            const result = await api.post('/cosmetics/gift/send', { match_id: id, gift_id: gift.id });
+            addMessage(result.message);
+            scrollToBottom();
+            toast(`Вы подарили «${gift.name}»`, 'success');
+          } catch (err) {
+            toast(err.message || 'Не удалось подарить подарок', 'error');
+          }
+        }
+      });
+    } catch (err) {
+      toast(err.message || 'Не удалось загрузить подарки', 'error');
+    }
+  });
+
   const imageBtn = el('button', { class: 'btn-icon', attrs: { type: 'button', 'aria-label': 'Отправить фото' } });
   imageBtn.style.width = '38px';
   imageBtn.style.height = '38px';
@@ -208,7 +243,7 @@ export function createChatWindow(matchId, options = {}) {
   const sendBtn = el('button', { class: 'chat-send', attrs: { type: 'submit', 'aria-label': 'Отправить' } });
   sendBtn.innerHTML = icon('send', { size: 19 });
 
-  composer.append(emojiBtn, imageBtn, composerInput, sendBtn, fileInput);
+  composer.append(emojiBtn, imageBtn, giftBtn, composerInput, sendBtn, fileInput);
   root.append(composer);
 
   function autoGrow() {
@@ -308,7 +343,18 @@ export function createChatWindow(matchId, options = {}) {
         imageWrap.append(img);
         bubble.append(imageWrap);
       }
-      if (message.body) bubble.append(el('div', { text: message.body }));
+      if (message.type === 'gift') {
+        const gift = giftMeta(message.body);
+        if (gift) {
+          const card = giftNode(gift, { size: 'sm' });
+          card.classList.add('msg__gift');
+          bubble.append(card);
+        } else {
+          bubble.append(el('div', { text: '🎁 Подарок' }));
+        }
+      } else if (message.body) {
+        bubble.append(el('div', { text: message.body }));
+      }
     }
 
     const meta = el('div', { class: 'msg__meta' });
