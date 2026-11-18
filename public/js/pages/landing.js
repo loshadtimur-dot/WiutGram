@@ -1,7 +1,7 @@
-import { api } from '../api.js?v=18';
-import { el, button } from '../ui.js?v=18';
-import { icon } from '../icons.js?v=18';
-import { navigate } from '../router.js?v=18';
+import { api } from '../api.js?v=19';
+import { el, button } from '../ui.js?v=19';
+import { icon } from '../icons.js?v=19';
+import { navigate } from '../router.js?v=19';
 
 const FEATURES = [
   {

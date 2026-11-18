@@ -7,7 +7,6 @@ const { requireSudo } = require('../../middleware/auth');
 const { cleaned, toInt } = require('../../middleware/validate');
 const { notify } = require('../../lib/notify');
 const { nowIso } = require('../../utils/time');
-const { reject } = require('../../middleware/validate');
 
 const router = express.Router();
 

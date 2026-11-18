@@ -1,5 +1,5 @@
-import { api, clearToken } from '../api.js?v=18';
-import { storageGet, storageSet } from '../storage.js?v=18';
+import { api, clearToken } from '../api.js?v=19';
+import { storageGet, storageSet } from '../storage.js?v=19';
 import {
   el,
   button,
@@ -11,10 +11,10 @@ import {
   emptyState,
   passwordField,
   svgIcon
-} from '../ui.js?v=18';
-import { icon } from '../icons.js?v=18';
-import { getState, setUser, patchUser, applyTheme, refreshMe } from '../state.js?v=18';
-import { navigate } from '../router.js?v=18';
+} from '../ui.js?v=19';
+import { icon } from '../icons.js?v=19';
+import { getState, setUser, patchUser, applyTheme, refreshMe } from '../state.js?v=19';
+import { navigate } from '../router.js?v=19';
 
 function section(iconName, title) {
   const card = el('section', { class: 'settings-section' });

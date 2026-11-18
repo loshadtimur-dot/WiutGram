@@ -143,6 +143,61 @@ test('ads settings validate telegram and default price is 15 000', async () => {
   assert.equal(good.data.settings.discounts[0].percent, 10);
 });
 
+test('payment details stay private until enabled and are shown to buyers afterwards', async () => {
+  const guest = createClient(base);
+  const initial = await guest.get('/api/ads/config');
+  assert.equal(initial.status, 200);
+  assert.equal(initial.data.payment.card, null);
+  assert.equal(initial.data.payment.telegram, 'uni_lovers');
+
+  // Only the owner may change payment details; everyone else gets a 404.
+  const denied = await user.put('/api/admin/ads/settings', { ads_card_number: '4111111111111111' });
+  assert.equal(denied.status, 404);
+
+  const short = await owner.put('/api/admin/ads/settings', { ads_card_number: '4111' });
+  assert.equal(short.status, 400);
+
+  const saved = await owner.put('/api/admin/ads/settings', {
+    ads_card_number: '4111 1111 1111 1111',
+    ads_card_holder: 'Тест <img src=x onerror=alert(1)>',
+    ads_card_bank: 'Uzcard <script>alert(1)</script>',
+    ads_payment_note: 'После оплаты пришлите чек в Telegram',
+    ads_show_card: true
+  });
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  assert.equal(saved.data.settings.card_number, '4111111111111111');
+  assert.deepEqual(saved.data.warnings, []);
+
+  const publicConfig = await guest.get('/api/ads/config');
+  assert.equal(publicConfig.data.payment.card.number, '4111 1111 1111 1111');
+  assert.equal(publicConfig.data.payment.card.bank.startsWith('Uzcard'), true);
+  assert.equal(publicConfig.data.payment.card.bank.includes('<'), false);
+  assert.equal(publicConfig.data.payment.card.note, 'После оплаты пришлите чек в Telegram');
+  assert.equal(String(publicConfig.data.payment.card.holder).includes('<'), false);
+  assert.equal(publicConfig.data.payment.telegram_url, 'https://t.me/uni_lovers');
+
+  // The purchase window receives the same block together with the request code.
+  const hour = now + 60 * 3600;
+  const request = await guest.post('/api/ads/requests', { hours: [hour] });
+  assert.equal(request.status, 201, JSON.stringify(request.data));
+  assert.equal(request.data.payment.card.number, '4111 1111 1111 1111');
+  assert.match(request.data.message, new RegExp(request.data.code));
+
+  const log = await owner.get('/api/admin/log?limit=10');
+  assert.equal(log.status, 200);
+  assert.ok(log.data.log.some((row) => row.action === 'ads_settings'));
+
+  const hidden = await owner.put('/api/admin/ads/settings', { ads_show_card: false });
+  assert.equal(hidden.status, 200);
+  const afterHide = await guest.get('/api/ads/config');
+  assert.equal(afterHide.data.payment.card, null);
+  assert.equal(JSON.stringify(afterHide.data).includes('4111'), false);
+
+  const emptyNumber = await owner.put('/api/admin/ads/settings', { ads_card_number: '' });
+  assert.equal(emptyNumber.status, 200);
+  assert.equal(emptyNumber.data.settings.card_number, '');
+});
+
 test('banner upload accepts a real 4:1 image and rejects svg, gif and wrong ratio', async () => {
   const form = new FormData();
   form.append('image', new Blob([makePng(1600, 400)], { type: 'image/png' }), 'banner.png');
@@ -461,6 +516,50 @@ test('owner login locks after repeated failures', async () => {
     }
   }
   assert.equal(locked, true, 'owner account should lock after five failures');
+});
+
+/* ---------- Production mode: proxy, cookies, health ---------- */
+
+test('https behind a trusted proxy sets Secure cookies and health reports version', async () => {
+  const proxy = await startServer(3197, { TRUST_PROXY: '1' });
+  try {
+    const proxyBase = 'http://127.0.0.1:3197';
+    const client = createClient(proxyBase);
+    const created = await register(client, { email: 'proxy@example.com', username: 'proxyuser' });
+    assert.equal(created.response.status, 201, JSON.stringify(created.response.data));
+
+    const cookieOf = (response) =>
+      typeof response.headers.getSetCookie === 'function'
+        ? response.headers.getSetCookie().join('; ')
+        : String(response.headers.get('set-cookie') || '');
+
+    const https = await client.post(
+      '/api/auth/login',
+      { login: 'proxy@example.com', password: 'OwnerPass12345' },
+      { headers: { 'x-forwarded-proto': 'https' } }
+    );
+    assert.equal(https.status, 200, JSON.stringify(https.data));
+    const secureCookie = cookieOf(https);
+    assert.match(secureCookie, /uni_token=/);
+    assert.match(secureCookie, /Secure/i);
+    assert.match(secureCookie, /SameSite=None/i);
+
+    // Over plain HTTP the cookie stays readable by the app itself.
+    const plain = await createClient(proxyBase).post('/api/auth/login', {
+      login: 'proxy@example.com',
+      password: 'OwnerPass12345'
+    });
+    assert.equal(plain.status, 200);
+    assert.equal(/Secure/i.test(cookieOf(plain)), false);
+
+    const health = await createClient(proxyBase).get('/api/health');
+    assert.equal(health.status, 200);
+    assert.equal(health.data.ok, true);
+    assert.equal(health.data.db_ok, true);
+    assert.equal(health.data.version, '1.0.0');
+  } finally {
+    proxy.stop();
+  }
 });
 
 /* ---------- Rate limit on public requests ---------- */

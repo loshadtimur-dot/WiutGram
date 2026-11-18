@@ -1,16 +1,16 @@
-import { el, button, toast } from '../../ui.js?v=18';
-import { icon } from '../../icons.js?v=18';
-import { api } from '../../api.js?v=18';
-import { navigate } from '../../router.js?v=18';
-import { getState } from '../../state.js?v=18';
-import overviewSection from './overview.js?v=18';
-import usersSection from './users.js?v=18';
-import universitiesSection from './universities.js?v=18';
-import moderationSection from './moderation.js?v=18';
-import systemSection from './system.js?v=18';
-import adsSection from './ads/index.js?v=18';
-import superlikesSection from './superlikes.js?v=18';
-import securitySection from './security.js?v=18';
+import { el, button, toast } from '../../ui.js?v=19';
+import { icon } from '../../icons.js?v=19';
+import { api } from '../../api.js?v=19';
+import { navigate } from '../../router.js?v=19';
+import { getState } from '../../state.js?v=19';
+import overviewSection from './overview.js?v=19';
+import usersSection from './users.js?v=19';
+import universitiesSection from './universities.js?v=19';
+import moderationSection from './moderation.js?v=19';
+import systemSection from './system.js?v=19';
+import adsSection from './ads/index.js?v=19';
+import superlikesSection from './superlikes.js?v=19';
+import securitySection from './security.js?v=19';
 
 const SECTIONS = [
   { id: 'overview', label: 'Обзор', icon: 'chart' },

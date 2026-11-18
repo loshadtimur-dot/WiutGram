@@ -1,8 +1,8 @@
-import { api, compressImage, setToken } from '../../api.js?v=18';
-import { el, button, avatarNode, toast, openModal } from '../../ui.js?v=18';
-import { icon } from '../../icons.js?v=18';
-import { getState } from '../../state.js?v=18';
-import { navigate } from '../../router.js?v=18';
+import { api, compressImage, setToken } from '../../api.js?v=19';
+import { el, button, avatarNode, toast, openModal } from '../../ui.js?v=19';
+import { icon } from '../../icons.js?v=19';
+import { getState } from '../../state.js?v=19';
+import { navigate } from '../../router.js?v=19';
 import {
   sectionHead,
   statusChips,
@@ -17,7 +17,7 @@ import {
   textField,
   selectField,
   switchField
-} from './shared.js?v=18';
+} from './shared.js?v=19';
 
 const COURSE_OPTIONS = [
   ['', 'Не указан'],

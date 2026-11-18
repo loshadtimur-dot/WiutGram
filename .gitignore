@@ -1,8 +1,39 @@
+# Dependencies
 node_modules/
+
+# Runtime data: database, WAL files, private media, backups
 data/
 uploads/
-.env
-*.log
-.DS_Store
+storage/
+backups/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
 
+# Secrets: never commit any of these
+.env
+.env.*
+!.env.example
+!.env.production.example
+data/secret.txt
+*.pem
+*.key
+secret.txt
+vapid.json
+
+# Logs and diagnostics
+logs/
+*.log
+npm-debug.log*
 screenshots/
+playwright-report/
+test-results/
+coverage/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

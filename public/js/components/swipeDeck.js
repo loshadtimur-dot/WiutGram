@@ -1,8 +1,8 @@
-import { api } from '../api.js?v=18';
-import { el, toast, initials, gradientFor, svgIcon, ruleBadges, looksForLabel } from '../ui.js?v=18';
-import { icon } from '../icons.js?v=18';
-import { navigate } from '../router.js?v=18';
-import { openReportDialog, openBlockConfirm } from './report.js?v=18';
+import { api } from '../api.js?v=19';
+import { el, toast, initials, gradientFor, svgIcon, ruleBadges, looksForLabel } from '../ui.js?v=19';
+import { icon } from '../icons.js?v=19';
+import { navigate } from '../router.js?v=19';
+import { openReportDialog, openBlockConfirm } from './report.js?v=19';
 
 const INTEREST_LABELS = {
   travel: ['Путешествия', '✈️'], music: ['Музыка', '🎧'], movies: ['Кино', '🎬'], sport: ['Спорт', '🏋️'],
@@ -47,7 +47,10 @@ export function createSwipeDeck(options) {
     head.append(el('div', { class: 'swipe-card__details-title', text: 'Подробнее' }));
     const close = el('button', { class: 'icon-btn-plain', attrs: { type: 'button', 'aria-label': 'Свернуть' } });
     close.innerHTML = icon('chevronDown', { size: 20 });
-    close.addEventListener('click', () => closeDetails(card));
+    close.addEventListener('click', () => {
+      // The card owns its own details panel, so the closer is resolved lazily.
+      if (card._closeDetails) card._closeDetails();
+    });
     head.append(close);
     details.append(head);
 

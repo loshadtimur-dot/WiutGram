@@ -1,6 +1,6 @@
-import { api } from '../api.js?v=18';
-import { el, button, toast, openModal } from '../ui.js?v=18';
-import { icon } from '../icons.js?v=18';
+import { api } from '../api.js?v=19';
+import { el, button, toast, openModal } from '../ui.js?v=19';
+import { icon } from '../icons.js?v=19';
 import {
   TASHKENT_OFFSET,
   tashkentParts,
@@ -14,7 +14,7 @@ import {
   groupHours,
   groupLabel,
   copyText
-} from '../ads-utils.js?v=18';
+} from '../ads-utils.js?v=19';
 
 const QUICK_RANGES = [
   { label: 'Утро 08–12', from: 8, to: 12 },
@@ -611,6 +611,30 @@ export default async function AdvertisePage() {
       body.append(telegramRow);
     } else {
       body.append(el('p', { class: 'adv-modal__missing', text: 'Контакт администратора пока не указан.' }));
+    }
+
+    const card = data.payment && data.payment.card;
+    if (card) {
+      const cardBox = el('div', { class: 'adv-modal__card' });
+      cardBox.append(el('div', { class: 'adv-modal__label', text: 'Оплата переводом на карту' }));
+      const numberRow = el('div', { class: 'adv-modal__card-number' });
+      numberRow.append(el('strong', { text: card.number }));
+      numberRow.append(
+        button('Скопировать номер', {
+          variant: 'btn-secondary btn-sm',
+          onClick: async () => {
+            const ok = await copyText(card.number);
+            toast(ok ? 'Номер скопирован' : 'Не удалось скопировать', ok ? 'success' : 'error');
+          }
+        })
+      );
+      cardBox.append(numberRow);
+      const details = el('div', { class: 'adv-modal__card-details' });
+      if (card.holder) details.append(el('span', { text: `Владелец: ${card.holder}` }));
+      if (card.bank) details.append(el('span', { text: `Банк: ${card.bank}` }));
+      if (details.childNodes.length) cardBox.append(details);
+      if (card.note) cardBox.append(el('p', { class: 'adv-modal__card-note', text: card.note }));
+      body.append(cardBox);
     }
 
     const summary = el('div', { class: 'adv-modal__summary' });

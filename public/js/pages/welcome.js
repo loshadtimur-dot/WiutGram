@@ -1,7 +1,7 @@
-import { el, button, avatarNode } from '../ui.js?v=18';
-import { getState } from '../state.js?v=18';
-import { navigate } from '../router.js?v=18';
-import { icon } from '../icons.js?v=18';
+import { el, button, avatarNode } from '../ui.js?v=19';
+import { getState } from '../state.js?v=19';
+import { navigate } from '../router.js?v=19';
+import { icon } from '../icons.js?v=19';
 
 export default function WelcomePage() {
   const user = getState().user;

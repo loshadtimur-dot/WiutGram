@@ -11,7 +11,8 @@ const { adminLog } = require('../../lib/activity');
 const { requireOwner, requireSudo, noStore } = require('../../middleware/auth');
 const { adminLimiter } = require('../../middleware/rateLimit');
 const { toInt, clamp, cleaned } = require('../../middleware/validate');
-const { UPLOAD_DIR, MAX_BYTES, deleteUpload } = require('../../utils/files');
+const { normalizeCard, cardDigitsValid, luhnValid } = require('../../lib/ads/payment');
+const { UPLOAD_DIR, deleteUpload } = require('../../utils/files');
 const { inspectImage } = require('../../utils/imageMeta');
 const { nowIso } = require('../../utils/time');
 const { dayKeyOf, shortDayLabel, isoOfHour } = require('../../utils/tashkent');
@@ -54,8 +55,20 @@ const BOOLEAN_KEYS = [
   'ads_enabled',
   'ads_swipe_enabled',
   'ads_profile_enabled',
-  'ads_show_audience_stats'
+  'ads_show_audience_stats',
+  'ads_show_card'
 ];
+
+// Payment fields are published on /advertise, so markup characters are stripped
+// even though the client renders them as plain text.
+function paymentText(value, max) {
+  const text = String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[<>]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned(text, max);
+}
 
 router.get('/settings', (req, res) => {
   res.json({ settings: ads.getSettings(), raw: db.listSettings() });
@@ -65,6 +78,7 @@ router.put('/settings', (req, res) => {
   const body = req.body || {};
   const before = ads.getSettings();
   const writes = {};
+  const warnings = [];
 
   for (const key of BOOLEAN_KEYS) {
     if (body[key] !== undefined) writes[key] = body[key] ? '1' : '0';
@@ -104,12 +118,31 @@ router.put('/settings', (req, res) => {
   if (body.ads_house_text !== undefined) {
     writes.ads_house_text = cleaned(body.ads_house_text, 140);
   }
+  if (body.ads_card_number !== undefined) {
+    const digits = normalizeCard(body.ads_card_number);
+    if (digits && !cardDigitsValid(digits)) {
+      return res.status(400).json({ error: 'Номер карты: от 12 до 19 цифр, можно с пробелами' });
+    }
+    if (digits && !luhnValid(digits)) {
+      warnings.push('Номер карты не проходит проверку контрольной суммы — сохранили, но проверьте цифры.');
+    }
+    writes.ads_card_number = digits;
+  }
+  if (body.ads_card_holder !== undefined) {
+    writes.ads_card_holder = paymentText(body.ads_card_holder, 80);
+  }
+  if (body.ads_card_bank !== undefined) {
+    writes.ads_card_bank = paymentText(body.ads_card_bank, 60);
+  }
+  if (body.ads_payment_note !== undefined) {
+    writes.ads_payment_note = paymentText(body.ads_payment_note, 300);
+  }
 
   for (const [key, value] of Object.entries(writes)) db.setSetting(key, value);
   ads.bustCache();
   const after = ads.getSettings();
   adminLog(req, 'ads_settings', 'ads', { before, after });
-  res.json({ settings: after, saved: Object.keys(writes) });
+  res.json({ settings: after, saved: Object.keys(writes), warnings });
 });
 
 /* ---------- Calendar and campaigns ---------- */

@@ -1,8 +1,8 @@
-import { api } from '../../../api.js?v=18';
-import { el, button, toast } from '../../../ui.js?v=18';
-import { formatSum, dayLabel, dayKeyOf } from '../../../ads-utils.js?v=18';
-import { sectionHead, emptyState } from '../shared.js?v=18';
-import { paymentChip, groupHoursText } from './shared.js?v=18';
+import { api } from '../../../api.js?v=19';
+import { el, button, toast } from '../../../ui.js?v=19';
+import { formatSum, dayLabel, dayKeyOf } from '../../../ads-utils.js?v=19';
+import { sectionHead, emptyState } from '../shared.js?v=19';
+import { paymentChip, groupHoursText } from './shared.js?v=19';
 
 function money(value) {
   return formatSum(value || 0);

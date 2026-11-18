@@ -1,6 +1,6 @@
-import { api, compressImage, toFormData } from '../api.js?v=18';
-import { el, button, openModal, toast } from '../ui.js?v=18';
-import { icon } from '../icons.js?v=18';
+import { api, compressImage, toFormData } from '../api.js?v=19';
+import { el, button, openModal, toast } from '../ui.js?v=19';
+import { icon } from '../icons.js?v=19';
 
 // Creates a post (photo + caption + location) or a 24h story.
 export function openPostCreate(onCreated) {

@@ -1,6 +1,6 @@
-import { api, setToken, clearToken } from './api.js?v=18';
-import { storageGet } from './storage.js?v=18';
-import { icon } from './icons.js?v=18';
+import { api, setToken, clearToken } from './api.js?v=19';
+import { storageGet } from './storage.js?v=19';
+import { icon } from './icons.js?v=19';
 import {
   getState,
   setUser,
@@ -12,29 +12,29 @@ import {
   applyTheme,
   watchSystemTheme,
   isOwner
-} from './state.js?v=18';
-import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=18';
-import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=18';
-import { initSocket, onSocket, disconnectSocket } from './socket.js?v=18';
-import { showMatchScreen } from './components/match.js?v=18';
+} from './state.js?v=19';
+import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=19';
+import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=19';
+import { initSocket, onSocket, disconnectSocket } from './socket.js?v=19';
+import { showMatchScreen } from './components/match.js?v=19';
 
-import Landing from './pages/landing.js?v=18';
-import LoginPage from './pages/login.js?v=18';
-import RegisterPage from './pages/register.js?v=18';
-import WelcomePage from './pages/welcome.js?v=18';
-import SwipePage from './pages/swipe.js?v=18';
-import LikesPage from './pages/likes.js?v=18';
-import ChatsPage from './pages/chats.js?v=18';
-import ChatPage from './pages/chat.js?v=18';
-import ProfilePage from './pages/profile.js?v=18';
-import EditProfilePage from './pages/edit-profile.js?v=18';
-import ExplorePage from './pages/explore.js?v=18';
-import NotificationsPage from './pages/notifications.js?v=18';
-import SettingsPage from './pages/settings.js?v=18';
-import SuperlikesPage from './pages/superlikes.js?v=18';
-import LegalPage from './pages/legal.js?v=18';
-import AdvertisePage from './pages/advertise.js?v=18';
-import AdReportPage from './pages/ad-report.js?v=18';
+import Landing from './pages/landing.js?v=19';
+import LoginPage from './pages/login.js?v=19';
+import RegisterPage from './pages/register.js?v=19';
+import WelcomePage from './pages/welcome.js?v=19';
+import SwipePage from './pages/swipe.js?v=19';
+import LikesPage from './pages/likes.js?v=19';
+import ChatsPage from './pages/chats.js?v=19';
+import ChatPage from './pages/chat.js?v=19';
+import ProfilePage from './pages/profile.js?v=19';
+import EditProfilePage from './pages/edit-profile.js?v=19';
+import ExplorePage from './pages/explore.js?v=19';
+import NotificationsPage from './pages/notifications.js?v=19';
+import SettingsPage from './pages/settings.js?v=19';
+import SuperlikesPage from './pages/superlikes.js?v=19';
+import LegalPage from './pages/legal.js?v=19';
+import AdvertisePage from './pages/advertise.js?v=19';
+import AdReportPage from './pages/ad-report.js?v=19';
 
 const NAV_ITEMS = [
   { path: '/swipe', label: 'Свайпы', icon: 'layers' },
@@ -63,7 +63,7 @@ const ROUTES = [
   {
     path: '/admin',
     page: async (ctx) => {
-      const module = await import('./pages/admin/index.js?v=18');
+      const module = await import('./pages/admin/index.js?v=19');
       return module.default(ctx);
     },
     auth: true,

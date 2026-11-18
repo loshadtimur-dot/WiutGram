@@ -4,13 +4,13 @@ const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { swipeLimiter } = require('../middleware/rateLimit');
-const { cardsFor, photosFor, groupPhotos, cardView } = require('../lib/userView');
+const { cardsFor, photosFor, cardView } = require('../lib/userView');
 const { ensureMatch, matchDateLabel } = require('../lib/matches');
 const { isBlockedBetween } = require('../lib/blocks');
 const { ensureSuperLikes, consumeSuperLike, SUPER_LIKES_PER_DAY } = require('../lib/limits');
 const { notify } = require('../lib/notify');
 const { emitToUser } = require('../lib/io');
-const { toInt, oneOf, clamp, cleaned } = require('../middleware/validate');
+const { toInt, oneOf, clamp } = require('../middleware/validate');
 const { nowIso } = require('../utils/time');
 
 const router = express.Router();

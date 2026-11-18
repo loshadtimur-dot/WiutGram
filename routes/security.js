@@ -1,6 +1,5 @@
 'use strict';
 
-const crypto = require('crypto');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const QRCode = require('qrcode');

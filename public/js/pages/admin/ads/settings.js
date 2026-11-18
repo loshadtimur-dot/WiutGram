@@ -1,7 +1,7 @@
-import { api } from '../../../api.js?v=18';
-import { el, button, toast } from '../../../ui.js?v=18';
-import { icon } from '../../../icons.js?v=18';
-import { sectionHead } from '../shared.js?v=18';
+import { api } from '../../../api.js?v=19';
+import { el, button, toast } from '../../../ui.js?v=19';
+import { icon } from '../../../icons.js?v=19';
+import { sectionHead } from '../shared.js?v=19';
 
 export default async function adsSettingsSection({ refresh }) {
   let data;
@@ -113,6 +113,82 @@ export default async function adsSettingsSection({ refresh }) {
   panel.append(form);
   root.append(panel);
 
+  /* ---------- Payment details (public on /advertise) ---------- */
+
+  const payCard = el('div', { class: 'admin-panel' });
+  payCard.append(el('strong', { text: 'Оплата и контакты' }));
+  payCard.append(
+    el('p', {
+      class: 'field__hint',
+      text: 'Эти реквизиты увидят все, кто нажмёт «Купить». Используйте карту, на которую готовы принимать переводы.'
+    })
+  );
+  const payGrid = el('div', { class: 'ads-form-grid' });
+
+  function payField(key, label, options = {}) {
+    const field = el('label', { class: `field ${options.full ? 'field--full' : ''}` });
+    field.append(el('span', { class: 'field__label', text: label }));
+    const input = el('input', {
+      class: 'input',
+      attrs: {
+        type: 'text',
+        maxlength: options.maxlength || '80',
+        inputmode: options.inputmode || null,
+        placeholder: options.placeholder || ''
+      }
+    });
+    input.value = options.value ?? '';
+    inputs[key] = input;
+    field.append(input);
+    if (options.hint) field.append(el('span', { class: 'field__hint', text: options.hint }));
+    payGrid.append(field);
+    return input;
+  }
+
+  const cardInput = payField('ads_card_number', 'Номер карты', {
+    placeholder: '8600 0000 0000 0000',
+    inputmode: 'numeric',
+    maxlength: '30',
+    hint: 'Хранятся только цифры. Показывается группами по 4.'
+  });
+  const cardPreview = el('span', { class: 'field__hint' });
+  cardInput.closest('.field').append(cardPreview);
+  const renderCardPreview = () => {
+    const digits = cardInput.value.replace(/\D/g, '').slice(0, 19);
+    cardPreview.textContent = digits ? `На странице: ${digits.replace(/(\d{4})(?=\d)/g, '$1 ')}` : '';
+  };
+  cardInput.addEventListener('input', renderCardPreview);
+  renderCardPreview();
+
+  payField('ads_card_holder', 'Владелец карты', {
+    maxlength: '80',
+    placeholder: 'Как в банковском приложении'
+  });
+  payField('ads_card_bank', 'Банк', { maxlength: '60', placeholder: 'Например, Uzcard' });
+  payField('ads_payment_note', 'Примечание к оплате', {
+    full: true,
+    maxlength: '300',
+    placeholder: 'После оплаты пришлите чек в Telegram'
+  });
+
+  const showCardRow = el('label', { class: 'switch', style: { gridColumn: '1 / -1' } });
+  const showCardText = el('div', { class: 'switch__text' });
+  showCardText.append(el('div', { class: 'switch__title', text: 'Показывать карту в окне покупки' }));
+  showCardText.append(
+    el('div', {
+      class: 'switch__desc',
+      text: 'Пока выключено, номер и реквизиты не отдаются публичной странице вообще.'
+    })
+  );
+  const showCardInput = el('input', { attrs: { type: 'checkbox' } });
+  showCardInput.checked = !!settings.show_card;
+  inputs.ads_show_card = showCardInput;
+  showCardRow.append(showCardText, showCardInput);
+  payGrid.append(showCardRow);
+
+  payCard.append(payGrid);
+  root.append(payCard);
+
   /* ---------- Discounts ---------- */
 
   const discountCard = el('div', { class: 'admin-panel' });
@@ -161,7 +237,12 @@ export default async function adsSettingsSection({ refresh }) {
           ads_swipe_enabled: inputs.ads_swipe_enabled.checked,
           ads_profile_enabled: inputs.ads_profile_enabled.checked,
           ads_show_audience_stats: inputs.ads_show_audience_stats.checked,
+          ads_show_card: inputs.ads_show_card.checked,
           ads_telegram: inputs.ads_telegram.value.trim(),
+          ads_card_number: inputs.ads_card_number.value.trim(),
+          ads_card_holder: inputs.ads_card_holder.value.trim(),
+          ads_card_bank: inputs.ads_card_bank.value.trim(),
+          ads_payment_note: inputs.ads_payment_note.value.trim(),
           ads_price_per_hour: Number(inputs.ads_price_per_hour.value) || 0,
           ads_horizon_days: Number(inputs.ads_horizon_days.value) || 30,
           ads_min_notice_hours: Number(inputs.ads_min_notice_hours.value) || 0,
@@ -177,8 +258,9 @@ export default async function adsSettingsSection({ refresh }) {
             })
             .filter((tier) => tier.min_hours > 0 && tier.percent > 0)
         };
-        await api.put('/admin/ads/settings', payload);
+        const saved = await api.put('/admin/ads/settings', payload);
         toast('Настройки рекламы сохранены', 'success');
+        for (const warning of saved.warnings || []) toast(warning);
         if (refresh) refresh();
       } catch (err) {
         toast(err.message || 'Не удалось сохранить настройки', 'error');

@@ -1,29 +1,65 @@
 # /etc/caddy/Caddyfile
-# Caddy obtains and renews HTTPS certificates automatically.
+#
+# Domain and ACME email come from the Caddy environment
+# (/etc/caddy/caddy.env or `systemctl edit caddy`):
+#   SITE_DOMAIN=uni-lovers.uz
+#   ACME_EMAIL=admin@uni-lovers.uz
+#
+# Caddy obtains and renews the HTTPS certificate automatically.
 
-uni-lovers.uz {
-    encode zstd gzip
+{
+	email {$ACME_EMAIL:admin@example.com}
+	admin off
+}
 
-    reverse_proxy 127.0.0.1:3000 {
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
-    }
+# Redirect www to the bare domain.
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
 
-    # Long cache for versioned static assets, no cache for HTML.
-    @static path /css/* /js/* /img/*
-    header @static Cache-Control "public, max-age=31536000, immutable"
+{$SITE_DOMAIN} {
+	encode zstd gzip
 
-    @html path / /index.html
-    header @html Cache-Control "no-cache"
+	# Banner uploads are capped at 8 MB in the app; leave headroom for the form.
+	request_body {
+		max_size 16MB
+	}
 
-    header {
-        X-Content-Type-Options nosniff
-        Referrer-Policy strict-origin-when-cross-origin
-        -Server
-    }
+	reverse_proxy 127.0.0.1:3000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
 
-    log {
-        output file /var/log/caddy/uni-lovers.log
-        format console
-    }
+	# Versioned static assets can be cached forever.
+	@static path /css/* /js/* /img/*
+	header @static Cache-Control "public, max-age=31536000, immutable"
+
+	# HTML is always revalidated so a deploy is visible immediately.
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+
+	# The owner area must never be indexed.
+	@admin path /admin /admin/* /api/admin/* /api/admin
+	header @admin X-Robots-Tag "noindex, nofollow, noarchive"
+
+	@media path /media/*
+	header @media Cache-Control "private, max-age=600"
+	header @media X-Robots-Tag "noindex, noimageindex"
+	header @media X-Content-Type-Options "nosniff"
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/uni-lovers.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+		format console
+	}
 }

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the UNI Lovers backup every night at 03:15 (Asia/Tashkent)
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 Asia/Tashkent
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

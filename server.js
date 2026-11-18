@@ -132,8 +132,23 @@ app.use('/api', apiLimiter);
 app.use('/api', requirePasswordChanged);
 app.use('/api', requireWritable);
 
+const PACKAGE_VERSION = require('./package.json').version;
+
 function healthPayload() {
-  return { ok: true, time: nowIso(), db: db.driver, uptime: Math.round(process.uptime()) };
+  let dbOk = true;
+  try {
+    db.get('SELECT 1 AS ok');
+  } catch (err) {
+    dbOk = false;
+  }
+  return {
+    ok: dbOk,
+    time: nowIso(),
+    db: db.driver,
+    db_ok: dbOk,
+    version: PACKAGE_VERSION,
+    uptime: Math.round(process.uptime())
+  };
 }
 app.get('/api/health', (req, res) => res.json(healthPayload()));
 app.get('/health', (req, res) => res.json(healthPayload()));

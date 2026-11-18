@@ -1,6 +1,26 @@
 # UNI Lovers
 
+[![CI](https://github.com/loshadtimur-dot/uni-lovers/actions/workflows/ci.yml/badge.svg)](https://github.com/loshadtimur-dot/uni-lovers/actions/workflows/ci.yml)
+
 Сайт знакомств для студентов Ташкента: свайпы, матчи, realtime-чаты, посты, истории, статистика, уведомления, реклама по часам и Центр управления для владельца. Интерфейс на русском, код и комментарии на английском.
+
+## Проверки
+
+```bash
+npm run lint        # ESLint (0 ошибок обязательно, предупреждения допустимы)
+npm run test:api    # 23 сценария API на временной БД
+npm run test:e2e    # Playwright; нужен Chromium: npx playwright install chromium
+```
+
+## Документация
+
+- `docs/DEPLOY.md` — пошаговый запуск на VPS с доменом и HTTPS.
+- `docs/BACKUP_RESTORE.md` — бэкапы, ротация, восстановление.
+- `docs/RUNBOOK.md` — что делать при сбое, откат, потеря доступа.
+- `docs/HOSTING_DECISION.md` — где размещать и что уточнить у юриста.
+- `docs/ARCHITECTURE.md` — схема, таблицы, потоки данных.
+- `docs/AUDIT.md` — результаты аудита и известные ограничения.
+- `docs/HANDOFF.md` — что сделано, что проверить, что сделать владельцу.
 
 ## Быстрый старт
 

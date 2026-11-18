@@ -25,12 +25,7 @@ function pick(obj, keys) {
 // Public representation of a user row, safe to return to other users.
 function publicUser(row, options = {}) {
   if (!row) return null;
-  const {
-    isOnline = false,
-    distance = null,
-    photos = [],
-    includePrivate = false
-  } = options;
+  const { isOnline = false, photos = [], includePrivate = false } = options;
 
   const age = ageFromBirthdate(row.birthdate);
   const user = {
@@ -138,6 +133,8 @@ function attachPhotos(users, photoRows) {
 // Removes characters that could break markup when text is rendered client-side.
 function cleanText(value, maxLength = 1000) {
   if (typeof value !== 'string') return '';
+  // Control characters are stripped on purpose; they break markup and terminal output.
+  // eslint-disable-next-line no-control-regex
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').slice(0, maxLength).trim();
 }
 

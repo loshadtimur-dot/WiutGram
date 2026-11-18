@@ -1,22 +1,37 @@
 [Unit]
 Description=UNI Lovers (Node.js)
-After=network.target
+Documentation=file:///srv/uni-lovers/docs/RUNBOOK.md
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
-User=www-data
-Group=www-data
+User=unilovers
+Group=unilovers
 WorkingDirectory=/srv/uni-lovers
-EnvironmentFile=/srv/uni-lovers/.env
+# Secrets live outside the repository, readable only by the service user.
+EnvironmentFile=/etc/uni-lovers/uni-lovers.env
+Environment=NODE_ENV=production
 ExecStart=/usr/bin/node server.js
 Restart=always
 RestartSec=5
 KillSignal=SIGTERM
-TimeoutStopSec=15
+TimeoutStopSec=20
+LimitNOFILE=8192
+
+# Hardening: the service can only write where the app needs to.
 NoNewPrivileges=true
 PrivateTmp=true
+PrivateDevices=true
 ProtectSystem=strict
-ReadWritePaths=/srv/uni-lovers/data /srv/uni-lovers/uploads /srv/uni-lovers/logs /srv/uni-lovers/backups
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryMax=768M
+ReadWritePaths=/srv/uni-lovers/data /srv/uni-lovers/uploads /srv/uni-lovers/storage /srv/uni-lovers/logs /srv/uni-lovers/backups
 
 [Install]
 WantedBy=multi-user.target

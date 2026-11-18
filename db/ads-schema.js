@@ -108,6 +108,11 @@ const ADS_DEFAULT_RULES = [
 const ADS_DEFAULT_SETTINGS = {
   ads_enabled: '1',
   ads_telegram: '',
+  ads_card_number: '',
+  ads_card_holder: '',
+  ads_card_bank: '',
+  ads_show_card: '0',
+  ads_payment_note: '',
   ads_price_per_hour: '15000',
   ads_horizon_days: '30',
   ads_min_notice_hours: '1',

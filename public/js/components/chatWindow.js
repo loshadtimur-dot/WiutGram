@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=18';
+import { api, compressImage, toFormData } from '../api.js?v=19';
 import {
   el,
   avatarNode,
@@ -12,12 +12,12 @@ import {
   initials,
   gradientFor,
   svgIcon
-} from '../ui.js?v=18';
-import { PREFERRED_EMOJI, icon } from '../icons.js?v=18';
-import { getState, setOnline, setCounts } from '../state.js?v=18';
-import { onSocket, startTyping, stopTyping } from '../socket.js?v=18';
-import { openReportDialog, openBlockConfirm } from './report.js?v=18';
-import { navigate } from '../router.js?v=18';
+} from '../ui.js?v=19';
+import { PREFERRED_EMOJI, icon } from '../icons.js?v=19';
+import { getState, setOnline, setCounts } from '../state.js?v=19';
+import { onSocket, startTyping, stopTyping } from '../socket.js?v=19';
+import { openReportDialog, openBlockConfirm } from './report.js?v=19';
+import { navigate } from '../router.js?v=19';
 
 export function createChatWindow(matchId, options = {}) {
   const root = el('div', { class: 'chat-window' });

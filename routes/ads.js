@@ -3,6 +3,7 @@
 const express = require('express');
 const db = require('../db');
 const ads = require('../lib/ads');
+const { publicPayment } = require('../lib/ads/payment');
 const { adRequestLimiter } = require('../middleware/rateLimit');
 const { noStore } = require('../middleware/auth');
 const { toInt } = require('../middleware/validate');
@@ -19,6 +20,7 @@ router.get('/config', noStore, (req, res) => {
     swipe_enabled: settings.swipe_enabled,
     profile_enabled: settings.profile_enabled,
     telegram: settings.telegram,
+    payment: publicPayment(settings),
     price_per_hour: settings.price_per_hour,
     horizon_days: settings.horizon_days,
     min_notice_hours: settings.min_notice_hours,

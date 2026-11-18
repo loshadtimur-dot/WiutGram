@@ -11,7 +11,7 @@ const ROOT = path.join(__dirname, '..');
 /* ---------- Server lifecycle ---------- */
 
 // Starts the real server against a disposable database and uploads folder.
-async function startServer(port = 3199) {
+async function startServer(port = 3199, overrides = {}) {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-test-'));
   const dbFile = path.join(tempDir, 'app.db');
   const uploadsDir = path.join(tempDir, 'uploads');
@@ -25,7 +25,8 @@ async function startServer(port = 3199) {
     UNI_TEST_MODE: '1',
     JWT_SECRET: 'test-secret-key-for-automated-tests-only',
     NODE_ENV: 'test',
-    TRUST_PROXY: 'false'
+    TRUST_PROXY: 'false',
+    ...overrides
   };
 
   const out = fs.openSync(logFile, 'a');

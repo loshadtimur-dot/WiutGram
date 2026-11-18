@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=18';
+import { api, compressImage, toFormData } from '../api.js?v=19';
 import {
   el,
   avatarNode,
@@ -18,17 +18,17 @@ import {
   gradientFor,
   svgIcon,
   plural
-} from '../ui.js?v=18';
-import { icon } from '../icons.js?v=18';
-import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=18';
-import { navigate } from '../router.js?v=18';
-import { openPostModal } from '../components/postModal.js?v=18';
-import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=18';
-import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=18';
-import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=18';
-import { openReportDialog, openBlockConfirm } from '../components/report.js?v=18';
-import { showMatchScreen } from '../components/match.js?v=18';
-import { mountAdBanner } from '../components/adBanner.js?v=18';
+} from '../ui.js?v=19';
+import { icon } from '../icons.js?v=19';
+import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=19';
+import { navigate } from '../router.js?v=19';
+import { openPostModal } from '../components/postModal.js?v=19';
+import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=19';
+import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=19';
+import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=19';
+import { openReportDialog, openBlockConfirm } from '../components/report.js?v=19';
+import { showMatchScreen } from '../components/match.js?v=19';
+import { mountAdBanner } from '../components/adBanner.js?v=19';
 
 export default async function ProfilePage(ctx) {
   const me = getState().user;
