@@ -1,8 +1,8 @@
-import { api, setToken } from '../api.js?v=24';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=24';
-import { setUser } from '../state.js?v=24';
-import { navigate } from '../router.js?v=24';
-import { icon } from '../icons.js?v=24';
+import { api, setToken } from '../api.js?v=25';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=25';
+import { setUser } from '../state.js?v=25';
+import { navigate } from '../router.js?v=25';
+import { icon } from '../icons.js?v=25';
 
 export default function LoginPage(ctx) {
   const root = el('div', { class: 'auth' });

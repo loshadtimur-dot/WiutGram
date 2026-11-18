@@ -1,5 +1,5 @@
-import { api } from '../../../api.js?v=24';
-import { el, button, toast, openModal } from '../../../ui.js?v=24';
+import { api } from '../../../api.js?v=25';
+import { el, button, toast, openModal } from '../../../ui.js?v=25';
 
 // 4:1 banner cropper. The preview canvas is 800×200 and the export is 1600×400.
 const VIEW_W = 800;

@@ -1,5 +1,5 @@
-import { api } from '../api.js?v=24';
-import { el, button, openModal, confirmDialog, toast, avatarNode } from '../ui.js?v=24';
+import { api } from '../api.js?v=25';
+import { el, button, openModal, confirmDialog, toast, avatarNode } from '../ui.js?v=25';
 
 const REASONS = [
   ['spam', 'Спам или реклама'],

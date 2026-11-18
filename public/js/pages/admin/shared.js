@@ -1,5 +1,5 @@
-import { api } from '../../api.js?v=24';
-import { el, button, openModal, toast } from '../../ui.js?v=24';
+import { api } from '../../api.js?v=25';
+import { el, button, openModal, toast } from '../../ui.js?v=25';
 
 const COURSE_LABELS = {
   '1': '1 курс',

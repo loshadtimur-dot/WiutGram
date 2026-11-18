@@ -1,9 +1,9 @@
-import { api } from '../../../api.js?v=24';
-import { el, button, toast, openModal } from '../../../ui.js?v=24';
-import { formatSum } from '../../../ads-utils.js?v=24';
-import { sectionHead, emptyState } from '../shared.js?v=24';
-import { PAYMENT_LABELS, paymentChip, openCampaignDetail, openPreviewModal, groupHoursText } from './shared.js?v=24';
-import { openBookingModal } from './booking.js?v=24';
+import { api } from '../../../api.js?v=25';
+import { el, button, toast, openModal } from '../../../ui.js?v=25';
+import { formatSum } from '../../../ads-utils.js?v=25';
+import { sectionHead, emptyState } from '../shared.js?v=25';
+import { PAYMENT_LABELS, paymentChip, openCampaignDetail, openPreviewModal, groupHoursText } from './shared.js?v=25';
+import { openBookingModal } from './booking.js?v=25';
 
 // Password confirmation for dangerous owner actions.
 export function withSudo({ title, description, reason, actionLabel = 'Подтвердить', onConfirm }) {

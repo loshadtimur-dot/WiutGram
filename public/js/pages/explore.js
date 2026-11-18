@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=24';
+import { api } from '../api.js?v=25';
 import {
   el,
   avatarNode,
@@ -11,14 +11,14 @@ import {
   gradientFor,
   timeAgo,
   svgIcon
-} from '../ui.js?v=24';
-import { icon } from '../icons.js?v=24';
-import { getState } from '../state.js?v=24';
-import { navigate } from '../router.js?v=24';
-import { createStoryRail } from '../components/storyViewer.js?v=24';
-import { openStoryCreate } from '../components/postCreate.js?v=24';
-import { createPostCard } from '../components/postCard.js?v=24';
-import { openPostModal } from '../components/postModal.js?v=24';
+} from '../ui.js?v=25';
+import { icon } from '../icons.js?v=25';
+import { getState } from '../state.js?v=25';
+import { navigate } from '../router.js?v=25';
+import { createStoryRail } from '../components/storyViewer.js?v=25';
+import { openStoryCreate } from '../components/postCreate.js?v=25';
+import { createPostCard } from '../components/postCard.js?v=25';
+import { openPostModal } from '../components/postModal.js?v=25';
 
 const INTERESTS = [
   ['travel', 'Путешествия'], ['music', 'Музыка'], ['movies', 'Кино'], ['sport', 'Спорт'],

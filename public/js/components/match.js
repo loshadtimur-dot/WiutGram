@@ -1,6 +1,6 @@
-import { el, avatarNode, button, colorFor } from '../ui.js?v=24';
-import { icon } from '../icons.js?v=24';
-import { navigate } from '../router.js?v=24';
+import { el, avatarNode, button, colorFor } from '../ui.js?v=25';
+import { icon } from '../icons.js?v=25';
+import { navigate } from '../router.js?v=25';
 
 function confettiLayer() {
   const layer = el('div', { class: 'confetti-layer', attrs: { 'aria-hidden': 'true' } });

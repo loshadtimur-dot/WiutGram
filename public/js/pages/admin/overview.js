@@ -1,7 +1,7 @@
-import { api } from '../../api.js?v=24';
-import { el, avatarNode } from '../../ui.js?v=24';
-import { icon } from '../../icons.js?v=24';
-import { sectionHead, fmtDate, courseLabel, emptyState, statusChips } from './shared.js?v=24';
+import { api } from '../../api.js?v=25';
+import { el, avatarNode } from '../../ui.js?v=25';
+import { icon } from '../../icons.js?v=25';
+import { sectionHead, fmtDate, courseLabel, emptyState, statusChips } from './shared.js?v=25';
 
 function drawChart(canvas, labels, series) {
   const dpr = window.devicePixelRatio || 1;

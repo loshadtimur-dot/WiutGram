@@ -156,6 +156,10 @@
   color: var(--nope);
   font-weight: 600;
 }
+.input.is-invalid {
+  border-color: var(--nope);
+  background: color-mix(in srgb, var(--nope) 6%, var(--surface));
+}
 .input,
 .select,
 .textarea {

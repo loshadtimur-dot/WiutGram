@@ -1,8 +1,8 @@
-import { api, compressImage, setToken } from '../api.js?v=24';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=24';
-import { setUser } from '../state.js?v=24';
-import { navigate } from '../router.js?v=24';
-import { icon } from '../icons.js?v=24';
+import { api, compressImage, setToken } from '../api.js?v=25';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=25';
+import { setUser } from '../state.js?v=25';
+import { navigate } from '../router.js?v=25';
+import { icon } from '../icons.js?v=25';
 
 const FALLBACK_DISTRICTS = [
   'Алмазарский', 'Бектемирский', 'Мирабадский', 'Мирзо-Улугбекский', 'Сергелийский', 'Учтепинский',
@@ -104,6 +104,7 @@ export default async function RegisterPage(ctx) {
   let minOwnerPassword = 10;
   let stepIndex = 0;
   let busy = false;
+  let lastInvalidField = null;
 
   try {
     const [reference, firstInfo, universityList] = await Promise.all([
@@ -177,6 +178,14 @@ export default async function RegisterPage(ctx) {
   wizard.append(body);
   const errorBox = el('div', { class: 'field__error hidden', attrs: { role: 'alert' } });
   wizard.append(errorBox);
+
+  // A message from a previous attempt must disappear as soon as the user
+  // starts typing, otherwise it looks like it belongs to the field being edited.
+  function clearFormError() {
+    errorBox.classList.add('hidden');
+    errorBox.textContent = '';
+    wizard.querySelectorAll('.input.is-invalid').forEach((input) => input.classList.remove('is-invalid'));
+  }
   const actions = el('div', { class: 'wizard__actions' });
   wizard.append(actions);
   panel.append(wizard);
@@ -234,6 +243,7 @@ export default async function RegisterPage(ctx) {
     emailInput.value = data.email;
     const syncEmail = () => {
       data.email = emailInput.value.trim();
+      clearFormError();
     };
     emailInput.addEventListener('input', syncEmail);
     emailInput.addEventListener('change', syncEmail);
@@ -268,24 +278,42 @@ export default async function RegisterPage(ctx) {
     const syncPassword = () => {
       data.password = pass.input.value;
       updateMeter();
+      clearFormError();
       const length = pass.input.value.length;
       passCount.classList.remove('is-error', 'copy-ok');
       if (!length) {
         passCount.textContent = firstUser
-          ? `Пароль владельца сайта: нужно минимум ${minLength} символов`
+          ? `Пароль: нужно минимум ${minLength} символов`
           : '';
       } else if (length < minLength) {
-        passCount.textContent = `Ещё ${minLength - length} символ(а) — минимум ${minLength}`;
+        passCount.textContent = `Пароль: ${length} из ${minLength} — добавьте ещё ${minLength - length}`;
         passCount.classList.add('is-error');
       } else {
-        passCount.textContent = firstUser ? 'Длина пароля подходит' : '';
-        if (firstUser) passCount.classList.add('copy-ok');
+        passCount.textContent = `Пароль: ${length} символов — подходит`;
+        passCount.classList.add('copy-ok');
       }
     };
     pass.input.addEventListener('input', syncPassword);
     pass.input.addEventListener('change', syncPassword);
     updateMeter();
     syncPassword();
+    pass.field.append(
+      button('Придумать пароль', {
+        variant: 'btn-secondary btn-sm',
+        type: 'button',
+        onClick: () => {
+          const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+          const values = new Uint32Array(12);
+          (window.crypto || {}).getRandomValues?.(values);
+          let generated = '';
+          values.forEach((value) => { generated += alphabet[value % alphabet.length]; });
+          pass.input.value = generated;
+          pass.input.type = 'text';
+          syncPassword();
+          toast('Пароль готов — сохраните его', 'success');
+        }
+      })
+    );
     frag.append(pass.field);
 
     const usernameField = el('label', { class: 'field' });
@@ -310,16 +338,23 @@ export default async function RegisterPage(ctx) {
       const value = normalizeUsername(usernameInput.value);
       if (usernameInput.value !== value) usernameInput.value = value;
       data.username = value;
+      clearFormError();
       usernameHint.textContent = '';
       usernameHint.classList.remove('copy-ok', 'is-error');
       clearTimeout(checkTimer);
-      if (value.length < 3) return;
+      if (value.length < 4) {
+        if (value.length) {
+          usernameHint.textContent = `${value.length} из 4`;
+          usernameHint.classList.add('is-error');
+        }
+        return;
+      }
       usernameHint.textContent = 'Проверяем…';
       checkTimer = setTimeout(async () => {
         try {
           const result = await api.get(`/auth/username-check?username=${encodeURIComponent(value)}`);
           if (result.available) {
-            usernameHint.textContent = 'свободен';
+            usernameHint.textContent = `${value.length} симв. · свободен`;
             usernameHint.classList.add('copy-ok');
           } else {
             const suggestion = `${value}${value.length > 18 ? '' : '_1'}`.slice(0, 20);
@@ -334,7 +369,7 @@ export default async function RegisterPage(ctx) {
     usernameInput.addEventListener('input', syncUsername);
     usernameInput.addEventListener('change', syncUsername);
     usernameField.append(usernameInput);
-    usernameField.append(el('span', { class: 'field__hint', text: '3–20 символов: латиница, цифры, точка, _' }));
+    usernameField.append(el('span', { class: 'field__hint', text: '4–20 символов: латиница, цифры, точка, _' }));
     frag.append(usernameField);
     return frag;
   }
@@ -689,16 +724,18 @@ export default async function RegisterPage(ctx) {
       const liveUser = document.querySelector('.wizard input[autocomplete="username"]');
       if (liveUser) data.username = normalizeUsername(liveUser.value);
       const email = data.email.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email)) return 'Введите корректный email';
+      lastInvalidField = liveEmail || null;
+      if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email)) return 'Email: введите адрес вида you@example.com';
       const minLength = firstUser ? Math.max(8, minOwnerPassword) : 8;
+      lastInvalidField = livePass || null;
       if (data.password.length < minLength) {
-        return firstUser
-          ? `Пароль владельца сайта: минимум ${minLength} символов, сейчас ${data.password.length}`
-          : `Пароль: минимум ${minLength} символов, сейчас ${data.password.length}`;
+        return `Пароль: введено ${data.password.length} из ${minLength} символов`;
       }
-      if (!/^[a-z0-9._]{3,20}$/.test(data.username)) {
-        return 'Username: 3–20 символов, латиница, цифры, точка или _';
+      lastInvalidField = liveUser || null;
+      if (!/^[a-z0-9._]{4,20}$/.test(data.username)) {
+        return `Username: минимум 4 символа (сейчас ${data.username.length})`;
       }
+      lastInvalidField = null;
     }
     if (index === 1) {
       if (data.display_name.trim().length < 2) return 'Укажите имя (минимум 2 символа)';
@@ -771,7 +808,12 @@ export default async function RegisterPage(ctx) {
     if (error) {
       errorBox.textContent = error;
       errorBox.classList.remove('hidden');
-      errorBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const anchor = lastInvalidField && document.contains(lastInvalidField) ? lastInvalidField : errorBox;
+      if (anchor !== errorBox) {
+        anchor.classList.add('is-invalid');
+        anchor.focus({ preventScroll: true });
+      }
+      anchor.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
     if (stepIndex < STEPS.length - 1) {

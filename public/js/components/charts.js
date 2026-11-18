@@ -1,4 +1,4 @@
-import { el } from '../ui.js?v=24';
+import { el } from '../ui.js?v=25';
 
 function setupCanvas(wrap) {
   const canvas = el('canvas');

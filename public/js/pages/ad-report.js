@@ -1,6 +1,6 @@
-import { api } from '../api.js?v=24';
-import { el, formatNumber } from '../ui.js?v=24';
-import { formatSum, dayLabel } from '../ads-utils.js?v=24';
+import { api } from '../api.js?v=25';
+import { el, formatNumber } from '../ui.js?v=25';
+import { formatSum, dayLabel } from '../ads-utils.js?v=25';
 
 const PAYMENT_LABELS = { paid: 'Оплачено', unpaid: 'Не оплачено', refunded: 'Возврат' };
 

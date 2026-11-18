@@ -3,6 +3,8 @@
 const { cleanText } = require('../utils/sanitize');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+// Registration asks for 4+, but the server still accepts legacy 3-char names
+// so existing accounts can keep editing their profile.
 const USERNAME_RE = /^[a-z0-9._]{3,20}$/;
 
 function isString(value) {
@@ -56,7 +58,7 @@ function fail(res, status, error) {
 
 const MESSAGES = {
   email: 'Введите корректный email',
-  username: 'Username: 3–20 символов, латиница, цифры, точка или _',
+  username: 'Username: 4–20 символов, латиница, цифры, точка или _',
   password: 'Пароль должен содержать минимум 8 символов',
   displayName: 'Укажите имя (2–40 символов)',
   birthdate: 'Укажите корректную дату рождения',
