@@ -14,6 +14,7 @@ npm run test:e2e    # Playwright; нужен Chromium: npx playwright install ch
 
 ## Документация
 
+- `docs/RAILWAY.md` — запуск в один клик на Railway (Dockerfile + volume).
 - `docs/DEPLOY.md` — пошаговый запуск на VPS с доменом и HTTPS.
 - `docs/BACKUP_RESTORE.md` — бэкапы, ротация, восстановление.
 - `docs/RUNBOOK.md` — что делать при сбое, откат, потеря доступа.

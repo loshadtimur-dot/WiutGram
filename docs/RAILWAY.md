@@ -1,0 +1,139 @@
+# Запуск UNI Lovers на Railway
+
+Проект уже готов к Railway: есть `Dockerfile`, `.dockerignore` и `railway.json`
+(health-check `/api/health`, один реплика). Ниже — что делать руками.
+
+## Важно понимать заранее
+
+- Приложение хранит данные в SQLite, то есть **нужен постоянный диск**. Без volume
+  база исчезнет при каждом перезапуске.
+- **Реплика должна быть ровно одна.** Railway не поддерживает несколько реплик с
+  одним SQLite: включите *Settings → Deploy → Replicas = 1* и не включайте
+  горизонтальное масштабирование.
+- Railway даёт HTTPS автоматически, поэтому `TRUST_PROXY=1` обязателен — иначе
+  IP в лимитах и Secure-куки будут работать неправильно.
+- Free-план Railway — пробный (около 5 $ кредита). Дальше Hobby ≈ 5 $/мес плюс
+  расход ресурсов; для этого приложения обычно 5–10 $/мес.
+
+## 1. Код в GitHub
+
+Railway разворачивает из репозитория, поэтому сначала код должен оказаться в
+`loshadtimur-dot/uni-lovers`. Если репозиторий ещё пустой — см. `docs/HANDOFF.md`,
+пункт про права токена (`Contents: Read and write`).
+
+## 2. Новый проект
+
+1. Откройте <https://railway.com/new>.
+2. **Deploy from GitHub repo** → выберите `uni-lovers`.
+3. Railway сам найдёт `Dockerfile` и `railway.json`. Если спросит builder —
+   выберите **Dockerfile**.
+4. Дождитесь первого билда (2–4 минуты: собирается `better-sqlite3`).
+
+## 3. Постоянный диск (volume)
+
+1. Ваш сервис → **Settings → Volumes → Add Volume**.
+2. **Mount path: `/data`** (именно так: путь внутри контейнера).
+3. Confirm. После подключения volume сервис перезапустится.
+
+## 4. Переменные окружения
+
+Сервис → **Variables → Raw Editor**, вставьте:
+
+```env
+NODE_ENV=production
+TRUST_PROXY=1
+UNI_DB_FILE=/data/app.db
+UPLOADS_DIR=/data/uploads
+JWT_SECRET=СЮДА_ВСТАВЬТЕ_СЛУЧАЙНУЮ_СТРОКУ
+SITE_URL=https://ВАШ-ДОМЕН.railway.app
+APP_URL=https://ВАШ-ДОМЕН.railway.app
+```
+
+`JWT_SECRET` сгенерируйте локально: `openssl rand -hex 48` (Windows: `node -e
+"console.log(require('crypto').randomBytes(48).toString('hex'))"`).
+
+- `PORT` задавать не нужно: Railway подставляет его сам, сервер её читает.
+- `SITE_URL`/`APP_URL` замените на реальный домен после шага 5.
+- Секреты (JWT, токены, пароли SMTP) вводите только в Railway Variables —
+  никогда в код и не в чат.
+
+## 5. Публичный домен
+
+1. Сервис → **Settings → Networking → Generate Domain**.
+2. Railway выдаст адрес вида `uni-lovers-production.up.railway.app`.
+3. Скопируйте его в переменные `SITE_URL` и `APP_URL` (без слэша на конце) и
+   нажмите **Redeploy**.
+4. Свой домен: **Custom Domain** → добавьте, затем в DNS пропишите CNAME на
+   выданный Railway-хост (для apex-домена — A-записи, которые покажет Railway).
+
+## 6. Проверка
+
+```bash
+curl -s https://ВАШ-ДОМЕН/api/health
+```
+
+Ожидается `{"ok":true,...,"db_ok":true,"version":"1.0.0"}`. В Railway вкладка
+**Deployments → Logs** должна быть без ошибок, статус — Active, а health-check
+зелёный.
+
+## 7. Первый вход и владелец
+
+1. Откройте сайт и **сразу зарегистрируйтесь** — первый реальный аккаунт
+   становится владельцем (`/admin`).
+2. Пароль владельца — от 10 символов, сохраните в менеджере паролей.
+3. Включите 2FA: «Безопасность» → «Двухфакторная аутентификация», сохраните
+   резервные коды.
+4. «Админ-панель» → «Реклама» → «Настройки»: Telegram, цена, номер карты,
+   владелец, банк, примечание, включите «Показывать карту».
+
+## 8. Бэкапы на Railway
+
+Таймера systemd в контейнере нет, поэтому используйте один из вариантов:
+
+**Вариант А (проще).** Railway → сервис → **Settings → Volumes**: включите
+снапшоты/сохраняйте копии volume средствами Railway.
+
+**Вариант Б (полноценно, как на VPS).** Добавьте второй сервис из того же
+репозитория (Duplicate service), в его настройках:
+
+- **Settings → Deploy → Custom Start Command:** `bash deploy/backup.sh`
+- **Settings → Deploy → Cron Schedule:** `15 3 * * *`
+- **Variables:** те же, что у основного сервиса, плюс
+  `BACKUP_DIR=/data/backups` и `KEEP_DAILY/KEEP_WEEKLY/KEEP_MONTHLY`
+- тот же volume `/data`
+
+Тогда каждую ночь будет создаваться `VACUUM INTO`-копия с проверкой
+`integrity_check` и архив медиа в `/data/backups` (ротация 7/4/3).
+
+Восстановление: `railway ssh` в сервис и
+
+```bash
+bash scripts/restore.sh /data/backups/daily/app-YYYYMMDD.db /data/backups/daily/media-YYYYMMDD.tar.gz
+```
+
+## 9. Обновление версии
+
+Любой push в `main` на GitHub → Railway пересобирает и перезапускает сервис.
+Перед крупными изменениями сделайте бэкап (шаг 8) — volume при деплое
+сохраняется.
+
+## 10. Если что-то не работает
+
+| Симптом | Причина и решение |
+| --- | --- |
+| Deploy failed на этапе `npm ci` | Обрыв загрузки; нажмите **Redeploy**. Если повторяется — проверьте логи, чаще всего это сеть Railway |
+| `502` / health-check красный | Сервис не слушает 3000: не задавайте `PORT=3000` вручную (Railway подставляет свой) |
+| Данные пропали после перезапуска | Не подключён volume или `UNI_DB_FILE` не `/data/app.db` |
+| `SQLITE_CANTOPEN` | Volume смонтирован не в `/data` либо путь в `UNI_DB_FILE` другой |
+| Не входит владелец, забыт пароль | `railway ssh`, затем `NEW_OWNER_PASSWORD='...' node scripts/owner-reset.js owner@example.com` |
+| Долгий первый ответ | Контейнер засыпает на free-плане; Hobby держит сервис активным |
+
+## 11. Ограничения Railway (честно)
+
+- Один процесс и один SQLite — этого достаточно для первых тысяч пользователей,
+  но не для горизонтального масштабирования.
+- Локальный диск ограничен размером volume: фото пользователей занимают место.
+- Railway не запускает systemd, Caddy и cron из `deploy/` — они нужны только для
+  VPS-варианта из `docs/DEPLOY.md`.
+- Реальную отправку писем/push проект пока не выполняет (этапы G и J не
+  реализованы), поэтому Railway-настройки SMTP/VAPID не требуются.

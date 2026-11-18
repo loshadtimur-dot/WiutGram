@@ -11,6 +11,9 @@ const DATA_DIR = path.join(__dirname, '..', 'data');
 const DB_FILE = process.env.UNI_DB_FILE ? path.resolve(process.env.UNI_DB_FILE) : path.join(DATA_DIR, 'app.db');
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+// A custom UNI_DB_FILE may point to a mounted volume that is not created yet.
+const DB_DIR = path.dirname(DB_FILE);
+if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
 
 let driver = 'better-sqlite3';
 let raw;
