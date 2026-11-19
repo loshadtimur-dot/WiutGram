@@ -312,6 +312,8 @@ h4 { font-size: 16px; font-weight: 600; }
 
 .verified,
 .verified-badge { color: var(--super); }
+.verified svg path + path,
+.verified-badge svg path + path { fill: #fff; }
 
 .badge--demo {
   background: var(--surface-2);

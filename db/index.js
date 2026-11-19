@@ -10,7 +10,12 @@ const {
   COSMETICS_USER_COLUMNS,
   COSMETICS_DEFAULT_SETTINGS
 } = require('./cosmetics-schema');
+const { SHOP_TABLES, SHOP_INDEXES, GIFT_COLUMNS, SHOP_DEFAULT_SETTINGS } = require('./shop-schema');
+const { CHAT_TABLES, CHAT_MESSAGE_INDEXES, ensureMessagesShape } = require('./chat-schema');
+const { ACCESS_TABLES, ACCESS_INDEXES } = require('./access-schema');
+const { shopSeed } = require('../lib/design');
 const { CITY, UNIVERSITY_SEED, UNIVERSITY_NAME_EN } = require('../config');
+const { nowIso } = require('../utils/time');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 // UNI_DB_FILE lets tests run against a disposable copy without touching real data.
@@ -168,6 +173,36 @@ function seedUniversities() {
   run('UPDATE universities SET is_active = CASE WHEN id = ? THEN 1 ELSE 0 END', [wiut.id]);
 }
 
+// Catalogue rows are inserted once; owner price and availability edits survive
+// restarts because the insert ignores existing slugs.
+function seedShopCatalogue() {
+  const now = nowIso();
+  for (const row of shopSeed()) {
+    run(
+      `INSERT OR IGNORE INTO shop_items
+       (kind, slug, title, description, price, asset_key, rarity, edition_limit,
+        edition_sold, is_active, is_owner_only, tags, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)`,
+      [
+        row.kind,
+        row.slug,
+        row.title,
+        row.description,
+        row.price,
+        row.asset_key,
+        row.rarity,
+        row.edition_limit || null,
+        row.is_active === undefined ? 1 : row.is_active,
+        row.is_owner_only || 0,
+        row.tags || '[]',
+        row.sort_order || 0,
+        now,
+        now
+      ]
+    );
+  }
+}
+
 function migrate() {
   for (const sql of TABLES) exec(sql);
   for (const table of Object.keys(EXTRA_COLUMNS)) ensureColumns(table, EXTRA_COLUMNS[table]);
@@ -192,6 +227,26 @@ function migrate() {
   for (const [key, value] of Object.entries(COSMETICS_DEFAULT_SETTINGS)) {
     run('INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)', [key, value]);
   }
+
+  // Shop: catalogue, orders, owned items and the profile decoration slots.
+  for (const sql of SHOP_TABLES) exec(sql);
+  ensureColumns('user_gifts', GIFT_COLUMNS);
+  for (const sql of SHOP_INDEXES) exec(sql);
+  for (const [key, value] of Object.entries(SHOP_DEFAULT_SETTINGS)) {
+    run('INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)', [key, value]);
+  }
+  seedShopCatalogue();
+
+  // Conversations: the two core tables must exist before messages is rebuilt.
+  exec(CHAT_TABLES[0]);
+  exec(CHAT_TABLES[1]);
+  ensureMessagesShape(raw);
+  for (const sql of CHAT_TABLES) exec(sql);
+  for (const sql of CHAT_MESSAGE_INDEXES) exec(sql);
+
+  // Access recovery requests.
+  for (const sql of ACCESS_TABLES) exec(sql);
+  for (const sql of ACCESS_INDEXES) exec(sql);
 
   // Admins are not a separate role anymore.
   run("UPDATE users SET role = 'user' WHERE role = 'admin'");

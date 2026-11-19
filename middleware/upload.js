@@ -53,9 +53,31 @@ function imageUpload(subdir, field = 'image') {
   };
 }
 
+// Voice notes are stored as-is (no server-side transcoding).
+function audioUpload(subdir = 'voice', field = 'audio') {
+  const upload = multer({
+    storage: buildStorage(subdir),
+    limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+    fileFilter(req, file, cb) {
+      const allowed = ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav'];
+      if (!allowed.includes(file.mimetype)) {
+        return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', field));
+      }
+      return cb(null, true);
+    }
+  }).single(field);
+  return (req, res, next) => {
+    upload(req, res, (err) => {
+      if (!err) return next();
+      if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: 'Голосовое больше 10 МБ' });
+      return res.status(400).json({ error: 'Допустимы WEBM, OGG, MP4 или MP3' });
+    });
+  };
+}
+
 // Public URL for an uploaded file.
 function publicPath(subdir, filename) {
   return `/uploads/${subdir}/${filename}`;
 }
 
-module.exports = { imageUpload, publicPath, ALLOWED_MIME };
+module.exports = { imageUpload, audioUpload, publicPath, ALLOWED_MIME };

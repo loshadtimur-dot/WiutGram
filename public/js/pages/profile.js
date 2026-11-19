@@ -29,13 +29,10 @@ import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?
 import { openReportDialog, openBlockConfirm } from '../components/report.js?v=25';
 import { showMatchScreen } from '../components/match.js?v=25';
 import { mountAdBanner } from '../components/adBanner.js?v=25';
-import {
-  bannerBackdrop,
-  badgeNode,
-  giftNode,
-  applyNameGift,
-  openCosmeticsStudio
-} from '../components/cosmetics.js?v=25';
+import { badgeNode, applyNameGift } from '../components/cosmetics.js?v=25';
+import { glassSvg } from '../components/glass.js?v=25';
+import { decorPanelNode, bannerNode, bannerPlaceholder, openBannerGallery, openStatusPicker } from '../components/decor.js?v=25';
+import { openGiftViewer } from '../components/giftViewer.js?v=25';
 
 export default async function ProfilePage(ctx) {
   const me = getState().user;
@@ -71,6 +68,15 @@ export default async function ProfilePage(ctx) {
     root.classList.add('has-gift-bg');
   }
   let following = !!profileData.is_following;
+  const decorState =
+    profileData.decor || { banner: null, background: null, status: null, custom_banner_path: null };
+  const profileGifts = profileData.gifts || [];
+  const giftStats = profileData.gift_stats || { total: 0, top_givers: [] };
+  const giftCount = giftStats.total || profileGifts.length;
+  if (decorState.background) {
+    root.style.background = decorState.background.theme;
+    root.classList.add('has-background', `bg-pattern-${decorState.background.pattern || 'dots'}`);
+  }
 
   let posts = [];
   let feeds = [];
@@ -83,7 +89,7 @@ export default async function ProfilePage(ctx) {
   /* ---------- Header ---------- */
   const header = el('div', { class: 'profile-header' });
   const avatarCol = el('div', { class: 'profile-avatar-col' });
-  const avatarHolder = el('div');
+  const avatarHolder = el('div', { class: 'avatar-holder' });
   avatarCol.append(avatarHolder);
   if (isSelf) {
     const addStory = el('button', { class: 'btn btn-secondary btn-sm', attrs: { type: 'button' } });
@@ -99,6 +105,16 @@ export default async function ProfilePage(ctx) {
   const nameText = el('div', { class: 'profile-username', text: profile.display_name });
   if (cosmetics.equipped_gift) applyNameGift(nameText, cosmetics.equipped_gift);
   nameRow.append(nameText);
+  if (decorState.status) {
+    const statusBubble = el('button', { class: 'status-bubble', attrs: { type: 'button' } });
+    statusBubble.innerHTML = glassSvg(decorState.status.emoji, 18);
+    statusBubble.append(el('span', { text: decorState.status.text || decorState.status.name }));
+    statusBubble.title = decorState.status.name;
+    if (isSelf) {
+      statusBubble.addEventListener('click', () => openStatusPicker(() => window.location.reload()));
+    }
+    nameRow.append(statusBubble);
+  }
   nameRow.append(ruleBadges(profile));
   if (getState().online.get(profile.id)) {
     const online = el('span', { class: 'tag' });
@@ -130,6 +146,7 @@ export default async function ProfilePage(ctx) {
     addStat('followers', 'Подписчики', cosmetics.follow.followers || 0);
     addStat('following', 'Подписки', cosmetics.follow.following || 0);
     addStat('matches', 'Матчи', counts.matches || 0).addEventListener('click', () => navigate('/chats'));
+
   } else {
     addStat('posts', 'Публикации', counts.posts || 0);
     addStat('followers', 'Подписчики', cosmetics.follow.followers || 0);
@@ -167,13 +184,10 @@ export default async function ProfilePage(ctx) {
     actions.append(shareBtn);
     actions.append(button('Настройки', { variant: 'btn-ghost', onClick: () => navigate('/settings') }));
     actions.append(
-      button('Косметика', {
+      button('Купить подарок', {
         variant: 'btn-secondary',
         icon: 'gift',
-        onClick: () =>
-          openCosmeticsStudio(() => {
-            window.location.reload();
-          })
+        onClick: () => navigate('/shop?tab=gift')
       })
     );
     if (me.role === 'owner') {
@@ -227,7 +241,14 @@ export default async function ProfilePage(ctx) {
         button('Написать', {
           variant: 'btn-secondary',
           icon: 'chat',
-          onClick: () => navigate(`/chat/${profileData.match.id}`)
+          onClick: async () => {
+            try {
+              const data = await api.post('/conversations/dm', { username: profile.username });
+              navigate(`/chat/${data.conversation.id}`);
+            } catch (err) {
+              toast(err.message || 'Не удалось открыть чат', 'error');
+            }
+          }
         })
       );
     }
@@ -318,37 +339,120 @@ export default async function ProfilePage(ctx) {
   }
   info.append(bio);
   header.append(info);
-  if (cosmetics.banner) {
-    const bannerWrap = el('div', { class: 'profile-banner-wrap' });
-    bannerWrap.append(bannerBackdrop(cosmetics.banner));
-    root.append(bannerWrap);
+  const bannerHost = el('div');
+  function renderBanner() {
+    bannerHost.innerHTML = '';
+    if (decorState.banner || decorState.custom_banner_path) {
+      const wrap = el('div', { class: 'profile-banner-wrap' });
+      wrap.append(bannerNode(decorState.banner, decorState.custom_banner_path));
+      bannerHost.append(wrap);
+    } else if (isSelf) {
+      bannerHost.append(bannerPlaceholder(() => openBannerGallery(() => window.location.reload())));
+    } else {
+      const wrap = el('div', { class: 'profile-banner-wrap' });
+      const neutral = bannerNode(null, null);
+      neutral.style.opacity = '0.55';
+      wrap.append(neutral);
+      bannerHost.append(wrap);
+    }
   }
+  renderBanner();
+  root.append(bannerHost);
   root.append(header);
 
-  // Gifts are grouped by type, so a large collection stays compact.
-  const visibleGifts = cosmetics.gifts.filter((gift) => isSelf || !gift.is_hidden);
+  if (isSelf) {
+    const decorBlock = el('div', { class: 'card card-pad', style: { marginBottom: '12px' } });
+    const decorTitle = el('div', { class: 'row', style: { justifyContent: 'space-between', marginBottom: '8px' } });
+    decorTitle.append(el('strong', { text: 'Оформление профиля', style: { fontSize: '14px' } }));
+    decorTitle.append(
+      button('Магазин', { variant: 'btn-ghost btn-sm', onClick: () => navigate('/shop') })
+    );
+    decorBlock.append(decorTitle);
+    decorBlock.append(
+      decorPanelNode({
+        decor: decorState,
+        giftsCount: giftCount,
+        onOpen: (kind) => {
+          if (kind === 'gifts') navigate('/shop?tab=gift');
+            else window.location.reload();
+        }
+      })
+    );
+    root.append(decorBlock);
+  }
+
+  const visibleGifts = profileGifts;
   const giftsSection = el('div', { class: 'profile-gifts' });
   const giftsHead = el('div', { class: 'profile-gifts__head' });
   giftsHead.innerHTML = icon('gift', { size: 18 });
-  giftsHead.append(el('span', { text: `Подарки${visibleGifts.length ? ` · ${visibleGifts.length}` : ''}` }));
+  giftsHead.append(el('span', { text: `Подарки${giftCount ? ` · ${giftCount}` : ''}` }));
+  const giftsHeadActions = el('div', { class: 'row' });
+  if (isSelf) {
+    giftsHeadActions.append(
+      button('Купить подарок', { variant: 'btn-primary btn-sm', onClick: () => navigate('/shop?tab=gift') })
+    );
+  } else {
+    giftsHeadActions.append(
+      button('Подарить', {
+        variant: 'btn-primary btn-sm',
+        onClick: () => navigate('/shop?tab=gift')
+      })
+    );
+  }
+  if (visibleGifts.length > 6) {
+    giftsHeadActions.append(
+      button('Показать все', { variant: 'btn-ghost btn-sm', onClick: () => openAllGifts(visibleGifts) })
+    );
+  }
+  giftsHead.append(giftsHeadActions);
   giftsSection.append(giftsHead);
   if (visibleGifts.length) {
-    const grid = el('div', { class: 'profile-gifts__grid' });
-    visibleGifts.forEach((gift) => {
-      grid.append(giftNode(gift, { count: gift.count, regifted: gift.has_regifted, size: 'sm' }));
-    });
-    giftsSection.append(grid);
+    const rail = el('div', { class: 'profile-gifts__rail' });
+    for (const gift of visibleGifts.slice(0, 14)) {
+      const card = el('button', { class: 'gift-mini', attrs: { type: 'button', title: gift.name } });
+      const art = el('div', { class: 'gift-mini__art' });
+      art.innerHTML = gift.svg || '';
+      card.append(art);
+      card.append(el('span', { class: 'gift-mini__name', text: gift.name }));
+      if (gift.is_pinned) card.append(el('span', { class: 'gift-mini__pin', text: '★' }));
+      if (gift.edition_number) card.append(el('span', { class: 'gift-mini__edition', text: `№${gift.edition_number}` }));
+      card.addEventListener('click', () =>
+        openGiftViewer(gift.id, { onChanged: () => window.location.reload() })
+      );
+      rail.append(card);
+    }
+    giftsSection.append(rail);
   } else {
     giftsSection.append(
       el('div', {
         class: 'profile-gifts__empty',
         text: isSelf
-          ? 'Пока нет подарков. Их можно купить у владельца в Telegram и поставить на имя.'
+          ? 'Пока нет подарков. Выберите подарок в магазине — он появится здесь после оплаты.'
           : 'У пользователя пока нет открытых подарков.'
       })
     );
   }
   root.append(giftsSection);
+
+  function openAllGifts(list) {
+    const grid = el('div', { class: 'shop-grid' });
+    const modal = openModal({ title: `Подарки · ${giftCount}`, body: grid, size: 'wide' });
+    for (const gift of list) {
+      const card = el('button', { class: 'shop-card shop-card--gift', attrs: { type: 'button' } });
+      const art = el('div', { class: 'shop-card__art' });
+      art.innerHTML = gift.svg || '';
+      card.append(art);
+      const info = el('div', { class: 'shop-card__body' });
+      info.append(el('div', { class: 'shop-card__title', text: gift.name }));
+      info.append(el('div', { class: 'people-card__meta', text: gift.sender ? gift.sender.display_name : 'Скрытый отправитель' }));
+      card.append(info);
+      card.addEventListener('click', () => {
+        modal.close();
+        openGiftViewer(gift.id, { onChanged: () => window.location.reload() });
+      });
+      grid.append(card);
+    }
+  }
 
   if (isSelf) root.append(superlikesCard());
 
@@ -418,6 +522,16 @@ export default async function ProfilePage(ctx) {
       avatarHolder.append(ring);
     } else {
       avatarHolder.append(avatarNode(profile, 'xxl'));
+    }
+    if (isSelf) {
+      const corner = el('button', {
+        class: decorState.status ? 'status-add status-add--emoji' : 'status-add',
+        attrs: { type: 'button', 'aria-label': 'Эмодзи-статус', title: 'Эмодзи-статус' }
+      });
+      if (decorState.status) corner.innerHTML = glassSvg(decorState.status.emoji, 18);
+      else corner.innerHTML = icon('plus', { size: 15 });
+      corner.addEventListener('click', () => openStatusPicker(() => window.location.reload()));
+      avatarHolder.append(corner);
     }
   }
 
@@ -834,6 +948,34 @@ export default async function ProfilePage(ctx) {
       kpi('Просмотры историй', formatNumber(stats.totals.story_views))
     );
     statsSection.append(kpis);
+
+    const giftCard = el('div', { class: 'chart-card gift-summary' });
+    giftCard.append(el('div', { class: 'section__title', text: 'Подарки' }));
+    giftCard.append(
+      el('div', {
+        class: 'gift-summary__total',
+        text: `Всего получено: ${formatNumber(giftStats.total || 0)}`
+      })
+    );
+    if ((giftStats.top_givers || []).length) {
+      giftCard.append(el('div', { class: 'gift-summary__label', text: 'Топ дарителей' }));
+      const donors = el('div', { class: 'gift-summary__list' });
+      for (const entry of giftStats.top_givers) {
+        if (!entry.user) continue;
+        const row = el('div', { class: 'gift-summary__row' });
+        row.append(avatarNode(entry.user, { size: 'xs' }));
+        row.append(
+          el('span', {
+            class: 'gift-summary__name',
+            text: entry.user.display_name || `@${entry.user.username}`
+          })
+        );
+        row.append(el('span', { class: 'gift-summary__count', text: `${entry.count} ✦` }));
+        donors.append(row);
+      }
+      giftCard.append(donors);
+    }
+    statsSection.append(giftCard);
 
     const viewChart = el('div', { class: 'chart-card' });
     const viewHead = el('div', { class: 'chart-card__head' });

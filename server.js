@@ -33,6 +33,12 @@ const activityHourly = require('./lib/activityHourly');
 const ads = require('./lib/ads');
 
 const authRoutes = require('./routes/auth');
+const shopRoutes = require('./routes/shop');
+const decorRoutes = require('./routes/decor');
+const accessRoutes = require('./routes/access');
+const conversationRoutes = require('./routes/conversations');
+const chatMessageRoutes = require('./routes/chat-messages');
+const peopleRoutes = require('./routes/people');
 const userRoutes = require('./routes/users');
 const cosmeticsRoutes = require('./routes/cosmetics');
 const discoverRoutes = require('./routes/discover');
@@ -57,6 +63,15 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 
 ensureUploadDirs();
 getSecret();
+
+// Move legacy match chats into the conversation model once, before serving.
+try {
+  const { migrateMatchesToConversations } = require('./lib/chat/migrate');
+  const migration = migrateMatchesToConversations();
+  if (migration.migrated) logger.info(`chat migration: ${migration.migrated} messages, ${migration.created} conversations`);
+} catch (err) {
+  logger.error(`chat migration failed: ${err.message}`);
+}
 
 const app = express();
 // Behind nginx/Caddy the real client IP arrives in X-Forwarded-For.
@@ -134,6 +149,11 @@ app.use('/api', requirePasswordChanged);
 app.use('/api', requireWritable);
 
 const PACKAGE_VERSION = require('./package.json').version;
+// Long-lived caching for the generated illustration sprites.
+app.get(/^\/img\/(gifts-sprite|glass-sprite)\.svg$/, (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  res.sendFile(path.join(PUBLIC_DIR, 'img', path.basename(req.path)));
+});
 
 function healthPayload() {
   let dbOk = true;
@@ -155,6 +175,13 @@ app.get('/api/health', (req, res) => res.json(healthPayload()));
 app.get('/health', (req, res) => res.json(healthPayload()));
 
 app.use('/api/auth', authRoutes);
+// Shop, decoration, conversations and the recovery form are additive features.
+app.use('/api/access', accessRoutes);
+app.use('/api/shop', shopRoutes);
+app.use('/api', decorRoutes);
+app.use('/api', conversationRoutes);
+app.use('/api', chatMessageRoutes);
+app.use('/api', peopleRoutes);
 // Public bootstrap routes must be mounted before the auth-guarded routers below,
 // which are mounted on /api and would otherwise reject anonymous requests.
 app.use('/api/settings', settingsRoutes);
@@ -264,6 +291,31 @@ io.on('connection', (socket) => {
   if (becameOnline && !user.hide_online) {
     io.emit('presence:update', presencePayload(user.id, true));
   }
+
+  function conversationMember(conversationId) {
+    return db.get('SELECT 1 AS ok FROM conversation_members WHERE conversation_id = ? AND user_id = ? AND banned = 0', [
+      Number(conversationId) || 0,
+      user.id
+    ]);
+  }
+
+  socket.on('conversation:typing', (payload) => {
+    const conversationId = Number(payload && payload.conversation_id);
+    if (!conversationId || !conversationMember(conversationId)) return;
+    const members = db.all('SELECT user_id FROM conversation_members WHERE conversation_id = ? AND banned = 0', [
+      conversationId
+    ]);
+    for (const member of members) {
+      if (Number(member.user_id) === Number(user.id)) continue;
+      io.to(`user:${member.user_id}`).emit('conversation:typing', {
+        conversation_id: conversationId,
+        user_id: user.id,
+        name: user.display_name,
+        typing: payload.typing !== false,
+        recording: !!payload.recording
+      });
+    }
+  });
 
   socket.on('typing:start', (payload) => {
     const info = matchForUser(Number(payload?.match_id), user.id);

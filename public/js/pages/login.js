@@ -1,5 +1,5 @@
 import { api, setToken } from '../api.js?v=25';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=25';
+import { el, button, passwordField, toast, svgIcon, openModal } from '../ui.js?v=25';
 import { setUser } from '../state.js?v=25';
 import { navigate } from '../router.js?v=25';
 import { icon } from '../icons.js?v=25';
@@ -95,6 +95,11 @@ export default function LoginPage(ctx) {
       setToken(data.token);
       setUser(data.user);
       window.dispatchEvent(new CustomEvent('uni:auth-changed'));
+      if (data.user.force_password_change) {
+        toast('Вы вошли с временным паролем — смените его в настройках', 'success');
+        navigate('/settings', { replace: true });
+        return;
+      }
       toast(`С возвращением, ${data.user.display_name}!`, 'success');
       const next = ctx.query.next && ctx.query.next.startsWith('/') ? ctx.query.next : '/swipe';
       navigate(next, { replace: true });
@@ -202,6 +207,58 @@ export default function LoginPage(ctx) {
   footer.append(el('span', { text: 'Нет аккаунта? ' }));
   footer.append(el('a', { text: 'Создать аккаунт', attrs: { href: '/register' } }));
   panel.append(footer);
+
+  const recoverRow = el('div', { class: 'auth__footer' });
+  const recoverLink = el('button', { class: 'btn btn-ghost btn-sm', text: 'Не могу войти', attrs: { type: 'button' } });
+  recoverLink.addEventListener('click', () => openRecovery());
+  recoverRow.append(recoverLink);
+  panel.append(recoverRow);
+
+  // Public recovery request: the answer never reveals whether the account exists.
+  function openRecovery() {
+    const body = el('div', { class: 'form-stack' });
+    const identifier = el('input', { class: 'input', attrs: { placeholder: 'Username или email' } });
+    const contact = el('input', { class: 'input', attrs: { placeholder: '@telegram для связи' } });
+    const comment = el('textarea', { class: 'input', attrs: { rows: '3', placeholder: 'Комментарий (необязательно)' } });
+    body.append(
+      el('label', { class: 'field__label', text: 'Ваш логин или email' }),
+      identifier,
+      el('label', { class: 'field__label', text: 'Как с вами связаться' }),
+      contact,
+      el('label', { class: 'field__label', text: 'Комментарий' }),
+      comment
+    );
+    const footer = el('div', { class: 'row' });
+    const modal = openModal({ title: 'Восстановление доступа', body, footer });
+    footer.append(
+      button('Отмена', { variant: 'btn-ghost', onClick: () => modal.close() }),
+      button('Отправить запрос', {
+        variant: 'btn-primary',
+        onClick: async () => {
+          try {
+            const data = await api.post('/access/request', {
+              identifier: identifier.value.trim(),
+              contact: contact.value.trim(),
+              comment: comment.value.trim()
+            });
+            body.innerHTML = '';
+            body.append(el('p', { text: data.message }));
+            body.append(
+              el('p', {
+                class: 'field__hint',
+                text: 'Владелец проверит данные и выдаст временный пароль. Никому не сообщайте пароли, кроме владельца в Telegram.'
+              })
+            );
+            footer.innerHTML = '';
+            footer.append(button('Понятно', { variant: 'btn-primary', onClick: () => modal.close() }));
+          } catch (err) {
+            toast(err.message || 'Не удалось отправить запрос', 'error');
+          }
+        }
+      })
+    );
+    setTimeout(() => identifier.focus(), 60);
+  }
   root.append(panel);
 
   const back = el('a', { class: 'legal__back', attrs: { href: '/' }, style: { position: 'fixed', left: '22px', bottom: '22px' } });

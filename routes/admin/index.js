@@ -27,6 +27,10 @@ const reportsRouter = require('./reports');
 const adsRouter = require('./ads');
 const superlikesRouter = require('./superlikes');
 const cosmeticsRouter = require('./cosmetics');
+const shopRouter = require('./shop');
+const accessRouter = require('./access');
+const groupsRouter = require('./groups');
+const designRouter = require('./design');
 
 /* ---------- Re-authentication ---------- */
 
@@ -370,6 +374,10 @@ router.use('/reports', reportsRouter);
 router.use('/ads', adsRouter);
 router.use('/superlikes', superlikesRouter);
 router.use('/cosmetics', cosmeticsRouter);
+router.use('/shop', shopRouter);
+router.use('/access', accessRouter);
+router.use('/groups', groupsRouter);
+router.use('/design', designRouter);
 
 /* ---------- Global content moderation ---------- */
 

@@ -23,7 +23,13 @@ export const socketEvents = [
   'story:views',
   'account:banned',
   'account:verified',
-  'account:role'
+  'account:role',
+  'message:edited',
+  'message:pin',
+  'conversation:read',
+  'conversation:typing',
+  'conversation:update',
+  'poll:update'
 ];
 
 export function onSocket(event, handler) {
@@ -102,4 +108,14 @@ export function startTyping(matchId) {
 
 export function stopTyping(matchId) {
   if (socket && connected) socket.emit('typing:stop', { match_id: Number(matchId) });
+}
+
+export function emitConversationTyping(conversationId, typing, recording = false) {
+  if (socket && connected) {
+    socket.emit('conversation:typing', {
+      conversation_id: Number(conversationId),
+      typing: !!typing,
+      recording: !!recording
+    });
+  }
 }
