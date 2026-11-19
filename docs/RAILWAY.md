@@ -47,7 +47,14 @@ UPLOADS_DIR=/data/uploads
 JWT_SECRET=СЮДА_ВСТАВЬТЕ_СЛУЧАЙНУЮ_СТРОКУ
 SITE_URL=https://ВАШ-ДОМЕН.railway.app
 APP_URL=https://ВАШ-ДОМЕН.railway.app
+RESEND_API_KEY=СЮДА_КЛЮЧ_RESEND
+MAIL_FROM=Wiutgram <noreply@ВАШ-ДОМЕН>
 ```
+
+Письма (сброс и подтверждение почты) уходят через HTTPS API Resend: на Railway
+исходящий SMTP часто заблокирован. Без `RESEND_API_KEY` письма не отправляются,
+а в логах разработки остаётся ссылка. Папка `backups/` рядом с базой хранит
+последние 20 копий, снятых перед миграциями.
 
 `JWT_SECRET` сгенерируйте локально: `openssl rand -hex 48` (Windows: `node -e
 "console.log(require('crypto').randomBytes(48).toString('hex'))"`).

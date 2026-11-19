@@ -17,7 +17,10 @@ const { shopSeed } = require('../lib/design');
 const { CITY, UNIVERSITY_SEED, UNIVERSITY_NAME_EN } = require('../config');
 const { nowIso } = require('../utils/time');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+// Railway mounts persistent storage as a volume; everything writable must live there.
+const DATA_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH
+  ? path.resolve(process.env.RAILWAY_VOLUME_MOUNT_PATH)
+  : path.join(__dirname, '..', 'data');
 // UNI_DB_FILE lets tests run against a disposable copy without touching real data.
 const DB_FILE = process.env.UNI_DB_FILE ? path.resolve(process.env.UNI_DB_FILE) : path.join(DATA_DIR, 'app.db');
 
@@ -265,6 +268,35 @@ function migrate() {
   }
 }
 
+// Copies the database before migrations touch it and keeps the last 20 copies,
+// so an unexpected migration failure never leaves the owner without a fallback.
+const BACKUP_DIR = path.join(DB_DIR, 'backups');
+const BACKUP_KEEP = 20;
+
+function backupBeforeMigrate() {
+  try {
+    if (!fs.existsSync(DB_FILE)) return null;
+    if (fs.statSync(DB_FILE).size === 0) return null;
+    raw.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+    fs.mkdirSync(BACKUP_DIR, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
+    const target = path.join(BACKUP_DIR, `app-${stamp}.db`);
+    fs.copyFileSync(DB_FILE, target);
+    const copies = fs
+      .readdirSync(BACKUP_DIR)
+      .filter((name) => /^app-\d{8}-\d{6}\.db$/.test(name))
+      .sort();
+    for (const old of copies.slice(0, Math.max(0, copies.length - BACKUP_KEEP))) {
+      fs.unlinkSync(path.join(BACKUP_DIR, old));
+    }
+    return target;
+  } catch (err) {
+    console.error('[db] backup before migration failed:', err.message);
+    return null;
+  }
+}
+
+backupBeforeMigrate();
 migrate();
 
 // Counts real (non demo) accounts. Used to decide who becomes the site owner.
