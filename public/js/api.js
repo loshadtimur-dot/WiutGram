@@ -103,6 +103,9 @@ export const api = {
   put(path, body) {
     return request(path, 'PUT', body);
   },
+  patch(path, body) {
+    return request(path, 'PATCH', body);
+  },
   delete(path, body) {
     return request(path, 'DELETE', body);
   },

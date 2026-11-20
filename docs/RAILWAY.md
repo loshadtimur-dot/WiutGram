@@ -42,26 +42,38 @@ Railway разворачивает из репозитория, поэтому �
 ```env
 NODE_ENV=production
 TRUST_PROXY=1
+JWT_SECRET=СЮДА_СЛУЧАЙНАЯ_СТРОКА_ИЗ_OPENSSL
 UNI_DB_FILE=/data/app.db
 UPLOADS_DIR=/data/uploads
-JWT_SECRET=СЮДА_ВСТАВЬТЕ_СЛУЧАЙНУЮ_СТРОКУ
-SITE_URL=https://ВАШ-ДОМЕН.railway.app
 APP_URL=https://ВАШ-ДОМЕН.railway.app
 ```
 
-`JWT_SECRET` сгенерируйте локально: `openssl rand -hex 48` (Windows: `node -e
-"console.log(require('crypto').randomBytes(48).toString('hex'))"`).
+Это полный список: других переменных приложение не читает. `PORT` задавать не
+нужно — Railway подставляет его сам. `APP_URL` нужен только для абсолютных
+ссылок в `sitemap.xml`; замените его на реальный домен после шага 5.
 
-- `PORT` задавать не нужно: Railway подставляет его сам, сервер её читает.
-- `SITE_URL`/`APP_URL` замените на реальный домен после шага 5.
-- Секреты (JWT, токены, пароли SMTP) вводите только в Railway Variables —
-  никогда в код и не в чат.
+`JWT_SECRET` сгенерируйте локально и вставьте готовое значение:
+`openssl rand -hex 48` (Windows: `node -e
+"console.log(require('crypto').randomBytes(48).toString('hex'))"`). Без него
+сервер создаст файл `secret.txt` на volume, но задать переменную надёжнее:
+при пересоздании сервиса без volume сессии не «слетят».
+
+Писем проект пока не отправляет: сброс пароля делает владелец вручную в
+«Админ-панель → Пользователи» (временный пароль с обязательной сменой). Поэтому
+`SMTP`, `RESEND_API_KEY`, `MAIL_FROM` и подобные переменные **не нужны** — они
+ни на что не влияют.
+
+Папка `backups/` рядом с базой хранит последние 20 копий, снятых перед
+миграциями (`/data/backups` при volume в `/data`).
+
+- Секреты (JWT, пароли) вводите только в Railway Variables — никогда в код и не
+  в чат.
 
 ## 5. Публичный домен
 
 1. Сервис → **Settings → Networking → Generate Domain**.
 2. Railway выдаст адрес вида `uni-lovers-production.up.railway.app`.
-3. Скопируйте его в переменные `SITE_URL` и `APP_URL` (без слэша на конце) и
+3. Скопируйте его в переменную `APP_URL` (без слэша на конце) и
    нажмите **Redeploy**.
 4. Свой домен: **Custom Domain** → добавьте, затем в DNS пропишите CNAME на
    выданный Railway-хост (для apex-домена — A-записи, которые покажет Railway).
@@ -146,5 +158,7 @@ bash scripts/restore.sh /data/backups/daily/app-YYYYMMDD.db /data/backups/daily/
 - Локальный диск ограничен размером volume: фото пользователей занимают место.
 - Railway не запускает systemd, Caddy и cron из `deploy/` — они нужны только для
   VPS-варианта из `docs/DEPLOY.md`.
-- Реальную отправку писем/push проект пока не выполняет (этапы G и J не
-  реализованы), поэтому Railway-настройки SMTP/VAPID не требуются.
+- Отправку писем и web-push проект пока не выполняет (этапы G и J не
+  реализованы), поэтому настройки SMTP/Resend/VAPID не требуются.
+- Медиа и база лежат на одном volume: если он закончится, загрузки фото
+  перестанут работать. Следите за размером volume в панели Railway.

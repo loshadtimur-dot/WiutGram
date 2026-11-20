@@ -16,6 +16,7 @@ const { hasBlocked, isBlockedBetween } = require('../lib/blocks');
 const { nowIso, lastDays } = require('../utils/time');
 const { oneOf, toInt, clamp } = require('../middleware/validate');
 const cosmeticsStore = require('../lib/cosmetics/store');
+const decorService = require('../lib/decor/service');
 
 const router = express.Router();
 
@@ -560,12 +561,18 @@ router.get('/:username', (req, res) => {
 
   const cosmetics = cosmeticsStore.profileCosmetics(target.id, { self: isSelf });
   const isFollowing = cosmeticsStore.isFollowing(req.user.id, target.id);
+  const decorState = decorService.decorFor(target.id, req.user.id);
+  const giftList = decorService.giftsFor(target.id, req.user);
+  counts.gifts = giftList.length;
 
   res.json({
     user: view,
     is_self: isSelf,
     counts,
     cosmetics,
+    decor: decorState,
+    gifts: giftList.slice(0, 24),
+    gift_stats: decorService.giftStats(target.id),
     is_following: isFollowing,
     follower_count: cosmetics.follow.followers,
     following_count: cosmetics.follow.following,

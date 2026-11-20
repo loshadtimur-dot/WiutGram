@@ -11,14 +11,22 @@ import systemSection from './system.js?v=25';
 import adsSection from './ads/index.js?v=25';
 import superlikesSection from './superlikes.js?v=25';
 import cosmeticsSection from './cosmetics.js?v=25';
+import shopSection from './shop.js?v=25';
+
+let adminBadgesBound = false;
+import accessSection from './access.js?v=25';
+import groupsSection from './groups.js?v=25';
 import securitySection from './security.js?v=25';
 
 const SECTIONS = [
   { id: 'overview', label: 'Обзор', icon: 'chart' },
+  { id: 'shop', label: 'Магазин', icon: 'gift' },
   { id: 'ads', label: 'Реклама', icon: 'image' },
   { id: 'superlikes', label: 'Суперлайки', icon: 'star' },
   { id: 'users', label: 'Пользователи', icon: 'users' },
-  { id: 'cosmetics', label: 'Косметика', icon: 'gift' },
+  { id: 'groups', label: 'Группы', icon: 'users' },
+  { id: 'access', label: 'Доступ', icon: 'lock' },
+  { id: 'cosmetics', label: 'Оформление', icon: 'sparkles' },
   { id: 'universities', label: 'Университеты', icon: 'graduation' },
   { id: 'content', label: 'Контент и жалобы', icon: 'file' },
   { id: 'settings', label: 'Настройки', icon: 'sliders' },
@@ -30,6 +38,9 @@ const SECTIONS = [
 const SECTIONS_MAP = {
   overview: overviewSection,
   ads: adsSection,
+  shop: shopSection,
+  access: accessSection,
+  groups: groupsSection,
   superlikes: superlikesSection,
   security: securitySection,
   users: usersSection,
@@ -108,10 +119,30 @@ export default async function AdminPage(ctx) {
       .get('/admin/superlikes/badge')
       .then((data) => setNavBadge('superlikes', data.new_orders))
       .catch(() => {});
+    api
+      .get('/admin/shop/badge')
+      .then((data) => setNavBadge('shop', data.new_orders))
+      .catch(() => {});
+    api
+      .get('/admin/access/badge')
+      .then((data) => setNavBadge('access', data.pending))
+      .catch(() => {});
+  }
+
+  // Sections can ask for fresh counters after they change something.
+  if (!adminBadgesBound) {
+    adminBadgesBound = true;
+    document.addEventListener('admin:badges', refreshBadges);
   }
 
   const sideFooter = el('div', { class: 'admin-nav__footer' });
   sideFooter.append(el('span', { class: 'field__hint', text: `@${state.user.username}` }));
+  sideFooter.append(
+    button('Графика', {
+      variant: 'btn-ghost btn-sm',
+      onClick: () => navigate('/admin/design-preview')
+    })
+  );
   sideFooter.append(
     button('Выйти на сайт', {
       variant: 'btn-ghost btn-sm',

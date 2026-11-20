@@ -8,6 +8,27 @@ const zlib = require('zlib');
 
 const ROOT = path.join(__dirname, '..');
 
+const SLEEP_BUFFER = new Int32Array(new SharedArrayBuffer(4));
+
+function sleepSync(ms) {
+  Atomics.wait(SLEEP_BUFFER, 0, 0, ms);
+}
+
+// Windows releases killed processes' database handles with a short delay, so a
+// recursive delete right after SIGKILL fails with EBUSY until the OS catches up.
+function removeTempDir(dir) {
+  const retryable = new Set(['EBUSY', 'EPERM', 'ENOTEMPTY', 'EACCES']);
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+      return;
+    } catch (err) {
+      if (!retryable.has(err.code)) throw err;
+    }
+    sleepSync(100);
+  }
+}
+
 /* ---------- Server lifecycle ---------- */
 
 // Starts the real server against a disposable database and uploads folder.
@@ -83,7 +104,7 @@ async function startServer(port = 3199, overrides = {}) {
       } catch (err) {
         // ignore
       }
-      fs.rmSync(tempDir, { recursive: true, force: true });
+      removeTempDir(tempDir);
     }
   };
 }

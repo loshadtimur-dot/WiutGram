@@ -38,12 +38,33 @@ function resolveMatch(req, res) {
   return info;
 }
 
+// Match chats live in the conversation model too, so both UIs see one history.
+function conversationForMatch(match) {
+  let conversation = db.get('SELECT * FROM conversations WHERE match_id = ?', [match.id]);
+  if (conversation) return conversation;
+  const createdAt = nowIso();
+  const result = db.run(
+    `INSERT INTO conversations (type, match_id, members_count, created_at) VALUES ('dm', ?, 2, ?)`,
+    [match.id, createdAt]
+  );
+  conversation = { id: Number(result.lastInsertRowid) };
+  for (const userId of [match.user_a, match.user_b]) {
+    db.run(
+      `INSERT OR IGNORE INTO conversation_members (conversation_id, user_id, role, joined_at)
+       VALUES (?, ?, 'member', ?)`,
+      [conversation.id, userId, createdAt]
+    );
+  }
+  return conversation;
+}
+
 function messageView(row, userId) {
   const mine = row.sender_id === Number(userId);
   const deleted = !!row.deleted_by_sender;
   return {
     id: row.id,
     match_id: row.match_id,
+    conversation_id: row.conversation_id || null,
     sender_id: row.sender_id,
     type: row.type,
     body: deleted ? '' : row.body,
@@ -85,11 +106,25 @@ function sendMessage(req, res, payload) {
   if (!info) return undefined;
 
   const createdAt = nowIso();
+  const conversation = conversationForMatch(info.match);
+  const seqRow = db.get('SELECT COALESCE(MAX(seq), 0) + 1 AS seq FROM messages WHERE conversation_id = ?', [
+    conversation.id
+  ]);
   const result = db.run(
-    `INSERT INTO messages (match_id, sender_id, type, body, image_path, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [info.match.id, req.user.id, payload.type, payload.body, payload.image_path, createdAt]
+    `INSERT INTO messages (match_id, conversation_id, seq, sender_id, type, body, image_path, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [info.match.id, conversation.id, seqRow.seq, req.user.id, payload.type, payload.body, payload.image_path, createdAt]
   );
+  db.run('UPDATE conversations SET last_message_id = ?, last_message_at = ? WHERE id = ?', [
+    Number(result.lastInsertRowid),
+    createdAt,
+    conversation.id
+  ]);
+  db.run('UPDATE conversation_members SET last_read_seq = ? WHERE conversation_id = ? AND user_id = ?', [
+    seqRow.seq,
+    conversation.id,
+    req.user.id
+  ]);
 
   const row = db.get('SELECT * FROM messages WHERE id = ?', [Number(result.lastInsertRowid)]);
   const view = messageView(row, req.user.id);
@@ -153,6 +188,13 @@ router.post('/matches/:id/read', (req, res) => {
   const result = db.run(
     'UPDATE messages SET read_at = ? WHERE match_id = ? AND sender_id != ? AND read_at IS NULL',
     [readAt, info.match.id, req.user.id]
+  );
+  const conversation = conversationForMatch(info.match);
+  db.run(
+    `UPDATE conversation_members SET last_read_seq = MAX(last_read_seq,
+      COALESCE((SELECT MAX(seq) FROM messages WHERE conversation_id = ?), 0))
+     WHERE conversation_id = ? AND user_id = ?`,
+    [conversation.id, conversation.id, req.user.id]
   );
 
   if (result.changes > 0) {

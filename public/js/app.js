@@ -36,6 +36,9 @@ import LegalPage from './pages/legal.js?v=25';
 import AdvertisePage from './pages/advertise.js?v=25';
 import AdReportPage from './pages/ad-report.js?v=25';
 import AuraPage from './pages/aura.js?v=25';
+import ShopPage from './pages/shop.js?v=25';
+import PeoplePage from './pages/people.js?v=25';
+import DesignPreviewPage from './pages/design-preview.js?v=25';
 
 const NAV_ITEMS = [
   { path: '/swipe', label: 'Свайпы', icon: 'layers' },
@@ -44,6 +47,11 @@ const NAV_ITEMS = [
   { path: '/chats', label: 'Чаты', icon: 'chat', badge: 'messages' },
   { path: '/aura', label: 'Aura', icon: 'star' },
   { path: '/profile', label: 'Профиль', icon: 'user' }
+];
+
+const EXTRA_NAV_ITEMS = [
+  { path: '/shop', label: 'Магазин', icon: 'gift' },
+  { path: '/people', label: 'Люди', icon: 'search' }
 ];
 
 const ROUTES = [
@@ -60,6 +68,9 @@ const ROUTES = [
   { path: '/u/:username', page: ProfilePage, auth: true, title: 'Профиль' },
   { path: '/explore', page: ExplorePage, auth: true, title: 'Обзор' },
   { path: '/aura', page: AuraPage, auth: true, title: 'Aura Table' },
+  { path: '/shop', page: ShopPage, auth: true, title: 'Магазин' },
+  { path: '/people', page: PeoplePage, auth: true, title: 'Люди' },
+  { path: '/admin/design-preview', page: DesignPreviewPage, auth: true, staff: true, title: 'Графика' },
   { path: '/notifications', page: NotificationsPage, auth: true, title: 'Уведомления' },
   { path: '/settings', page: SettingsPage, auth: true, title: 'Настройки' },
   { path: '/superlikes', page: SuperlikesPage, auth: true, title: 'Суперлайки' },
@@ -155,6 +166,8 @@ function appShell() {
         <span class="topbar__title" id="topbar-title"></span>
         <div class="topbar__spacer"></div>
         <div class="topbar__actions">
+          <a class="btn-icon" href="/people" data-link aria-label="Люди" title="Люди">${icon('search', { size: 19 })}</a>
+          <a class="btn-icon" href="/shop" data-link aria-label="Магазин" title="Магазин">${icon('gift', { size: 19 })}</a>
           <a class="btn-icon" id="notification-btn" href="/notifications" data-link aria-label="Уведомления">
             ${icon('bell', { size: 20 })}<span class="tabbar__badge hidden" id="bell-badge"></span>
           </a>
@@ -223,7 +236,7 @@ function renderNav() {
   const nav = document.getElementById('sidebar-nav');
   if (nav) {
     nav.innerHTML = '';
-    for (const item of NAV_ITEMS) {
+    for (const item of [...NAV_ITEMS, ...EXTRA_NAV_ITEMS]) {
       const link = el('a', { class: 'nav-link', attrs: { href: item.path, 'data-path': item.path } });
       link.innerHTML = icon(item.icon, { size: 21 });
       link.append(el('span', { text: item.label }));

@@ -8,8 +8,10 @@ const ROOT = path.join(__dirname, '..');
 // UPLOADS_DIR lets tests and deployments keep uploads outside the repository.
 const UPLOAD_DIR = process.env.UPLOADS_DIR
   ? path.resolve(process.env.UPLOADS_DIR)
-  : path.join(ROOT, 'uploads');
-const SUBDIRS = ['avatars', 'posts', 'stories', 'chat', 'ads'];
+  : process.env.RAILWAY_VOLUME_MOUNT_PATH
+    ? path.join(path.resolve(process.env.RAILWAY_VOLUME_MOUNT_PATH), 'uploads')
+    : path.join(ROOT, 'uploads');
+const SUBDIRS = ['avatars', 'posts', 'stories', 'chat', 'ads', 'voice'];
 const MAX_BYTES = 8 * 1024 * 1024;
 
 const MIME_EXT = {
