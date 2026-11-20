@@ -22,6 +22,7 @@ import {
   openChatGiftPicker,
   openEmojiPicker
 } from './chatModals.js?v=25';
+import { openGiftUnbox } from './giftViewer.js?v=25';
 
 const QUICK_REACTIONS = ['❤️', '👍', '😂', '🔥'];
 
@@ -413,9 +414,11 @@ export function createConversationWindow(conversationId, options = {}) {
     const play = el('button', { class: 'voice-play', attrs: { type: 'button', 'aria-label': 'Воспроизвести' } });
     play.innerHTML = icon('play', { size: 16 });
     const wave = el('div', { class: 'voice-wave' });
+    wave.append(el('span', { class: 'voice-progress' }));
     for (let i = 0; i < 22; i += 1) {
-      const bar = el('span');
+      const bar = el('span', { class: 'voice-bar' });
       bar.style.height = `${8 + ((i * 7) % 18)}px`;
+      bar.style.animationDelay = `${(i % 11) * 0.07}s`;
       wave.append(bar);
     }
     const time = el('span', { class: 'voice-time', text: humanDuration(message.meta ? message.meta.duration : 0) });
@@ -428,12 +431,33 @@ export function createConversationWindow(conversationId, options = {}) {
     });
     audio.addEventListener('play', () => {
       play.innerHTML = icon('pause', { size: 16 });
+      wrap.classList.add('is-playing');
     });
-    audio.addEventListener('pause', () => {
+    const idle = () => {
       play.innerHTML = icon('play', { size: 16 });
+      wrap.classList.remove('is-playing');
+    };
+    audio.addEventListener('pause', idle);
+    audio.addEventListener('ended', () => {
+      idle();
+      audio.currentTime = 0;
+      wrap.style.setProperty('--voice-progress', '0%');
+      time.textContent = humanDuration(message.meta ? message.meta.duration : 0);
     });
+    audio.addEventListener('loadedmetadata', () => {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      if (!message.meta || !message.meta.duration) time.textContent = humanDuration(audio.duration);
+    });
+    // Chrome reports Infinity for freshly recorded WebM files, so fall back to
+    // the duration the recorder stored with the message.
+    const totalSeconds = () => {
+      if (Number.isFinite(audio.duration) && audio.duration > 0) return audio.duration;
+      return Number(message.meta && message.meta.duration) || 0;
+    };
     audio.addEventListener('timeupdate', () => {
       time.textContent = humanDuration(audio.currentTime || 0);
+      const total = totalSeconds();
+      wrap.style.setProperty('--voice-progress', total ? `${Math.min(100, (audio.currentTime / total) * 100)}%` : '0%');
     });
     speed.addEventListener('click', () => {
       const rates = [1, 1.5, 2];
@@ -446,13 +470,25 @@ export function createConversationWindow(conversationId, options = {}) {
 
   function giftCard(message) {
     const gift = message.gift;
-    const card = el('div', { class: 'msg__gift-card' });
+    const card = el('button', {
+      class: 'msg__gift-card',
+      attrs: { type: 'button', 'aria-label': gift ? `Открыть подарок «${gift.name}»` : 'Открыть подарок' }
+    });
     const art = el('div', { class: 'msg__gift-art' });
     art.innerHTML = gift ? gift.svg : '';
     card.append(art);
     card.append(el('div', { class: 'msg__gift-name', text: gift ? gift.name : 'Подарок' }));
     if (gift && gift.message) card.append(el('div', { class: 'msg__gift-note', text: gift.message }));
-    card.addEventListener('click', () => navigate('/shop?tab=orders'));
+    card.append(
+      el('div', {
+        class: 'msg__gift-open',
+        text: message.mine ? 'Открыть подарок' : 'Нажмите, чтобы распаковать'
+      })
+    );
+    card.addEventListener('click', () => {
+      if (!gift) return navigate('/shop?tab=orders');
+      openGiftUnbox(gift, { sender: message.sender, mine: message.mine, createdAt: message.created_at });
+    });
     return card;
   }
 
