@@ -18,13 +18,13 @@
 ## 1. Код в GitHub
 
 Railway разворачивает из репозитория, поэтому сначала код должен оказаться в
-`loshadtimur-dot/uni-lovers`. Если репозиторий ещё пустой — см. `docs/HANDOFF.md`,
+`loshadtimur-dot/WiutGram`. Если репозиторий ещё пустой — см. `docs/HANDOFF.md`,
 пункт про права токена (`Contents: Read and write`).
 
 ## 2. Новый проект
 
 1. Откройте <https://railway.com/new>.
-2. **Deploy from GitHub repo** → выберите `uni-lovers`.
+2. **Deploy from GitHub repo** → выберите `WiutGram`.
 3. Railway сам найдёт `Dockerfile` и `railway.json`. Если спросит builder —
    выберите **Dockerfile**.
 4. Дождитесь первого билда (2–4 минуты: собирается `better-sqlite3`).
@@ -72,7 +72,7 @@ APP_URL=https://ВАШ-ДОМЕН.railway.app
 ## 5. Публичный домен
 
 1. Сервис → **Settings → Networking → Generate Domain**.
-2. Railway выдаст адрес вида `uni-lovers-production.up.railway.app`.
+2. Railway выдаст адрес вида `wiutgram-production.up.railway.app`.
 3. Скопируйте его в переменную `APP_URL` (без слэша на конце) и
    нажмите **Redeploy**.
 4. Свой домен: **Custom Domain** → добавьте, затем в DNS пропишите CNAME на
@@ -139,6 +139,10 @@ bash scripts/restore.sh /data/backups/daily/app-YYYYMMDD.db /data/backups/daily/
 Миграции БД выполняются автоматически при старте и только добавляют новые
 таблицы/колонки (подписки, баннеры, значки, подарки). Существующие пользователи
 и их данные не удаляются; другие университеты просто отключаются, а не стираются.
+
+При сборке образа заново генерируются SVG-спрайты подарков и эмодзи
+(`scripts/build-design-assets.js`), так что закоммиченные копии могут отставать —
+важна версия в `lib/design`.
 
 ## 10. Если что-то не работает
 

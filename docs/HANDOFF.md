@@ -8,7 +8,7 @@
 | Этап | Статус | Комментарий |
 | --- | --- | --- |
 | A. Аудит и реклама | **Сделано** (браузерный прогон — нет) | ESLint, npm audit, API-тесты 23/23, найдено и исправлено 4 дефекта, реквизиты оплаты и Telegram в рекламе |
-| B. GitHub и CI | **Сделано** | Код в `main` (репозиторий `loshadtimur-dot/uni-lovers`), тег `v1.0.0` и релиз, CI зелёный: lint, API-тесты, E2E в Chromium, audit |
+| B. GitHub и CI | **Сделано** | Код в `main` (репозиторий `loshadtimur-dot/WiutGram`), тег `v1.0.0` и релиз, CI зелёный: lint, API-тесты, E2E в Chromium, audit |
 | C. Деплой на VPS | **Скрипты и документы готовы**, на реальном VPS не запускалось | install.sh, deploy.sh, rollback.sh, systemd, Caddyfile, logrotate, `.env.production.example`, `docs/DEPLOY.md`; для Railway — `Dockerfile`, `railway.json`, `docs/RAILWAY.md` |
 | D. Бэкапы и алерты | **Скрипты готовы и проверены на копии**, алерты — только для бэкапа | backup.sh (7/4/3, integrity, offsite), restore.sh, systemd timer, `docs/BACKUP_RESTORE.md`, `docs/RUNBOOK.md` |
 | E. Приватность фото | **Не сделано** | Требует `sharp`, перекодирования, приватного хранилища и `/media/:id` |

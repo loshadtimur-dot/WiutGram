@@ -27,7 +27,7 @@ usermod -aG sudo deploy
 
 ```bash
 sudo mkdir -p /srv/uni-lovers && sudo chown deploy:deploy /srv/uni-lovers
-git clone https://github.com/loshadtimur-dot/uni-lovers.git /srv/uni-lovers
+git clone https://github.com/loshadtimur-dot/WiutGram.git /srv/uni-lovers
 cd /srv/uni-lovers
 ```
 
