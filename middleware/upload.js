@@ -17,15 +17,29 @@ function buildStorage(subdir) {
       cb(null, destination);
     },
     filename(req, file, cb) {
-      const extMap = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-      const ext = extMap[file.mimetype] || 'jpg';
+      const extMap = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'audio/webm': 'webm',
+        'audio/ogg': 'ogg',
+        'audio/mp4': 'm4a',
+        'audio/mpeg': 'mp3',
+        'audio/wav': 'wav'
+      };
+      const ext = extMap[baseMime(file.mimetype)] || 'jpg';
       cb(null, randomName(ext));
     }
   });
 }
 
+// Browsers append codecs ("audio/webm;codecs=opus"), so compare the base type.
+function baseMime(value) {
+  return String(value || '').split(';')[0].trim().toLowerCase();
+}
+
 function fileFilter(req, file, cb) {
-  if (!ALLOWED_MIME.includes(file.mimetype)) {
+  if (!ALLOWED_MIME.includes(baseMime(file.mimetype))) {
     return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'image'));
   }
   return cb(null, true);
@@ -53,14 +67,15 @@ function imageUpload(subdir, field = 'image') {
   };
 }
 
-// Voice notes are stored as-is (no server-side transcoding).
-function audioUpload(subdir = 'voice', field = 'audio') {
+// Voice notes are stored as-is (no server-side transcoding). The composer sends
+// the recording as "voice", which is also the default field here.
+function audioUpload(subdir = 'voice', field = 'voice') {
   const upload = multer({
     storage: buildStorage(subdir),
     limits: { fileSize: 10 * 1024 * 1024, files: 1 },
     fileFilter(req, file, cb) {
       const allowed = ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav'];
-      if (!allowed.includes(file.mimetype)) {
+      if (!allowed.includes(baseMime(file.mimetype))) {
         return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', field));
       }
       return cb(null, true);
