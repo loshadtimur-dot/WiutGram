@@ -1,6 +1,6 @@
 # Wiutgram
 
-[![CI](https://github.com/loshadtimur-dot/uni-lovers/actions/workflows/ci.yml/badge.svg)](https://github.com/loshadtimur-dot/uni-lovers/actions/workflows/ci.yml)
+[![CI](https://github.com/loshadtimur-dot/uni-lovers/actions/workflows/ci.yml/badge.svg)](https://github.com/loshadtimur-dot/WiutGram/actions/workflows/ci.yml)
 
 Сайт знакомств **только для студентов Westminster International University in Tashkent (WIUT)**: свайпы, матчи, realtime-чаты, посты, истории, статистика, уведомления, Aura Table, косметика профиля (баннеры, значки, подарки), реклама по часам и Центр управления для владельца. При регистрации доступен только WIUT — другие университеты отключены. Интерфейс на русском, код и комментарии на английском.
 
@@ -168,7 +168,7 @@ sudo systemctl enable --now uni-lovers
 
 `TRUST_PROXY` обязателен за прокси, иначе rate limit увидит IP прокси. В production cookie сессии передаётся только по HTTPS (`secure`). По `SIGTERM` сервер аккуратно закрывает соединения и сохраняет счётчики активности.
 
-Проверка: `curl https://uni-lovers.uz/health` → `{"ok":true,...}`.
+Проверка: `curl https://wiutgram.up.railway.app/api/health` → `{"ok":true,...}`.
 
 ### Резервное копирование
 
