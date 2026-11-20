@@ -15,6 +15,73 @@ function sparkles(hero) {
   }
 }
 
+const UNBOX_SKY = {
+  common: 'radial-gradient(120% 100% at 50% 0%, #3b2a58 0%, #171a33 58%, #0c0e1d 100%)',
+  rare: 'radial-gradient(120% 100% at 50% 0%, #123a5e 0%, #101c37 58%, #080b18 100%)',
+  epic: 'radial-gradient(120% 100% at 50% 0%, #4a1c6b 0%, #21123d 58%, #0b0718 100%)',
+  legendary: 'radial-gradient(120% 100% at 50% 0%, #6b3a10 0%, #2a1706 58%, #100a04 100%)',
+  admin: 'radial-gradient(120% 100% at 50% 0%, #2f2a16 0%, #141208 58%, #060604 100%)'
+};
+const UNBOX_CONFETTI = ['#ffd166', '#ff8fb3', '#8ad7ff', '#b6f5c8', '#e0c3ff'];
+
+// The recipient-facing moment: the card is opened, light bursts out and the
+// illustration lands with a soft bounce. It works from the chat gift card,
+// where the user already owns the item, so it needs no extra request.
+function openGiftUnbox(gift, options = {}) {
+  const body = el('div', { class: 'unbox' });
+  const scene = el('div', { class: `unbox__scene unbox__scene--${gift.rarity || 'common'}` });
+  scene.style.background = UNBOX_SKY[gift.rarity] || UNBOX_SKY.common;
+  scene.append(el('div', { class: 'unbox__rays' }));
+  scene.append(el('div', { class: 'unbox__halo' }));
+  const confetti = el('div', { class: 'unbox__confetti' });
+  for (let index = 0; index < 22; index += 1) {
+    const bit = el('span');
+    bit.style.left = `${8 + Math.random() * 84}%`;
+    bit.style.background = UNBOX_CONFETTI[index % UNBOX_CONFETTI.length];
+    bit.style.animationDelay = `${0.15 + Math.random() * 0.5}s`;
+    bit.style.setProperty('--dx', `${(Math.random() - 0.5) * 120}px`);
+    bit.style.setProperty('--rot', `${(Math.random() - 0.5) * 540}deg`);
+    confetti.append(bit);
+  }
+  scene.append(confetti);
+
+  const art = el('div', { class: 'unbox__art' });
+  art.innerHTML = gift.svg || '';
+  scene.append(art);
+  scene.append(el('div', { class: 'unbox__label', text: 'Вам подарок' }));
+  body.append(scene);
+
+  const title = el('div', { class: 'unbox__title' });
+  title.append(el('h2', { text: gift.name }));
+  const meta = el('div', { class: 'unbox__meta' });
+  if (gift.rarity_label) {
+    meta.append(el('span', { class: `rarity-pill rarity-pill--${gift.rarity}`, text: gift.rarity_label }));
+  }
+  const sender = options.sender;
+  if (options.mine) {
+    meta.append(el('span', { text: 'Ваш подарок' }));
+  } else if (sender) {
+    // "от @owner" reads correctly whatever the display name is.
+    meta.append(el('span', { text: sender.username ? `от @${sender.username}` : `от ${sender.display_name}` }));
+  }
+  title.append(meta);
+  body.append(title);
+
+  if (gift.message) body.append(el('div', { class: 'gift-caption', text: gift.message }));
+
+  const footer = el('div', { class: 'unbox__actions' });
+  const modal = openModal({ title: 'Подарок', body, footer, size: 'wide' });
+  footer.append(
+    button('Спасибо!', {
+      variant: 'btn-primary',
+      onClick: () => modal.close()
+    })
+  );
+  return modal;
+}
+
+export { openGiftUnbox };
+
 export function openGiftViewer(giftId, options = {}) {
   const body = el('div', { class: 'gift-view' });
   body.append(loadingRow('Открываем подарок…'));

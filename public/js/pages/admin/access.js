@@ -185,7 +185,7 @@ export default async function AccessAdmin() {
         if (request.comment) info.append(el('div', { class: 'people-card__meta', text: `Комментарий: ${request.comment}` }));
         info.append(el('div', { class: 'people-card__meta', text: fmtDateTime(request.created_at) }));
         row.append(info);
-        const actions = el('div', { class: 'row', style: { flexWrap: 'wrap' } });
+        const actions = el('div', { class: 'admin-actions' });
         if (request.user_id) {
           actions.append(
             button('Карточка', {
