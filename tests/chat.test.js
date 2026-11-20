@@ -247,3 +247,25 @@ test('people search and public groups are discoverable', async () => {
   const joined = await bob.client.post(`/api/conversations/${published.data.conversation.id}/join`);
   assert.equal(joined.status, 200);
 });
+
+test('a recorded voice note uploads through the same field the composer sends', async () => {
+  const dm = await alice.client.post('/api/conversations/dm', { username: 'chatbob' });
+  assert.equal(dm.status, 200, JSON.stringify(dm.data));
+
+  // Chromium labels recordings as "audio/webm;codecs=opus" and names the part "voice".
+  const form = new FormData();
+  form.append('voice', new Blob([Buffer.from('fake-webm-bytes')], { type: 'audio/webm;codecs=opus' }), 'voice.webm');
+  form.append('duration', '4');
+  const sent = await alice.client.post(`/api/conversations/${dm.data.conversation.id}/messages/voice`, undefined, { form });
+  assert.equal(sent.status, 201, JSON.stringify(sent.data));
+  assert.equal(sent.data.message.type, 'voice');
+  assert.match(sent.data.message.image_path, /^\/uploads\/voice\/.+\.webm$/);
+
+  const file = await alice.client.get(sent.data.message.image_path);
+  assert.equal(file.status, 200);
+
+  const history = await bob.client.get(`/api/conversations/${dm.data.conversation.id}/messages`);
+  const voice = history.data.messages.find((message) => message.id === sent.data.message.id);
+  assert.ok(voice, 'the recipient sees the voice note');
+  assert.equal(voice.type, 'voice');
+});

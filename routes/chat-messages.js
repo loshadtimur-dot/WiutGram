@@ -147,7 +147,8 @@ router.post('/conversations/:id/messages/image', uploadLimiter, imageUpload('cha
   return res.status(201).json({ message: { ...view, mine: true } });
 });
 
-router.post('/conversations/:id/messages/voice', uploadLimiter, audioUpload('voice'), (req, res) => {
+// The composer posts the recording as the "voice" field, so the multer field must match it.
+router.post('/conversations/:id/messages/voice', uploadLimiter, audioUpload('voice', 'voice'), (req, res) => {
   const found = guard(req, res, req.params.id);
   if (!found) return undefined;
   if (!chat.can(found.member, 'send_media')) return res.status(403).json({ error: 'Медиа отключены' });
