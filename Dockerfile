@@ -27,6 +27,10 @@ WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY . .
 
+# The sprites are generated from lib/design, so regenerate them from the code
+# that actually ships instead of relying on a cached file in the repo.
+RUN node scripts/build-design-assets.js
+
 RUN mkdir -p /data/uploads /data/backups
 
 EXPOSE 3000
