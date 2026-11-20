@@ -122,7 +122,11 @@
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
+.shop-card {
+  align-items: stretch;
+}
 .shop-card__art {
+  width: 100%;
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
@@ -147,10 +151,16 @@
   width: 100%;
   height: 100%;
 }
-.shop-card__art .gift-sprite {
+.shop-card__art .gift-sprite,
+.shop-card__art > svg {
   width: 78%;
   height: 78%;
   filter: drop-shadow(0 10px 16px rgba(20, 24, 40, 0.18));
+}
+.shop-card__art > svg {
+  display: block;
+  height: auto;
+  aspect-ratio: 1 / 1;
 }
 .shop-card__body {
   padding: 10px 12px 12px;
@@ -794,13 +804,15 @@
   gap: 14px;
 }
 .gift-hero {
-  border-radius: 20px;
+  border-radius: 22px;
   padding: 26px;
   display: grid;
   place-items: center;
   position: relative;
   overflow: hidden;
-  min-height: 230px;
+  min-height: 240px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 .gift-hero__art {
   width: min(210px, 62%);
@@ -883,6 +895,116 @@
 @keyframes gift-twinkle {
   0%, 100% { opacity: 0.35; transform: rotate(0deg); }
   50% { opacity: 0.75; transform: rotate(6deg); }
+}
+
+/* ---------- Unboxing (recipient side) ---------- */
+.unbox {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.unbox__scene {
+  position: relative;
+  min-height: 330px;
+  border-radius: 24px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 26px 54px -34px rgba(0, 0, 0, 0.7);
+}
+.unbox__rays {
+  position: absolute;
+  inset: -45%;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.14) 0 5deg, transparent 5deg 16deg);
+  animation: unbox-spin 26s linear infinite;
+  opacity: 0.5;
+}
+@keyframes unbox-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.unbox__halo {
+  position: absolute;
+  width: 430px;
+  height: 430px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 42%, transparent 66%);
+  animation: unbox-halo 1.7s var(--ease) both;
+}
+@keyframes unbox-halo {
+  0% { transform: scale(0.2); opacity: 0; }
+  45% { opacity: 0.9; }
+  100% { transform: scale(1.15); opacity: 0.35; }
+}
+.unbox__art {
+  position: relative;
+  z-index: 2;
+  width: min(250px, 66%);
+  animation: unbox-art 0.95s cubic-bezier(0.2, 1.5, 0.36, 1) both;
+  filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.42));
+}
+@keyframes unbox-art {
+  0% { transform: scale(0.18) rotate(-16deg); opacity: 0; }
+  58% { transform: scale(1.1) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.unbox__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.unbox__confetti span {
+  position: absolute;
+  top: 34%;
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: unbox-confetti 1.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes unbox-confetti {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.6); opacity: 0; }
+  14% { opacity: 1; }
+  100% { transform: translate(var(--dx, 0), 250px) rotate(var(--rot, 220deg)) scale(1); opacity: 0; }
+}
+.unbox__label {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  font-size: 10.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.86);
+  animation: unbox-fade 0.8s 0.35s both;
+}
+@keyframes unbox-fade {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.unbox__title {
+  text-align: center;
+}
+.unbox__title h2 {
+  margin: 0 0 5px;
+  font-size: 21px;
+  letter-spacing: -0.01em;
+}
+.unbox__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.unbox__actions {
+  display: flex;
+  justify-content: center;
 }
 
 /* ---------- People ---------- */
@@ -1073,5 +1195,9 @@
 @media (prefers-reduced-motion: reduce) {
   .gift-hero__art,
   .gift-bit::before,
-  .gift-spark { animation: none !important; }
+  .gift-spark,
+  .unbox__rays,
+  .unbox__halo,
+  .unbox__art,
+  .unbox__confetti span { animation: none !important; }
 }
