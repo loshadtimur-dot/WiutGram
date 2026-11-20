@@ -9,13 +9,19 @@
   position: relative;
   overflow: hidden;
   background-size: cover;
-  box-shadow: var(--shadow-sm, 0 8px 24px rgba(20, 20, 30, 0.12));
+  box-shadow: var(--shadow-sm, 0 8px 24px rgba(20, 20, 30, 0.12)),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 -40px 60px -40px rgba(0, 0, 0, 0.5);
 }
 .profile-banner::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 40%, rgba(0, 0, 0, 0.28) 100%);
+  background:
+    radial-gradient(120% 120% at 50% -20%, rgba(255, 255, 255, 0.24), transparent 52%),
+    radial-gradient(140% 130% at 50% 120%, rgba(0, 0, 0, 0.4), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 30%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
 }
 .banner-pattern-stars::before,
 .banner-pattern-bokeh::before,
@@ -95,6 +101,21 @@
 @keyframes banner-twinkle {
   from { opacity: 0.45; }
   to { opacity: 0.95; }
+}
+
+/* A single diagonal sheen makes a flat gradient read as a lit surface. */
+.banner-pattern-lines::after,
+.banner-pattern-grid::after,
+.banner-pattern-aurora::after,
+.banner-pattern-sun::after {
+  content: '';
+  position: absolute;
+  inset: -30% -10%;
+  background: linear-gradient(112deg, transparent 34%, rgba(255, 255, 255, 0.16) 46%, transparent 58%);
+  pointer-events: none;
+}
+.bg-pattern-cosmos::before {
+  box-shadow: inset 0 0 120px 30px rgba(0, 0, 0, 0.65);
 }
 @keyframes aurora-drift {
   from { transform: translate3d(-4%, 0, 0) scale(1); }
@@ -467,6 +488,18 @@
   min-width: 0;
 }
 .admin-card h3 { margin: 0; font-size: 15px; }
+/* Recovery-request actions: equal widths so a wrapped button never looks stray. */
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 240px;
+  justify-content: flex-end;
+}
+.admin-actions .btn { flex: 1 1 118px; }
+@media (max-width: 520px) {
+  .admin-actions { justify-content: stretch; }
+}
 .admin-card .input, .admin-card .select { width: 100%; }
 .admin-table { display: block; overflow-x: auto; }
 .admin-table__row {
