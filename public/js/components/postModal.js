@@ -26,7 +26,18 @@ export function openPostModal(post, options = {}) {
 
   const layout = el('div', { class: 'post-modal' });
   const mediaWrap = el('div', { class: 'post-modal__media' });
-  const img = el('img', { attrs: { src: post.image_path, alt: post.caption || 'Пост' } });
+  const img =
+    post.kind === 'video'
+      ? el('video', {
+          attrs: {
+            src: post.image_path,
+            controls: 'controls',
+            playsinline: 'playsinline',
+            preload: 'metadata',
+            'aria-label': post.caption || 'Видео'
+          }
+        })
+      : el('img', { attrs: { src: post.image_path, alt: post.caption || 'Пост' } });
   mediaWrap.append(img);
   const heart = el('div', { class: 'post-modal__heart' });
   heart.innerHTML = icon('heart', { size: 104, fill: true });

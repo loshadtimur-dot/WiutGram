@@ -698,7 +698,10 @@ export default async function ProfilePage(ctx) {
   /* ---------- Posts ---------- */
   function postTile(post) {
     const tile = el('div', { class: 'post-tile' });
-    const img = el('img', { attrs: { src: post.image_path, alt: post.caption || 'Пост', loading: 'lazy' } });
+    const img =
+      post.kind === 'video'
+        ? el('video', { attrs: { src: post.image_path, muted: 'muted', playsinline: 'playsinline', preload: 'metadata' } })
+        : el('img', { attrs: { src: post.image_path, alt: post.caption || 'Пост', loading: 'lazy' } });
     tile.append(img);
     const views = el('span', { class: 'post-tile__views' });
     views.innerHTML = icon('eye', { size: 11 });
@@ -1004,7 +1007,11 @@ export default async function ProfilePage(ctx) {
     for (const post of stats.top_posts) {
       const row = el('div', { class: 'top-post' });
       const imgWrap = el('div', { class: 'top-post__img' });
-      imgWrap.append(el('img', { attrs: { src: post.image_path, alt: '', loading: 'lazy' } }));
+      imgWrap.append(
+        post.kind === 'video'
+          ? el('video', { attrs: { src: post.image_path, muted: 'muted', playsinline: 'playsinline', preload: 'metadata' } })
+          : el('img', { attrs: { src: post.image_path, alt: '', loading: 'lazy' } })
+      );
       row.append(imgWrap);
       const body = el('div', { class: 'list-row__body' });
       body.append(el('div', { class: 'top-post__caption', text: post.caption || 'Без подписи' }));

@@ -387,7 +387,10 @@ export default async function ExplorePage() {
           const grid = el('div', { class: 'explore-grid' });
           posts.forEach((post, index) => {
             const tile = el('div', { class: `explore-tile ${index % 7 === 3 ? 'explore-tile--wide' : ''}` });
-            const img = el('img', { attrs: { src: post.image_path, alt: post.caption || 'Пост', loading: 'lazy' } });
+            const img =
+              post.kind === 'video'
+                ? el('video', { attrs: { src: post.image_path, muted: 'muted', playsinline: 'playsinline', preload: 'metadata' } })
+                : el('img', { attrs: { src: post.image_path, alt: post.caption || 'Пост', loading: 'lazy' } });
             tile.append(img);
             const overlay = el('div', { class: 'explore-tile__overlay' });
             const likes = el('span');

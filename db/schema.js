@@ -330,6 +330,7 @@ const EXTRA_COLUMNS = {
     ['force_password_change', 'INTEGER NOT NULL DEFAULT 0'],
     ['super_likes_bonus', 'INTEGER NOT NULL DEFAULT 0']
   ],
+  posts: [['post_kind', "TEXT NOT NULL DEFAULT 'image'"]],
   messages: [
     ['reaction', 'TEXT'],
     ['deleted_by_sender', 'INTEGER NOT NULL DEFAULT 0']

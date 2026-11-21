@@ -498,7 +498,11 @@ export function createConversationWindow(conversationId, options = {}) {
   // A shared feed post inside the chat: image preview plus the author.
   function postShareCard(post) {
     const card = el('button', { class: 'msg-post', attrs: { type: 'button' } });
-    card.append(el('img', { attrs: { src: post.image_path, alt: 'Пост', loading: 'lazy' } }));
+    card.append(
+      post.kind === 'video'
+        ? el('video', { attrs: { src: post.image_path, muted: 'muted', playsinline: 'playsinline', preload: 'metadata' } })
+        : el('img', { attrs: { src: post.image_path, alt: 'Пост', loading: 'lazy' } })
+    );
     const metaBox = el('div', { class: 'msg-post__meta' });
     metaBox.append(el('span', { class: 'msg-post__label', text: 'Пост' }));
     if (post.author_name) metaBox.append(el('span', { class: 'msg-post__author', text: post.author_name }));
@@ -941,7 +945,11 @@ export function createConversationWindow(conversationId, options = {}) {
     };
     for (const item of posts) {
       const btn = el('button', { class: 'post-picker__item', attrs: { type: 'button', 'data-post': String(item.id) } });
-      btn.append(el('img', { attrs: { src: item.image_path, alt: item.caption || 'Пост', loading: 'lazy' } }));
+      btn.append(
+        item.kind === 'video'
+          ? el('video', { attrs: { src: item.image_path, muted: 'muted', playsinline: 'playsinline', preload: 'metadata' } })
+          : el('img', { attrs: { src: item.image_path, alt: item.caption || 'Пост', loading: 'lazy' } })
+      );
       btn.addEventListener('click', () => {
         selectedPost = item.id;
         paint();

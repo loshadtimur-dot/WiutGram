@@ -526,7 +526,11 @@ export default async function AdminPage() {
         const grid = el('div', { class: 'posts-grid' });
         for (const post of data.posts) {
           const tile = el('div', { class: 'post-tile' });
-          tile.append(el('img', { attrs: { src: post.image_path, alt: '', loading: 'lazy' } }));
+          tile.append(
+            post.kind === 'video'
+              ? el('video', { attrs: { src: post.image_path, muted: 'muted', playsinline: 'playsinline', preload: 'metadata' } })
+              : el('img', { attrs: { src: post.image_path, alt: '', loading: 'lazy' } })
+          );
           const overlay = el('div', { class: 'post-tile__overlay', style: { flexDirection: 'column', gap: '6px' } });
           overlay.append(el('span', { text: post.author.display_name }));
           overlay.append(el('span', { class: 'field__hint', text: `${formatNumber(post.likes)} лайков · ${formatNumber(post.views_count)} просмотров` }));

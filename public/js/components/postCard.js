@@ -61,9 +61,20 @@ export function createPostCard(post, options = {}) {
   card.append(head);
 
   const media = el('div', { class: 'post-card__media' });
-  const img = el('img', {
-    attrs: { src: post.image_path, alt: post.caption || 'Пост', loading: 'lazy' }
-  });
+  const isVideo = post.kind === 'video';
+  const img = isVideo
+    ? el('video', {
+        attrs: {
+          src: post.image_path,
+          controls: 'controls',
+          playsinline: 'playsinline',
+          preload: 'metadata',
+          'aria-label': post.caption || 'Видео'
+        }
+      })
+    : el('img', {
+        attrs: { src: post.image_path, alt: post.caption || 'Пост', loading: 'lazy' }
+      });
   media.append(img);
   const heart = el('div', { class: 'post-card__heart' });
   heart.innerHTML = icon('heart', { size: 96, fill: true });
@@ -88,7 +99,7 @@ export function createPostCard(post, options = {}) {
       toast('Не удалось поставить лайк', 'error');
     }
   };
-  media.addEventListener('dblclick', likeAction);
+  if (!isVideo) media.addEventListener('dblclick', likeAction);
   media.addEventListener('click', (event) => {
     if (event.target === media || event.target === img) openPostModal(post, { onDeleted: options.onDeleted });
   });

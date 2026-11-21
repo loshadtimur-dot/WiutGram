@@ -6,16 +6,17 @@ import { icon } from '../icons.js?v=25';
 export function openPostCreate(onCreated) {
   const body = el('div', { class: 'col', style: { gap: '14px' } });
   let compressed = null;
+  let videoFile = null;
 
   const dropzone = el('div', { class: 'photo-drop' });
   const dropIcon = el('div', { class: 'photo-drop__icon' });
   dropIcon.innerHTML = icon('image', { size: 22 });
   dropzone.append(dropIcon);
-  dropzone.append(el('div', { text: 'Загрузите фото поста', style: { fontWeight: '700' } }));
-  dropzone.append(el('div', { class: 'field__hint', text: 'JPG, PNG или WEBP · перетащите или нажмите' }));
+  dropzone.append(el('div', { text: 'Загрузите фото или видео', style: { fontWeight: '700' } }));
+  dropzone.append(el('div', { class: 'field__hint', text: 'JPG, PNG, WEBP или MP4/WEBM до 50 МБ' }));
 
   const fileInput = el('input', {
-    attrs: { type: 'file', accept: 'image/jpeg,image/png,image/webp' },
+    attrs: { type: 'file', accept: 'image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime' },
     style: { display: 'none' }
   });
   const preview = el('div', { class: 'post-create__preview hidden' });
@@ -23,7 +24,25 @@ export function openPostCreate(onCreated) {
 
   async function handleFile(file) {
     if (!file) return;
+    if (String(file.type || '').startsWith('video/')) {
+      if (file.size > 50 * 1024 * 1024) {
+        toast('Видео больше 50 МБ', 'error');
+        return;
+      }
+      videoFile = file;
+      compressed = null;
+      preview.innerHTML = '';
+      preview.append(
+        el('video', {
+          attrs: { src: URL.createObjectURL(file), controls: 'controls', playsinline: 'playsinline' }
+        })
+      );
+      preview.classList.remove('hidden');
+      dropzone.classList.add('hidden');
+      return;
+    }
     try {
+      videoFile = null;
       compressed = await compressImage(file, 1440, 0.88);
       preview.innerHTML = '';
       preview.append(el('img', { attrs: { src: compressed.dataUrl, alt: 'Предпросмотр поста' } }));
@@ -77,18 +96,17 @@ export function openPostCreate(onCreated) {
   const publish = button('Опубликовать', {
     variant: 'btn-primary',
     onClick: async () => {
-      if (!compressed) {
-        toast('Добавьте фото', 'error');
+      if (!compressed && !videoFile) {
+        toast('Добавьте фото или видео', 'error');
         return;
       }
       publish.disabled = true;
       publish.textContent = 'Публикуем…';
       try {
-        const form = toFormData(
-          { caption: caption.value.trim(), location: location.value.trim() },
-          compressed.blob,
-          'post.jpg'
-        );
+        const fields = { caption: caption.value.trim(), location: location.value.trim() };
+        const form = videoFile
+          ? toFormData(fields, videoFile, videoFile.name || 'video.mp4')
+          : toFormData(fields, compressed.blob, 'post.jpg');
         const data = await api.upload('/posts', form);
         toast('Пост опубликован', 'success');
         modal.close();

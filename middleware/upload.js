@@ -114,9 +114,30 @@ function videoUpload(subdir = 'video', field = 'video') {
   };
 }
 
+// Feed posts take either a photo or a short video in the same field.
+function postMediaUpload(subdir = 'posts', field = 'image') {
+  const videoTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+  const upload = multer({
+    storage: buildStorage(subdir),
+    limits: { fileSize: 50 * 1024 * 1024, files: 1 },
+    fileFilter(req, file, cb) {
+      const type = baseMime(file.mimetype);
+      if (ALLOWED_MIME.includes(type) || videoTypes.includes(type)) return cb(null, true);
+      return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', field));
+    }
+  }).single(field);
+  return (req, res, next) => {
+    upload(req, res, (err) => {
+      if (!err) return next();
+      if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: 'Файл больше 50 МБ' });
+      return res.status(400).json({ error: 'Допустимы JPG, PNG, WEBP, MP4, WEBM или MOV' });
+    });
+  };
+}
+
 // Public URL for an uploaded file.
 function publicPath(subdir, filename) {
   return `/uploads/${subdir}/${filename}`;
 }
 
-module.exports = { imageUpload, audioUpload, videoUpload, publicPath, ALLOWED_MIME };
+module.exports = { imageUpload, audioUpload, videoUpload, postMediaUpload, publicPath, ALLOWED_MIME };

@@ -3,7 +3,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
-const { imageUpload } = require('../middleware/upload');
+const { postMediaUpload } = require('../middleware/upload');
 const { uploadLimiter } = require('../middleware/rateLimit');
 const { POST_FIELDS, mapPost, COMMENT_FIELDS, mapComment } = require('../lib/postView');
 const { isBlockedBetween } = require('../lib/blocks');
@@ -108,15 +108,16 @@ router.get('/feed', (req, res) => {
   });
 });
 
-router.post('/posts', uploadLimiter, imageUpload('posts'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Добавьте изображение' });
+router.post('/posts', uploadLimiter, postMediaUpload('posts'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Добавьте фото или видео' });
   const caption = cleaned(req.body?.caption, 2200);
   const location = cleaned(req.body?.location, 100);
   const path = `/uploads/posts/${req.file.filename}`;
+  const kind = String(req.file.mimetype || '').startsWith('video/') ? 'video' : 'image';
   const createdAt = nowIso();
   const result = db.run(
-    'INSERT INTO posts (user_id, image_path, caption, location, created_at, views_count) VALUES (?, ?, ?, ?, ?, 0)',
-    [req.user.id, path, caption, location, createdAt]
+    'INSERT INTO posts (user_id, image_path, caption, location, created_at, views_count, post_kind) VALUES (?, ?, ?, ?, ?, 0, ?)',
+    [req.user.id, path, caption, location, createdAt, kind]
   );
   const post = loadPost(Number(result.lastInsertRowid), req.user.id);
   res.status(201).json({ post });
