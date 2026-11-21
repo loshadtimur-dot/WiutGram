@@ -382,6 +382,27 @@
   box-shadow: var(--shadow-md);
   z-index: 5;
 }
+.chat-jump:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.chat-jump__count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--brand-1);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
 .chat-window {
   position: relative;
 }

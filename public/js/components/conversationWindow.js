@@ -115,6 +115,8 @@ export function createConversationWindow(conversationId, options = {}) {
 
   const jumpBtn = el('button', { class: 'chat-jump hidden', attrs: { type: 'button', 'aria-label': 'Вниз' } });
   jumpBtn.innerHTML = icon('chevronDown', { size: 18 });
+  const jumpCount = el('span', { class: 'chat-jump__count hidden' });
+  jumpBtn.append(jumpCount);
   root.append(jumpBtn);
 
   /* ---------- Composer ---------- */
@@ -679,10 +681,15 @@ export function createConversationWindow(conversationId, options = {}) {
   function addMessage(message, forceScroll = false) {
     if (!message) return;
     if (messages.some((item) => item.id === message.id)) return;
+    const wasNearBottom = isNearBottom();
     messages.push(message);
     messages.sort((a, b) => a.seq - b.seq);
     renderMessages();
     if (forceScroll || message.mine) scrollToBottom('smooth');
+    else if (!wasNearBottom) {
+      pendingUnread += 1;
+      syncJump();
+    }
   }
 
   function renderPinned() {
@@ -1029,12 +1036,28 @@ export function createConversationWindow(conversationId, options = {}) {
     }
   }
 
+  // Telegram-style pill: it appears when the history is scrolled up and counts
+  // messages that arrived while the reader was away from the bottom.
+  let pendingUnread = 0;
+  function isNearBottom() {
+    return messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 160;
+  }
+  function syncJump() {
+    if (isNearBottom()) pendingUnread = 0;
+    const far = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight > 500;
+    jumpBtn.classList.toggle('hidden', !far && pendingUnread === 0);
+    jumpCount.textContent = pendingUnread > 12 ? '12+' : String(pendingUnread);
+    jumpCount.classList.toggle('hidden', pendingUnread === 0);
+  }
   messagesEl.addEventListener('scroll', () => {
     if (messagesEl.scrollTop < 60) loadOlder();
-    const far = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight > 500;
-    jumpBtn.classList.toggle('hidden', !far);
+    syncJump();
   });
-  jumpBtn.addEventListener('click', () => scrollToBottom('smooth'));
+  jumpBtn.addEventListener('click', () => {
+    pendingUnread = 0;
+    scrollToBottom('smooth');
+    syncJump();
+  });
 
   async function reloadConversation() {
     const data = await api.get(`/conversations/${id}`);
