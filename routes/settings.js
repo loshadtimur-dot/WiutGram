@@ -15,7 +15,7 @@ router.get('/site', (req, res) => {
     registration_open: settings.registration_open === '1',
     maintenance_mode: settings.maintenance_mode === '1',
     welcome_message: settings.welcome_message || '',
-    min_age: 18,
+    min_age: 16,
     city: CITY,
     allow_university_requests: false,
     owner_telegram: settings.owner_telegram || '',

@@ -145,7 +145,7 @@ export default async function RegisterPage(ctx) {
   );
   const introPoints = el('div', { class: 'auth__points' });
   for (const [iconName, text] of [
-    ['shield', 'Только 18+ и настоящие люди'],
+    ['shield', 'Только студенты WIUT и настоящие люди'],
     ['camera', 'До 9 фото, первое — главное'],
     ['graduation', 'Только студенты WIUT']
   ]) {
@@ -376,7 +376,7 @@ export default async function RegisterPage(ctx) {
 
   function stepAbout() {
     const frag = document.createDocumentFragment();
-    frag.append(stepTitle('Как вас зовут?', 'Имя и дата рождения видны в профиле. Регистрация строго с 18 лет.'));
+    frag.append(stepTitle('Как вас зовут?', 'Имя и дата рождения видны в профиле. Регистрация с 16 лет.'));
 
     const nameField = el('label', { class: 'field' });
     nameField.append(el('span', { class: 'field__label', text: 'Имя' }));
@@ -438,7 +438,7 @@ export default async function RegisterPage(ctx) {
     check.append(checkbox);
     const checkText = el('span');
     checkText.innerHTML =
-      'Мне есть 18 лет, я принимаю <a href="/rules" target="_blank" style="color:var(--brand-1);font-weight:700">Правила</a> и <a href="/privacy" target="_blank" style="color:var(--brand-1);font-weight:700">Политику конфиденциальности</a>';
+      'Мне есть 16 лет, я принимаю <a href="/rules" target="_blank" style="color:var(--brand-1);font-weight:700">Правила</a> и <a href="/privacy" target="_blank" style="color:var(--brand-1);font-weight:700">Политику конфиденциальности</a>';
     check.append(checkText);
     frag.append(check);
     return frag;
@@ -746,9 +746,9 @@ export default async function RegisterPage(ctx) {
       );
       const age = (Date.now() - date.getTime()) / (365.25 * 24 * 3600 * 1000);
       if (Number.isNaN(age)) return 'Укажите корректную дату рождения';
-      if (age < 18) return 'Регистрация доступна только с 18 лет';
+      if (age < 16) return 'Регистрация доступна только с 16 лет';
       if (age > 100) return 'Проверьте год рождения';
-      if (!data.agreed) return 'Подтвердите, что вам есть 18 лет и вы принимаете правила';
+      if (!data.agreed) return 'Подтвердите, что вам есть 16 лет и вы принимаете правила';
     }
     if (index === 2) {
       if (!data.gender) return 'Выберите пол';
@@ -833,6 +833,64 @@ export default async function RegisterPage(ctx) {
   });
 
   // Explicit confirmation instead of silently jumping to another page.
+  function showVerificationSent(response) {
+    const user = response.user || {};
+    document.title = 'Подтвердите почту — Wiutgram';
+    panel.innerHTML = '';
+    const wrap = el('div', { class: 'wizard', style: { padding: '28px 22px', textAlign: 'center' } });
+    const badge = el('div', {
+      style: {
+        width: '64px',
+        height: '64px',
+        margin: '0 auto 14px',
+        borderRadius: '50%',
+        display: 'grid',
+        placeItems: 'center',
+        background: 'rgba(253, 38, 122, 0.12)'
+      }
+    });
+    badge.textContent = '✉️';
+    wrap.append(badge);
+    wrap.append(el('h2', { class: 'wizard__title', text: 'Проверьте почту' }));
+    wrap.append(
+      el('p', {
+        class: 'wizard__sub',
+        text: `Мы отправили письмо на ${response.email || data.email}. Откройте ссылку из него, чтобы активировать аккаунт.`
+      })
+    );
+    wrap.append(
+      el('p', {
+        class: 'field__hint',
+        text: 'Ссылка действует 24 часа. Если письма нет — проверьте папку «Спам».'
+      })
+    );
+    const actionsRow = el('div', {
+      class: 'row',
+      style: { justifyContent: 'center', gap: '10px', flexWrap: 'wrap', marginTop: '16px' }
+    });
+    const resend = button('Отправить письмо снова', {
+      variant: 'btn-secondary',
+      onClick: async () => {
+        resend.disabled = true;
+        try {
+          await api.post('/auth/resend-verification', { email: response.email || data.email });
+          toast('Письмо отправлено повторно', 'success');
+        } catch (err) {
+          toast(err.message || 'Не удалось отправить письмо', 'error');
+        } finally {
+          setTimeout(() => {
+            resend.disabled = false;
+          }, 60000);
+        }
+      }
+    });
+    const loginLink = el('a', { class: 'btn btn-primary', attrs: { href: '/login', 'data-link': '' } });
+    loginLink.textContent = 'Перейти ко входу';
+    actionsRow.append(resend, loginLink);
+    wrap.append(actionsRow);
+    panel.append(wrap);
+  }
+
   function showSuccess(response) {
     const user = response.user || {};
     document.title = 'Аккаунт создан — Wiutgram';
@@ -939,6 +997,10 @@ export default async function RegisterPage(ctx) {
         photos: data.photos.map((photo) => photo.dataUrl)
       };
       const response = await api.post('/auth/register', payload);
+      if (response.verification_required) {
+        showVerificationSent(response);
+        return;
+      }
       setToken(response.token);
       setUser(response.user);
       window.dispatchEvent(new CustomEvent('uni:auth-changed'));

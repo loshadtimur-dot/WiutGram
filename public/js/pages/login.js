@@ -71,6 +71,7 @@ export default function LoginPage(ctx) {
 
   let busy = false;
   let challenge = null;
+  let resendBtn = null;
   async function submit() {
     if (busy || challenge) return;
     errorBox.classList.add('hidden');
@@ -109,6 +110,27 @@ export default function LoginPage(ctx) {
         : err.message || 'Не удалось войти';
       errorBox.textContent = message;
       errorBox.classList.remove('hidden');
+      if (err.data && err.data.code === 'email_unverified' && !resendBtn) {
+        resendBtn = button('Отправить письмо снова', {
+          variant: 'btn-secondary',
+          onClick: async () => {
+            resendBtn.disabled = true;
+            try {
+              await api.post('/auth/resend-verification', { email: login });
+              toast('Письмо отправлено повторно', 'success');
+            } catch (resendError) {
+              toast(resendError.message || 'Не удалось отправить письмо', 'error');
+            } finally {
+              setTimeout(() => {
+                resendBtn.disabled = false;
+              }, 60000);
+            }
+          }
+        });
+        errorBox.append(resendBtn);
+        errorBox.style.display = 'grid';
+        errorBox.style.gap = '10px';
+      }
       if (err.status === 0) toast('Сервер недоступен', 'error');
     } finally {
       busy = false;

@@ -2,7 +2,15 @@
 
 const fs = require('fs');
 const path = require('path');
-const { TABLES, INDEXES, EXTRA_COLUMNS, DEFAULT_SETTINGS, POST_MIGRATION } = require('./schema');
+const {
+  TABLES,
+  INDEXES,
+  EXTRA_COLUMNS,
+  DEFAULT_SETTINGS,
+  POST_MIGRATION,
+  EMAIL_TABLES,
+  EMAIL_INDEXES
+} = require('./schema');
 const { ADS_TABLES, ADS_INDEXES, ADS_USER_COLUMNS, ADS_DEFAULT_SETTINGS } = require('./ads-schema');
 const {
   COSMETICS_TABLES,
@@ -250,6 +258,11 @@ function migrate() {
   // Access recovery requests.
   for (const sql of ACCESS_TABLES) exec(sql);
   for (const sql of ACCESS_INDEXES) exec(sql);
+
+  // Email confirmation tokens (additive, used only when mail is configured).
+  for (const sql of EMAIL_TABLES) exec(sql);
+  for (const sql of EMAIL_INDEXES) exec(sql);
+  run("UPDATE site_settings SET value = '16' WHERE key = 'min_age' AND value = '18'");
 
   // Admins are not a separate role anymore.
   run("UPDATE users SET role = 'user' WHERE role = 'admin'");

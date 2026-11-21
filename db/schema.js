@@ -328,7 +328,8 @@ const EXTRA_COLUMNS = {
     ['shadow_banned', 'INTEGER NOT NULL DEFAULT 0'],
     ['owner_note', 'TEXT'],
     ['force_password_change', 'INTEGER NOT NULL DEFAULT 0'],
-    ['super_likes_bonus', 'INTEGER NOT NULL DEFAULT 0']
+    ['super_likes_bonus', 'INTEGER NOT NULL DEFAULT 0'],
+    ['email_verified', 'INTEGER NOT NULL DEFAULT 1']
   ],
   posts: [['post_kind', "TEXT NOT NULL DEFAULT 'image'"]],
   messages: [
@@ -345,7 +346,7 @@ const EXTRA_COLUMNS = {
 const DEFAULT_SETTINGS = {
   site_name: 'Wiutgram',
   registration_open: '1',
-  min_age: '18',
+  min_age: '16',
   maintenance_mode: '0',
   welcome_message: 'Добро пожаловать в Wiutgram — сообщество студентов WIUT.',
   max_photos: '9',
@@ -364,4 +365,29 @@ const POST_MIGRATION = [
   'CREATE INDEX IF NOT EXISTS idx_users_district ON users(district)'
 ];
 
-module.exports = { TABLES, INDEXES, EXTRA_COLUMNS, DEFAULT_SETTINGS, POST_MIGRATION };
+// Email verification is additive: existing accounts stay verified, only new
+// registrations start unconfirmed when a mail provider is configured.
+const EMAIL_TABLES = [
+  `CREATE TABLE IF NOT EXISTS email_verifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL
+  )`
+];
+
+const EMAIL_INDEXES = [
+  'CREATE INDEX IF NOT EXISTS idx_email_verifications_user ON email_verifications(user_id)'
+];
+
+module.exports = {
+  TABLES,
+  INDEXES,
+  EXTRA_COLUMNS,
+  DEFAULT_SETTINGS,
+  POST_MIGRATION,
+  EMAIL_TABLES,
+  EMAIL_INDEXES
+};

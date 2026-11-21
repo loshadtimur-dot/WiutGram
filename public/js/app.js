@@ -35,6 +35,7 @@ import SuperlikesPage from './pages/superlikes.js?v=25';
 import LegalPage from './pages/legal.js?v=25';
 import AdvertisePage from './pages/advertise.js?v=25';
 import AdReportPage from './pages/ad-report.js?v=25';
+import VerifyEmailPage from './pages/verify.js?v=25';
 import AuraPage from './pages/aura.js?v=25';
 import ShopPage from './pages/shop.js?v=25';
 import PeoplePage from './pages/people.js?v=25';
@@ -58,6 +59,7 @@ const ROUTES = [
   { path: '/', page: Landing, layout: 'public', guestOnly: true, title: 'Сообщество студентов WIUT' },
   { path: '/login', page: LoginPage, layout: 'public', guestOnly: true, title: 'Вход' },
   { path: '/register', page: RegisterPage, layout: 'public', guestOnly: true, title: 'Регистрация' },
+  { path: '/verify', page: VerifyEmailPage, layout: 'public', title: 'Подтверждение почты' },
   { path: '/welcome', page: WelcomePage, auth: true },
   { path: '/swipe', page: SwipePage, auth: true, title: 'Свайпы' },
   { path: '/likes', page: LikesPage, auth: true, title: 'Лайки' },

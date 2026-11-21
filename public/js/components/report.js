@@ -3,11 +3,11 @@ import { el, button, openModal, confirmDialog, toast, avatarNode } from '../ui.j
 
 const REASONS = [
   ['spam', 'Спам или реклама'],
-  ['nudity', 'Фото 18+ / обнажённость'],
+  ['nudity', 'Откровенные фото / обнажённость'],
   ['harassment', 'Оскорбления и травля'],
   ['scam', 'Мошенничество'],
   ['fake', 'Фейковый профиль'],
-  ['underage', 'Несовершеннолетний пользователь'],
+  ['underage', 'Пользователь младше 16 лет'],
   ['other', 'Другое']
 ];
 

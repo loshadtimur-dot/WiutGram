@@ -666,7 +666,7 @@ export default async function AdminPage() {
           );
           if (report.details) body.append(el('div', { class: 'report-row__meta', text: `«${report.details}»` }));
           if (report.reason === 'underage') {
-            body.append(el('div', { class: 'report-row__meta', text: '⚠️ Проверьте профиль на 18+', style: { color: 'var(--nope)' } }));
+            body.append(el('div', { class: 'report-row__meta', text: '⚠️ Проверьте возраст и контент профиля', style: { color: 'var(--nope)' } }));
           }
           const actions = el('div', { class: 'row' });
           actions.append(

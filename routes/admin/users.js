@@ -334,7 +334,7 @@ router.put('/:id', (req, res) => {
   }
   if (body.birthdate !== undefined) {
     if (!isAdult(body.birthdate, 18)) {
-      return res.status(400).json({ error: 'Пользователь должен быть старше 18 лет' });
+      return res.status(400).json({ error: 'Пользователь должен быть старше 16 лет' });
     }
     updates.birthdate = String(body.birthdate);
   }

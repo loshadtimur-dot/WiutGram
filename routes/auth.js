@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('crypto');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -33,8 +34,60 @@ const { INTEREST_IDS, GENDERS, INTERESTED_IN, LOOKING_FOR } = require('../utils/
 const { normalizeList } = require('../utils/sanitize');
 const { saveDataUrl, deleteUpload } = require('../utils/files');
 const { nowIso } = require('../utils/time');
+const { isMailerConfigured, sendMail } = require('../utils/mailer');
 
 const router = express.Router();
+const VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+const MIN_AGE = 16;
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+// Prefer the configured public URL, fall back to the request origin so local
+// and preview deployments still produce working links.
+function siteOrigin(req) {
+  const configured = String(process.env.APP_URL || '').trim().replace(/\/+$/, '');
+  if (configured) return configured;
+  return `${req.protocol}://${req.get('host')}`;
+}
+
+function maskEmail(email) {
+  const [name, domain] = String(email || '').split('@');
+  if (!domain || !name) return String(email || '');
+  return `${name.slice(0, 2)}${'•'.repeat(Math.max(1, name.length - 2))}@${domain}`;
+}
+
+// Single-use confirmation link, valid for 24 hours.
+async function issueVerification(user, req) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const link = `${siteOrigin(req)}/verify?token=${token}`;
+  db.run('DELETE FROM email_verifications WHERE user_id = ?', [user.id]);
+  db.run(
+    'INSERT INTO email_verifications (user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?)',
+    [user.id, hashToken(token), new Date(Date.now() + VERIFICATION_TTL_MS).toISOString(), nowIso()]
+  );
+  const text = [
+    `Привет, ${user.display_name || user.username}!`,
+    '',
+    'Подтвердите почту, чтобы активировать аккаунт Wiutgram.',
+    `Ссылка действует 24 часа: ${link}`,
+    '',
+    'Если вы не регистрировались — просто проигнорируйте это письмо.'
+  ].join('\n');
+  const html = `
+    <div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:520px;margin:0 auto;padding:28px 24px;color:#18181b">
+      <h1 style="font-size:22px;margin:0 0 12px">Wiutgram</h1>
+      <p style="margin:0 0 18px;font-size:15px;line-height:1.6">Привет, ${user.display_name || user.username}! Подтвердите почту, чтобы активировать аккаунт.</p>
+      <p style="margin:0 0 22px">
+        <a href="${link}" style="display:inline-block;padding:13px 22px;border-radius:12px;background:#fd267a;color:#fff;text-decoration:none;font-weight:700">Подтвердить почту</a>
+      </p>
+      <p style="margin:0 0 8px;font-size:13px;color:#71717a;line-height:1.6">Ссылка действует 24 часа. Если кнопка не работает, скопируйте адрес:<br><a href="${link}" style="color:#fd267a;word-break:break-all">${link}</a></p>
+      <p style="margin:18px 0 0;font-size:13px;color:#a1a1aa">Если вы не регистрировались в Wiutgram — просто проигнорируйте это письмо.</p>
+    </div>`;
+  const sent = await sendMail({ to: user.email, subject: 'Подтвердите почту — Wiutgram', text, html });
+  if (!sent) throw new Error('MAIL_NOT_CONFIGURED');
+}
 
 function parseBirthdate(body) {
   if (typeof body.birthdate === 'string' && body.birthdate) return body.birthdate;
@@ -107,7 +160,7 @@ router.get('/username-check', (req, res) => {
   return res.json({ available: !taken, username });
 });
 
-router.post('/register', registerLimiter, (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   const body = req.body || {};
   const settings = db.listSettings();
   const realUsers = db.countRealUsers();
@@ -141,7 +194,7 @@ router.post('/register', registerLimiter, (req, res) => {
   const birthdate = parseBirthdate(body);
   if (!birthdate) return res.status(400).json({ error: MESSAGES.birthdate, field: 'birthdate' });
 
-  const minAge = Math.max(18, Number(settings.min_age) || 18);
+  const minAge = Math.max(MIN_AGE, Number(settings.min_age) || MIN_AGE);
   if (!isAdult(birthdate, minAge)) {
     return res.status(400).json({ error: MESSAGES.adult, field: 'birthdate', code: 'underage' });
   }
@@ -269,6 +322,27 @@ router.post('/register', registerLimiter, (req, res) => {
   }
 
   const user = db.get('SELECT * FROM users WHERE id = ?', [userId]);
+
+  // When email delivery is configured, a new account must confirm its address
+  // before the first sign-in. The owner account is never gated, so the site
+  // cannot lock itself out, and a failed send falls back to the normal flow.
+  if (isMailerConfigured() && user.role !== 'owner') {
+    try {
+      db.run('UPDATE users SET email_verified = 0 WHERE id = ?', [userId]);
+      await issueVerification(user, req);
+      const welcomeText = db.getSetting('welcome_message', 'Добро пожаловать в Wiutgram!');
+      notify({ userId, type: 'system', text: welcomeText });
+      return res.status(201).json({
+        verification_required: true,
+        email: user.email,
+        user: { display_name: user.display_name, username: user.username }
+      });
+    } catch (err) {
+      console.error('verification email failed:', err.message);
+      db.run('UPDATE users SET email_verified = 1 WHERE id = ?', [userId]);
+    }
+  }
+
   const welcome = db.getSetting('welcome_message', 'Добро пожаловать в Wiutgram!');
   notify({ userId, type: 'system', text: welcome });
   sessions.recordLogin({ userId, identifier: email, success: true, req });
@@ -281,6 +355,46 @@ router.post('/register', registerLimiter, (req, res) => {
     token,
     welcome
   });
+});
+
+// Opens the link from the confirmation email.
+router.post('/verify-email', authLimiter, async (req, res) => {
+  const token = String((req.body && req.body.token) || '').trim();
+  if (!/^[a-f0-9]{64}$/.test(token)) {
+    return res.status(400).json({ error: 'Ссылка недействительна' });
+  }
+  const row = db.get('SELECT * FROM email_verifications WHERE token_hash = ? AND used_at IS NULL', [
+    hashToken(token)
+  ]);
+  if (!row) return res.status(400).json({ error: 'Ссылка уже использована или устарела' });
+  if (row.expires_at < nowIso()) {
+    return res.status(400).json({ error: 'Срок действия ссылки истёк — запросите новое письмо' });
+  }
+  db.run('UPDATE email_verifications SET used_at = ? WHERE id = ?', [nowIso(), row.id]);
+  db.run('UPDATE users SET email_verified = 1, updated_at = ? WHERE id = ?', [nowIso(), row.user_id]);
+  return res.json({ ok: true });
+});
+
+// Repeat confirmation letter. Always answers ok so the endpoint cannot be used
+// to check which addresses are registered.
+router.post('/resend-verification', registerLimiter, async (req, res) => {
+  const email = validateEmail((req.body && req.body.email) || '');
+  const user = email ? db.get('SELECT * FROM users WHERE email = ?', [email]) : null;
+  if (user && user.email_verified === 0 && !user.is_banned) {
+    const last = db.get(
+      'SELECT created_at FROM email_verifications WHERE user_id = ? ORDER BY id DESC LIMIT 1',
+      [user.id]
+    );
+    const tooSoon = last && Date.now() - new Date(last.created_at).getTime() < 60 * 1000;
+    if (!tooSoon) {
+      try {
+        await issueVerification(user, req);
+      } catch (err) {
+        console.error('verification email failed:', err.message);
+      }
+    }
+  }
+  return res.json({ ok: true });
 });
 
 router.post('/login', authLimiter, async (req, res) => {
@@ -343,6 +457,15 @@ router.post('/login', authLimiter, async (req, res) => {
         ban_reason: user.ban_reason || 'Нарушение правил сообщества'
       });
     }
+  }
+
+  if (user.email_verified === 0) {
+    sessions.recordLogin({ userId: user.id, identifier: login, success: false, req });
+    return res.status(403).json({
+      error: `Подтвердите почту — письмо отправлено на ${maskEmail(user.email)}`,
+      code: 'email_unverified',
+      email: maskEmail(user.email)
+    });
   }
 
   // Owners with TOTP enabled must confirm the second factor first.

@@ -1,7 +1,7 @@
 {
   "name": "Wiutgram — сообщество студентов WIUT",
   "short_name": "Wiutgram",
-  "description": "Закрытое сообщество Westminster International University in Tashkent. Только 18+.",
+  "description": "Сообщество Westminster International University in Tashkent: знакомства, чаты, лента и подарки.",
   "lang": "ru",
   "start_url": "/swipe",
   "scope": "/",

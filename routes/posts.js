@@ -70,7 +70,7 @@ router.get('/feed', (req, res) => {
   const city = req.query.city ? String(req.query.city) : null;
   const q = req.query.q ? `%${String(req.query.q).trim()}%` : null;
   const interest = req.query.interest ? `%${String(req.query.interest)}%` : null;
-  const minAge = clamp(toInt(req.query.min_age, 18), 18, 99);
+  const minAge = clamp(toInt(req.query.min_age, 16), 16, 99);
   const maxAge = clamp(toInt(req.query.max_age, 99), 18, 99);
 
   if (city) {

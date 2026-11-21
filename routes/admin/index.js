@@ -148,7 +148,7 @@ const SETTING_KEYS = [
 ];
 
 router.get('/settings', (req, res) => {
-  res.json({ settings: db.listSettings(), city: CITY, min_age: 18 });
+  res.json({ settings: db.listSettings(), city: CITY, min_age: 16 });
 });
 
 router.put('/settings', (req, res) => {
@@ -172,7 +172,7 @@ router.put('/settings', (req, res) => {
   }
   const after = db.listSettings();
   adminLog(req, 'update_settings', 'site', { before, after });
-  res.json({ settings: after, min_age: 18 });
+  res.json({ settings: after, min_age: 16 });
 });
 
 /* ---------- Announcements ---------- */

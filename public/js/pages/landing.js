@@ -26,14 +26,19 @@ export default async function LandingPage() {
 
   const hero = el('div', { class: 'landing__hero' });
   const copy = el('div', { class: 'landing__copy' });
-  copy.append(el('div', { class: 'landing__eyebrow', text: '18+ · Только Westminster International University in Tashkent' }));
+  copy.append(
+    el('div', {
+      class: 'landing__eyebrow',
+      text: 'Westminster International University in Tashkent'
+    })
+  );
   const title = el('h1', { class: 'landing__title' });
   title.innerHTML = 'Сообщество студентов <span>WIUT</span>';
   copy.append(title);
   copy.append(
     el('p', {
       class: 'landing__sub',
-      text: 'Друзья, общение и подарки внутри одного кампуса. Только 18+.'
+      text: 'Друзья, общение и подарки внутри одного кампуса. Только для студентов WIUT.'
     })
   );
 
@@ -100,7 +105,7 @@ export default async function LandingPage() {
     <a href="/rules">Правила сообщества</a>
     <a href="/privacy">Политика конфиденциальности</a>
     <a href="/advertise">Реклама на сайте</a>
-    <span>Только для пользователей 18+</span>
+    <span>Только для студентов WIUT</span>
   `;
   root.append(foot);
 

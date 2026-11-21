@@ -22,7 +22,7 @@ function ageFromBirthdate(value) {
   return age;
 }
 
-function isAdult(birthdate, minAge = 18) {
+function isAdult(birthdate, minAge = 16) {
   const age = ageFromBirthdate(birthdate);
   if (age === null) return false;
   return age >= minAge && age <= 120;
