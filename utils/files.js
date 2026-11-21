@@ -11,7 +11,7 @@ const UPLOAD_DIR = process.env.UPLOADS_DIR
   : process.env.RAILWAY_VOLUME_MOUNT_PATH
     ? path.join(path.resolve(process.env.RAILWAY_VOLUME_MOUNT_PATH), 'uploads')
     : path.join(ROOT, 'uploads');
-const SUBDIRS = ['avatars', 'posts', 'stories', 'chat', 'ads', 'voice'];
+const SUBDIRS = ['avatars', 'posts', 'stories', 'chat', 'ads', 'voice', 'video'];
 const MAX_BYTES = 8 * 1024 * 1024;
 
 const MIME_EXT = {

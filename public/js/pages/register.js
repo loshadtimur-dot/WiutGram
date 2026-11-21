@@ -467,10 +467,9 @@ export default async function RegisterPage(ctx) {
     frag.append(stepTitle('Что вы ищете?', 'Честность помогает находить своих людей.'));
     const grid = el('div', { class: 'option-grid' });
     const options = [
-      ['Отношения', '❤️', 'relationship'],
-      ['Свидания', '🌹', 'dating'],
       ['Дружба', '🤝', 'friends'],
       ['Просто общение', '💬', 'chat'],
+      ['Проектная работа', '📚', 'project'],
       ['Пока не знаю', '🤷', 'not_sure']
     ];
     for (const [label, emoji, value] of options) {

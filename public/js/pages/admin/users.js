@@ -482,7 +482,7 @@ function renderProfileTab(user, universities, refresh) {
   addSelect('gender', 'Пол', [['male', 'Мужчина'], ['female', 'Женщина'], ['other', 'Другое']]);
   addSelect('interested_in', 'Кого ищет', [['male', 'Мужчин'], ['female', 'Женщин'], ['everyone', 'Всех']]);
   addSelect('looking_for', 'Цель', [
-    ['relationship', 'Отношения'], ['dating', 'Свидания'], ['friends', 'Дружба'], ['chat', 'Общение'], ['not_sure', 'Не уверен(а)']
+    ['friends', 'Дружба'], ['chat', 'Общение'], ['project', 'Проектная работа'], ['not_sure', 'Не уверен(а)']
   ]);
   const uniSelect = addSelect(
     'university_id',

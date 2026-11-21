@@ -32,6 +32,8 @@ const LANGUAGES = ['Узбекский', 'Русский', 'Английский
 
 const GENDERS = ['male', 'female', 'other'];
 const INTERESTED_IN = ['male', 'female', 'everyone'];
-const LOOKING_FOR = ['relationship', 'dating', 'friends', 'chat', 'not_sure'];
+// "relationship" and "dating" stay accepted for profiles created before the
+// repositioning; the UI only offers friend-, chat- and project-oriented goals.
+const LOOKING_FOR = ['relationship', 'dating', 'friends', 'chat', 'project', 'not_sure'];
 
 module.exports = { INTERESTS, INTEREST_IDS, LANGUAGES, GENDERS, INTERESTED_IN, LOOKING_FOR };

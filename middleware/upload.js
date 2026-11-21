@@ -25,7 +25,10 @@ function buildStorage(subdir) {
         'audio/ogg': 'ogg',
         'audio/mp4': 'm4a',
         'audio/mpeg': 'mp3',
-        'audio/wav': 'wav'
+        'audio/wav': 'wav',
+        'video/mp4': 'mp4',
+        'video/webm': 'webm',
+        'video/quicktime': 'mov'
       };
       const ext = extMap[baseMime(file.mimetype)] || 'jpg';
       cb(null, randomName(ext));
@@ -67,9 +70,8 @@ function imageUpload(subdir, field = 'image') {
   };
 }
 
-// Voice notes are stored as-is (no server-side transcoding). The composer sends
-// the recording as "voice", which is also the default field here.
-function audioUpload(subdir = 'voice', field = 'voice') {
+// Voice notes are stored as-is (no server-side transcoding).
+function audioUpload(subdir = 'voice', field = 'audio') {
   const upload = multer({
     storage: buildStorage(subdir),
     limits: { fileSize: 10 * 1024 * 1024, files: 1 },
@@ -90,9 +92,31 @@ function audioUpload(subdir = 'voice', field = 'voice') {
   };
 }
 
+// Short videos are stored as-is; the browser plays them with <video>.
+function videoUpload(subdir = 'video', field = 'video') {
+  const upload = multer({
+    storage: buildStorage(subdir),
+    limits: { fileSize: 50 * 1024 * 1024, files: 1 },
+    fileFilter(req, file, cb) {
+      const allowed = ['video/mp4', 'video/webm', 'video/quicktime'];
+      if (!allowed.includes(baseMime(file.mimetype))) {
+        return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', field));
+      }
+      return cb(null, true);
+    }
+  }).single(field);
+  return (req, res, next) => {
+    upload(req, res, (err) => {
+      if (!err) return next();
+      if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: 'Видео больше 50 МБ' });
+      return res.status(400).json({ error: 'Допустимы MP4, WEBM или MOV' });
+    });
+  };
+}
+
 // Public URL for an uploaded file.
 function publicPath(subdir, filename) {
   return `/uploads/${subdir}/${filename}`;
 }
 
-module.exports = { imageUpload, audioUpload, publicPath, ALLOWED_MIME };
+module.exports = { imageUpload, audioUpload, videoUpload, publicPath, ALLOWED_MIME };

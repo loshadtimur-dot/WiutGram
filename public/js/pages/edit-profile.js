@@ -5,10 +5,9 @@ import { getState, refreshMe, patchUser } from '../state.js?v=25';
 import { navigate } from '../router.js?v=25';
 
 const LOOKING_FOR = [
-  ['relationship', 'Отношения'],
-  ['dating', 'Свидания'],
   ['friends', 'Дружба'],
   ['chat', 'Просто общение'],
+  ['project', 'Проектная работа'],
   ['not_sure', 'Пока не знаю']
 ];
 

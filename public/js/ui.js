@@ -392,10 +392,11 @@ export function attachRipples(root = document) {
 export function looksForLabel(value) {
   return (
     {
-      relationship: 'Отношения',
-      dating: 'Свидания',
+      relationship: 'Дружба',
+      dating: 'Общение',
       friends: 'Дружба',
       chat: 'Просто общение',
+      project: 'Проектная работа',
       not_sure: 'Пока не знаю'
     }[value] || 'Пока не знаю'
   );

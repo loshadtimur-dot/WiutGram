@@ -152,8 +152,9 @@ export function createConversationWindow(conversationId, options = {}) {
   const sendBtn = el('button', { class: 'chat-send', attrs: { type: 'submit', 'aria-label': 'Отправить' } });
   sendBtn.innerHTML = icon('send', { size: 19 });
   const fileInput = el('input', { attrs: { type: 'file', accept: 'image/jpeg,image/png,image/webp' }, style: { display: 'none' } });
+  const videoInput = el('input', { attrs: { type: 'file', accept: 'video/mp4,video/webm,video/quicktime' }, style: { display: 'none' } });
 
-  composer.append(emojiBtn, attachBtn, giftBtn, input, voiceBtn, sendBtn, fileInput);
+  composer.append(emojiBtn, attachBtn, giftBtn, input, voiceBtn, sendBtn, fileInput, videoInput);
   root.append(composer);
 
   /* ---------- Attach menu ---------- */
@@ -169,6 +170,8 @@ export function createConversationWindow(conversationId, options = {}) {
       menu.append(btn);
     };
     action('Фото', () => fileInput.click());
+    action('Видео', () => videoInput.click());
+    action('Пост из ленты', () => openPostPicker());
     action('Опрос', () =>
       openPollModal(id, (data) => {
         data.message.poll = data.poll;
@@ -492,6 +495,19 @@ export function createConversationWindow(conversationId, options = {}) {
     return card;
   }
 
+  // A shared feed post inside the chat: image preview plus the author.
+  function postShareCard(post) {
+    const card = el('button', { class: 'msg-post', attrs: { type: 'button' } });
+    card.append(el('img', { attrs: { src: post.image_path, alt: 'Пост', loading: 'lazy' } }));
+    const metaBox = el('div', { class: 'msg-post__meta' });
+    metaBox.append(el('span', { class: 'msg-post__label', text: 'Пост' }));
+    if (post.author_name) metaBox.append(el('span', { class: 'msg-post__author', text: post.author_name }));
+    if (post.caption) metaBox.append(el('span', { class: 'msg-post__caption', text: post.caption }));
+    card.append(metaBox);
+    card.addEventListener('click', () => navigate(`/u/${post.username}`));
+    return card;
+  }
+
   function messageNode(message, grouped) {
     const row = el('div', { class: `msg-row ${message.mine ? 'msg-row--mine' : ''}`, attrs: { 'data-id': message.id, 'data-seq': message.seq } });
     const bubble = el('div', {
@@ -522,6 +538,23 @@ export function createConversationWindow(conversationId, options = {}) {
       imageWrap.append(img);
       bubble.append(imageWrap);
       if (message.body) bubble.append(el('div', { text: message.body }));
+    } else if (message.type === 'video' && message.image_path) {
+      const videoWrap = el('div', { class: 'msg__video' });
+      videoWrap.append(
+        el('video', {
+          attrs: {
+            src: message.image_path,
+            controls: 'controls',
+            playsinline: 'playsinline',
+            preload: 'metadata',
+            'aria-label': 'Видео в чате'
+          }
+        })
+      );
+      bubble.append(videoWrap);
+      if (message.body) bubble.append(el('div', { text: message.body }));
+    } else if (message.type === 'post' && message.post) {
+      bubble.append(postShareCard(message.post));
     } else if (message.type === 'voice' && message.image_path) {
       bubble.append(voiceCard(message));
     } else if (message.type === 'gift') {
@@ -849,6 +882,110 @@ export function createConversationWindow(conversationId, options = {}) {
     } finally {
       pendingImage = null;
     }
+  }
+
+  async function sendVideo(file) {
+    if (file.size > 50 * 1024 * 1024) {
+      toast('Видео больше 50 МБ', 'error');
+      return;
+    }
+    const form = toFormData({ reply_to_id: replyTo ? String(replyTo.id) : '' }, file, file.name || 'video.mp4');
+    try {
+      const data = await api.upload(`/conversations/${id}/messages/video`, form);
+      addMessage(data.message, true);
+      replyTo = null;
+      replyBar.classList.add('hidden');
+    } catch (err) {
+      toast(err.message || 'Не удалось отправить видео', 'error');
+    }
+  }
+
+  videoInput.addEventListener('change', () => {
+    const file = videoInput.files && videoInput.files[0];
+    videoInput.value = '';
+    if (file) sendVideo(file);
+  });
+
+  // Picks a post from the feed and a conversation to share it with.
+  async function openPostPicker() {
+    const body = el('div', { class: 'form-stack' });
+    body.append(el('div', { class: 'loading-row', html: '<div class="spinner spinner--sm"></div>' }));
+    const modal = openModal({ title: 'Отправить пост', body, size: 'wide' });
+    let feed;
+    let chats;
+    try {
+      [feed, chats] = await Promise.all([api.get('/feed?limit=12'), api.get('/conversations')]);
+    } catch (err) {
+      modal.close();
+      toast(err.message || 'Не удалось загрузить ленту', 'error');
+      return;
+    }
+    const posts = feed.posts || [];
+    const conversations = chats.conversations || [];
+    body.innerHTML = '';
+    if (!posts.length) {
+      body.append(el('div', { class: 'empty__text', text: 'В ленте пока нет постов' }));
+      return;
+    }
+    let selectedPost = posts[0].id;
+    let selectedChat = conversations.length ? conversations[0].id : null;
+    const grid = el('div', { class: 'post-picker' });
+    const chatList = el('div', { class: 'post-picker__chats' });
+    const paint = () => {
+      grid.querySelectorAll('[data-post]').forEach((node) => {
+        node.classList.toggle('is-active', Number(node.dataset.post) === Number(selectedPost));
+      });
+      chatList.querySelectorAll('[data-chat]').forEach((node) => {
+        node.classList.toggle('is-active', Number(node.dataset.chat) === Number(selectedChat));
+      });
+    };
+    for (const item of posts) {
+      const btn = el('button', { class: 'post-picker__item', attrs: { type: 'button', 'data-post': String(item.id) } });
+      btn.append(el('img', { attrs: { src: item.image_path, alt: item.caption || 'Пост', loading: 'lazy' } }));
+      btn.addEventListener('click', () => {
+        selectedPost = item.id;
+        paint();
+      });
+      grid.append(btn);
+    }
+    for (const chat of conversations) {
+      const title =
+        chat.title || (chat.peer && (chat.peer.display_name || chat.peer.username)) || 'Чат';
+      const row = el('button', { class: 'post-picker__chat', attrs: { type: 'button', 'data-chat': String(chat.id) } });
+      row.append(el('span', { text: title }));
+      row.addEventListener('click', () => {
+        selectedChat = chat.id;
+        paint();
+      });
+      chatList.append(row);
+    }
+    body.append(el('h4', { text: 'Пост' }), grid);
+    if (conversations.length) {
+      body.append(el('h4', { text: 'Куда отправить' }), chatList);
+    } else {
+      body.append(el('div', { class: 'empty__text', text: 'Пока нет чатов' }));
+    }
+    const submit = button('Отправить', {
+      variant: 'btn-primary',
+      onClick: async () => {
+        if (!selectedChat || !selectedPost) return;
+        try {
+          await api.post(`/conversations/${selectedChat}/messages/post`, { post_id: selectedPost });
+          modal.close();
+          toast('Пост отправлен', 'success');
+          if (Number(selectedChat) === id) {
+            const data = await api.get(`/conversations/${id}/messages?limit=40`);
+            messages = data.messages || messages;
+            renderMessages();
+            scrollToBottom();
+          }
+        } catch (err) {
+          toast(err.message || 'Не удалось отправить пост', 'error');
+        }
+      }
+    });
+    body.append(submit);
+    paint();
   }
 
   /* ---------- Loading ---------- */

@@ -3,7 +3,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
-const { imageUpload, audioUpload } = require('../middleware/upload');
+const { imageUpload, audioUpload, videoUpload } = require('../middleware/upload');
 const { uploadLimiter } = require('../middleware/rateLimit');
 const { toInt, cleaned } = require('../middleware/validate');
 const chat = require('../lib/chat/service');
@@ -87,11 +87,15 @@ function deliver(conversation, row, user) {
           ? 'Фото'
           : row.type === 'voice'
             ? 'Голосовое сообщение'
-            : row.type === 'gift'
-              ? 'Подарок'
-              : row.type === 'poll'
-                ? 'Опрос'
-                : String(row.body || '').slice(0, 80);
+            : row.type === 'video'
+              ? 'Видео'
+              : row.type === 'post'
+                ? 'Пост'
+                : row.type === 'gift'
+                  ? 'Подарок'
+                  : row.type === 'poll'
+                    ? 'Опрос'
+                    : String(row.body || '').slice(0, 80);
       notify({
         userId: entry.user_id,
         type: 'message',
@@ -160,6 +164,52 @@ router.post('/conversations/:id/messages/voice', uploadLimiter, audioUpload('voi
     type: 'voice',
     imagePath: `/uploads/voice/${req.file.filename}`,
     meta: { duration, mime: req.file.mimetype },
+    replyToId: toInt(req.body && req.body.reply_to_id, 0) || null
+  });
+  const view = deliver(found.conversation, result.message, req.user);
+  return res.status(201).json({ message: { ...view, mine: true } });
+});
+
+router.post('/conversations/:id/messages/video', uploadLimiter, videoUpload('video', 'video'), (req, res) => {
+  const found = guard(req, res, req.params.id);
+  if (!found) return undefined;
+  if (!chat.can(found.member, 'send_media')) return res.status(403).json({ error: 'Медиа отключены' });
+  if (!req.file) return res.status(400).json({ error: 'Выберите видео' });
+  const duration = Math.min(600, Math.max(0, toInt(req.body && req.body.duration, 0)));
+  const result = messages.sendMessage({
+    conversation: found.conversation,
+    user: req.user,
+    type: 'video',
+    imagePath: `/uploads/video/${req.file.filename}`,
+    meta: { duration, mime: req.file.mimetype },
+    replyToId: toInt(req.body && req.body.reply_to_id, 0) || null
+  });
+  const view = deliver(found.conversation, result.message, req.user);
+  return res.status(201).json({ message: { ...view, mine: true } });
+});
+
+// Shares a feed post into a conversation as a tappable card.
+router.post('/conversations/:id/messages/post', (req, res) => {
+  const found = guard(req, res, req.params.id);
+  if (!found) return undefined;
+  if (!writeGuard(req, res, found.conversation, found.member)) return undefined;
+  const post = db.get(
+    'SELECT p.*, u.username, u.display_name FROM posts p JOIN users u ON u.id = p.user_id WHERE p.id = ?',
+    [toInt(req.body && req.body.post_id, 0)]
+  );
+  if (!post) return res.status(404).json({ error: 'Пост не найден' });
+  if (Number(post.user_id) !== Number(req.user.id)) {
+    const author = db.get('SELECT is_banned, shadow_banned FROM users WHERE id = ?', [post.user_id]);
+    if (!author || author.is_banned || author.shadow_banned) {
+      return res.status(404).json({ error: 'Пост недоступен' });
+    }
+  }
+  const result = messages.sendMessage({
+    conversation: found.conversation,
+    user: req.user,
+    type: 'post',
+    body: cleaned(req.body && req.body.caption, 300),
+    meta: { post_id: Number(post.id) },
     replyToId: toInt(req.body && req.body.reply_to_id, 0) || null
   });
   const view = deliver(found.conversation, result.message, req.user);

@@ -33,7 +33,7 @@ export default async function LandingPage() {
   copy.append(
     el('p', {
       class: 'landing__sub',
-      text: 'Знакомства, чаты и подарки внутри одного кампуса. Только 18+.'
+      text: 'Друзья, общение и подарки внутри одного кампуса. Только 18+.'
     })
   );
 
