@@ -47,6 +47,7 @@ export default async function revenueSection({ refresh, settings }) {
   }
 
   function render(data) {
+    content.innerHTML = '';
     const revenue = data.revenue || {};
     const load = data.load || {};
     const kpis = el('div', { class: 'ads-kpis' });

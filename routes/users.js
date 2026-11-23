@@ -23,14 +23,14 @@ const router = express.Router();
 router.use(requireAuth);
 
 function profileCounts(userId) {
-  const posts = db.get('SELECT COUNT(*) AS total FROM posts WHERE user_id = ?', [userId]);
+  const posts = db.get('SELECT COUNT(*) AS total FROM posts WHERE user_id = ? AND is_hidden = 0', [userId]);
   const likes = db.get(
     `SELECT COUNT(*) AS total FROM post_likes pl
-     JOIN posts p ON p.id = pl.post_id WHERE p.user_id = ?`,
+     JOIN posts p ON p.id = pl.post_id WHERE p.user_id = ? AND p.is_hidden = 0`,
     [userId]
   );
   const views = db.get(
-    `SELECT COALESCE(SUM(views_count), 0) AS total FROM posts WHERE user_id = ?`,
+    `SELECT COALESCE(SUM(views_count), 0) AS total FROM posts WHERE user_id = ? AND is_hidden = 0`,
     [userId]
   );
   const profileViews = db.get(
@@ -184,7 +184,7 @@ router.get('/me/stats', (req, res) => {
     `SELECT p.id, p.image_path, p.caption, p.created_at, p.views_count,
        (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS likes,
        (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments
-     FROM posts p WHERE p.user_id = ?
+     FROM posts p WHERE p.user_id = ? AND p.is_hidden = 0
      ORDER BY likes DESC, p.views_count DESC LIMIT 5`,
     [me]
   );
@@ -193,7 +193,7 @@ router.get('/me/stats', (req, res) => {
     `SELECT p.id, p.image_path, p.caption, p.created_at, p.views_count,
        (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS likes,
        (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments
-     FROM posts p WHERE p.user_id = ?
+     FROM posts p WHERE p.user_id = ? AND p.is_hidden = 0
      ORDER BY p.views_count DESC, p.id DESC LIMIT 5`,
     [me]
   );

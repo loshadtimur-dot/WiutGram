@@ -59,6 +59,20 @@ export function emptyState(text, action) {
   return box;
 }
 
+export const REPORT_REASON_LABELS = {
+  spam: 'Спам или реклама',
+  nudity: 'Откровенный контент',
+  harassment: 'Оскорбления и травля',
+  scam: 'Мошенничество',
+  fake: 'Фейковый профиль',
+  underage: 'Младше 16 лет',
+  other: 'Другое'
+};
+
+export function reportReason(value) {
+  return REPORT_REASON_LABELS[value] || value || 'Без причины';
+}
+
 export function chip(text, variant = '') {
   return el('span', { class: `admin-chip ${variant ? `admin-chip--${variant}` : ''}`, text });
 }
@@ -66,6 +80,7 @@ export function chip(text, variant = '') {
 export function statusChips(user) {
   const wrap = el('div', { class: 'admin-chips' });
   if (user.role === 'owner') wrap.append(chip('Владелец', 'owner'));
+  else if (user.role === 'admin') wrap.append(chip('Админ', 'admin'));
   if (user.is_banned) wrap.append(chip('Бан', 'banned'));
   if (user.shadow_banned) wrap.append(chip('Теневой бан', 'banned'));
   if (user.is_verified) wrap.append(chip('Студент', 'verified'));

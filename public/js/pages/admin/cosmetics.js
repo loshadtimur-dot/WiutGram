@@ -177,7 +177,13 @@ export default async function cosmeticsSection() {
   const priceCard = el('div', { class: 'admin-card' });
   priceCard.append(el('h3', { text: 'Подарки: редкость и цена' }));
   priceCard.append(el('p', { class: 'field__hint', text: 'Меняйте редкость и цену — витрина обновится сразу.' }));
+  const giftSearch = el('input', {
+    class: 'input',
+    attrs: { type: 'search', placeholder: 'Найти подарок', 'aria-label': 'Поиск подарка' },
+    style: { maxWidth: '320px' }
+  });
   const table = el('div', { class: 'admin-table' });
+  const giftRows = [];
   const head = el('div', { class: 'admin-table__row admin-table__head' });
   head.append(
     el('span', { text: 'Подарок' }),
@@ -214,9 +220,14 @@ export default async function cosmeticsSection() {
       }
     });
     row.append(art, rarity, price, save);
+    giftRows.push({ row, text: `${gift.name} ${gift.slug || ''}`.toLowerCase() });
     table.append(row);
   }
-  priceCard.append(table);
+  giftSearch.addEventListener('input', () => {
+    const query = giftSearch.value.trim().toLowerCase();
+    for (const entry of giftRows) entry.row.classList.toggle('hidden', !!query && !entry.text.includes(query));
+  });
+  priceCard.append(giftSearch, table);
   root.append(priceCard);
 
   /* ---------- Recent grants ---------- */
@@ -243,7 +254,7 @@ export default async function cosmeticsSection() {
     if (!gift) continue;
     const row = el('div', { class: 'admin-grant-row' });
     row.append(giftNode(gift, { size: 'sm' }));
-    row.append(el('span', { text: `@${grant.username} — подарок` }));
+    row.append(el('span', { text: `@${grant.username} — ${gift.name}` }));
     recent.append(row);
   }
   root.append(recent);

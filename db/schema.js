@@ -331,7 +331,10 @@ const EXTRA_COLUMNS = {
     ['super_likes_bonus', 'INTEGER NOT NULL DEFAULT 0'],
     ['email_verified', 'INTEGER NOT NULL DEFAULT 1']
   ],
-  posts: [['post_kind', "TEXT NOT NULL DEFAULT 'image'"]],
+  posts: [
+    ['post_kind', "TEXT NOT NULL DEFAULT 'image'"],
+    ['is_hidden', 'INTEGER NOT NULL DEFAULT 0']
+  ],
   messages: [
     ['reaction', 'TEXT'],
     ['deleted_by_sender', 'INTEGER NOT NULL DEFAULT 0']

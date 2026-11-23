@@ -27,6 +27,7 @@ const ICONS = {
   gift: 'gift',
   badge: 'star',
   banner: 'image',
+  group: 'users',
   system: 'info'
 };
 
@@ -70,6 +71,7 @@ export default async function NotificationsPage() {
     switch (notification.type) {
       case 'match':
       case 'message':
+      case 'group':
         return '/chats';
       case 'like':
       case 'super_like':

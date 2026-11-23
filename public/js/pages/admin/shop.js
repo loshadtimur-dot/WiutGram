@@ -174,12 +174,18 @@ function ordersTab(refreshAll) {
 function catalogTab() {
   const wrap = el('div');
   const tools = el('div', { class: 'row', style: { marginBottom: '10px', flexWrap: 'wrap' } });
+  const search = el('input', {
+    class: 'input',
+    attrs: { type: 'search', placeholder: 'Поиск товара или slug' },
+    style: { flex: '1 1 220px', maxWidth: '320px' }
+  });
+  const count = el('span', { class: 'field__hint' });
   const kindFilter = el('select', { class: 'input', style: { maxWidth: '190px' } });
   kindFilter.append(el('option', { text: 'Все категории', attrs: { value: '' } }));
   for (const [key, label] of Object.entries(KINDS)) kindFilter.append(el('option', { text: label, attrs: { value: key } }));
-  tools.append(kindFilter);
-  tools.append(button('Добавить товар', { variant: 'btn-primary btn-sm', icon: 'plus', onClick: () => createItemModal(load) }));
+  tools.append(search, kindFilter, count, button('Добавить товар', { variant: 'btn-primary btn-sm', icon: 'plus', onClick: () => createItemModal(load) }));
   const list = el('div');
+  let searchTimer = null;
 
   async function load() {
     list.innerHTML = '';
@@ -187,11 +193,17 @@ function catalogTab() {
     try {
       const data = await api.get(`/admin/shop/items${kindFilter.value ? `?kind=${kindFilter.value}` : ''}`);
       list.innerHTML = '';
-      if (!data.items.length) {
-        list.append(emptyState('Товаров нет'));
+      const query = search.value.trim().toLowerCase();
+      const items = data.items.filter((item) => {
+        if (!query) return true;
+        return String(item.title || '').toLowerCase().includes(query) || String(item.slug || '').toLowerCase().includes(query);
+      });
+      count.textContent = `Товаров: ${items.length}`;
+      if (!items.length) {
+        list.append(emptyState(query ? 'Товары не найдены' : 'Товаров нет'));
         return;
       }
-      for (const item of data.items) {
+      for (const item of items) {
         const card = el('div', { class: 'admin-card', style: { padding: '10px', marginBottom: '6px' } });
         const row = el('div', { class: 'row', style: { justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' } });
         const info = el('div', { style: { flex: '1', minWidth: '200px' } });
@@ -238,6 +250,10 @@ function catalogTab() {
   }
 
   kindFilter.addEventListener('change', load);
+  search.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(load, 300);
+  });
   wrap.append(tools, list);
   load();
   return wrap;

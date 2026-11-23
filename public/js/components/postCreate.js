@@ -2,11 +2,35 @@ import { api, compressImage, toFormData } from '../api.js?v=25';
 import { el, button, openModal, toast } from '../ui.js?v=25';
 import { icon } from '../icons.js?v=25';
 
+function mediaActions({ onReplace, onRemove }) {
+  const row = el('div', { class: 'post-create__actions hidden' });
+  const replace = button('Заменить', { variant: 'btn-secondary btn-sm', onClick: onReplace });
+  replace.prepend(el('span', { html: icon('image', { size: 14 }) }));
+  const remove = button('Удалить', { variant: 'btn-ghost btn-sm', onClick: onRemove });
+  remove.prepend(el('span', { html: icon('trash', { size: 14 }) }));
+  row.append(replace, remove);
+  return row;
+}
+
+function bindDropzone(dropzone, onFile) {
+  dropzone.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    dropzone.classList.add('is-dragover');
+  });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+  dropzone.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropzone.classList.remove('is-dragover');
+    onFile(event.dataTransfer.files && event.dataTransfer.files[0]);
+  });
+}
+
 // Creates a post (photo + caption + location) or a 24h story.
 export function openPostCreate(onCreated) {
   const body = el('div', { class: 'col', style: { gap: '14px' } });
   let compressed = null;
   let videoFile = null;
+  let videoUrl = '';
 
   const dropzone = el('div', { class: 'photo-drop' });
   const dropIcon = el('div', { class: 'photo-drop__icon' });
@@ -20,7 +44,23 @@ export function openPostCreate(onCreated) {
     style: { display: 'none' }
   });
   const preview = el('div', { class: 'post-create__preview hidden' });
-  body.append(dropzone, fileInput, preview);
+  const actions = mediaActions({
+    onReplace: () => fileInput.click(),
+    onRemove: () => resetMedia()
+  });
+  body.append(dropzone, fileInput, preview, actions);
+
+  function resetMedia() {
+    compressed = null;
+    videoFile = null;
+    if (videoUrl) URL.revokeObjectURL(videoUrl);
+    videoUrl = '';
+    preview.innerHTML = '';
+    preview.classList.add('hidden');
+    actions.classList.add('hidden');
+    dropzone.classList.remove('hidden');
+    fileInput.value = '';
+  }
 
   async function handleFile(file) {
     if (!file) return;
@@ -29,24 +69,30 @@ export function openPostCreate(onCreated) {
         toast('Видео больше 50 МБ', 'error');
         return;
       }
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
       videoFile = file;
       compressed = null;
+      videoUrl = URL.createObjectURL(file);
       preview.innerHTML = '';
       preview.append(
         el('video', {
-          attrs: { src: URL.createObjectURL(file), controls: 'controls', playsinline: 'playsinline' }
+          attrs: { src: videoUrl, controls: 'controls', playsinline: 'playsinline' }
         })
       );
       preview.classList.remove('hidden');
+      actions.classList.remove('hidden');
       dropzone.classList.add('hidden');
       return;
     }
     try {
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
+      videoUrl = '';
       videoFile = null;
       compressed = await compressImage(file, 1440, 0.88);
       preview.innerHTML = '';
       preview.append(el('img', { attrs: { src: compressed.dataUrl, alt: 'Предпросмотр поста' } }));
       preview.classList.remove('hidden');
+      actions.classList.remove('hidden');
       dropzone.classList.add('hidden');
     } catch (err) {
       toast(err.message || 'Не удалось обработать фото', 'error');
@@ -54,19 +100,9 @@ export function openPostCreate(onCreated) {
   }
 
   dropzone.addEventListener('click', () => fileInput.click());
+  bindDropzone(dropzone, handleFile);
   fileInput.addEventListener('change', () => {
     handleFile(fileInput.files && fileInput.files[0]);
-    fileInput.value = '';
-  });
-  dropzone.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    dropzone.classList.add('is-dragover');
-  });
-  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
-  dropzone.addEventListener('drop', (event) => {
-    event.preventDefault();
-    dropzone.classList.remove('is-dragover');
-    handleFile(event.dataTransfer.files && event.dataTransfer.files[0]);
   });
 
   const captionField = el('label', { class: 'field' });
@@ -92,7 +128,7 @@ export function openPostCreate(onCreated) {
   body.append(locationField);
 
   const footer = el('div', { class: 'row' });
-  const modal = openModal({ title: 'Новый пост', body, footer });
+  const modal = openModal({ title: 'Новый пост', body, footer, onClose: resetMedia });
   const publish = button('Опубликовать', {
     variant: 'btn-primary',
     onClick: async () => {
@@ -126,6 +162,7 @@ export function openPostCreate(onCreated) {
 export function openStoryCreate(onCreated) {
   const body = el('div', { class: 'col', style: { gap: '14px' } });
   let compressed = null;
+
   const dropzone = el('div', { class: 'photo-drop' });
   const dropIcon = el('div', { class: 'photo-drop__icon' });
   dropIcon.innerHTML = icon('camera', { size: 22 });
@@ -137,7 +174,20 @@ export function openStoryCreate(onCreated) {
     style: { display: 'none' }
   });
   const preview = el('div', { class: 'post-create__preview hidden' });
-  body.append(dropzone, fileInput, preview);
+  const actions = mediaActions({
+    onReplace: () => fileInput.click(),
+    onRemove: () => resetMedia()
+  });
+  body.append(dropzone, fileInput, preview, actions);
+
+  function resetMedia() {
+    compressed = null;
+    preview.innerHTML = '';
+    preview.classList.add('hidden');
+    actions.classList.add('hidden');
+    dropzone.classList.remove('hidden');
+    fileInput.value = '';
+  }
 
   async function handleFile(file) {
     if (!file) return;
@@ -146,15 +196,16 @@ export function openStoryCreate(onCreated) {
       preview.innerHTML = '';
       preview.append(el('img', { attrs: { src: compressed.dataUrl, alt: 'Предпросмотр истории' } }));
       preview.classList.remove('hidden');
+      actions.classList.remove('hidden');
       dropzone.classList.add('hidden');
     } catch (err) {
       toast(err.message || 'Не удалось обработать фото', 'error');
     }
   }
   dropzone.addEventListener('click', () => fileInput.click());
+  bindDropzone(dropzone, handleFile);
   fileInput.addEventListener('change', () => {
     handleFile(fileInput.files && fileInput.files[0]);
-    fileInput.value = '';
   });
 
   const captionField = el('label', { class: 'field' });
@@ -167,7 +218,7 @@ export function openStoryCreate(onCreated) {
   body.append(captionField);
 
   const footer = el('div', { class: 'row' });
-  const modal = openModal({ title: 'Новая история', body, footer });
+  const modal = openModal({ title: 'Новая история', body, footer, onClose: resetMedia });
   const publish = button('Опубликовать', {
     variant: 'btn-primary',
     onClick: async () => {

@@ -148,6 +148,47 @@ router.get('/conversations/settings', (req, res) => {
   });
 });
 
+// A member can report a group; the owner and the admin panel see the report.
+const GROUP_REPORT_REASONS = ['spam', 'harassment', 'scam', 'fake', 'other'];
+const GROUP_REPORT_LABELS = {
+  spam: 'спам или реклама',
+  harassment: 'оскорбления и травля',
+  scam: 'мошенничество',
+  fake: 'фейковая группа',
+  other: 'другое'
+};
+
+router.post('/conversations/:id/report', (req, res) => {
+  const found = guard(req, res, req.params.id);
+  if (!found) return undefined;
+  const conversation = found.conversation;
+  if (conversation.type !== 'group') return res.status(400).json({ error: 'Пожаловаться можно только на группу' });
+  const reason = String((req.body && req.body.reason) || '');
+  if (!GROUP_REPORT_REASONS.includes(reason)) return res.status(400).json({ error: 'Выберите причину жалобы' });
+  const details = cleaned(req.body && req.body.details, 1000);
+  const duplicate = db.get(
+    `SELECT id FROM conversation_reports
+     WHERE conversation_id = ? AND reporter_id = ? AND status = 'new' AND created_at > ?`,
+    [conversation.id, req.user.id, new Date(Date.now() - 24 * 3600 * 1000).toISOString()]
+  );
+  if (duplicate) return res.status(409).json({ error: 'Жалоба на эту группу уже отправлена' });
+  db.run(
+    `INSERT INTO conversation_reports (conversation_id, reporter_id, reason, details, status, created_at)
+     VALUES (?, ?, ?, ?, 'new', ?)`,
+    [conversation.id, req.user.id, reason, details, nowIso()]
+  );
+  if (conversation.created_by && conversation.created_by !== req.user.id) {
+    notify({
+      userId: conversation.created_by,
+      type: 'group',
+      actorId: req.user.id,
+      refId: conversation.id,
+      text: `Жалоба на группу «${conversation.title}»: ${GROUP_REPORT_LABELS[reason]}`
+    });
+  }
+  return res.status(201).json({ ok: true, message: 'Жалоба отправлена модераторам' });
+});
+
 router.post('/conversations', (req, res) => {
   const result = chat.createGroup(req.user, req.body || {});
   if (result.error) return res.status(result.status || 400).json({ error: result.error });

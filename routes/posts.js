@@ -33,6 +33,7 @@ function loadPost(postId, viewerId) {
 }
 
 function canSeePost(post, viewerId) {
+  if (post.is_hidden) return false;
   const author = db.get('SELECT * FROM users WHERE id = ?', [post.user_id]);
   if (!author || author.is_banned || author.shadow_banned) return false;
   if (isBlockedBetween(viewerId, author.id)) return false;
@@ -56,7 +57,7 @@ router.get('/feed', (req, res) => {
     authorId = author.id;
   }
 
-  const filters = [];
+  const filters = ['p.is_hidden = 0'];
   const filterParams = [];
   if (authorId) {
     filters.push('p.user_id = ?');
@@ -98,7 +99,7 @@ router.get('/feed', (req, res) => {
   );
 
   const total = authorId
-    ? db.get('SELECT COUNT(*) AS t FROM posts WHERE user_id = ?', [authorId]).t
+    ? db.get('SELECT COUNT(*) AS t FROM posts WHERE user_id = ? AND is_hidden = 0', [authorId]).t
     : null;
 
   return res.json({

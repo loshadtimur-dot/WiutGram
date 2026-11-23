@@ -23,6 +23,7 @@ async function renderSettings() {
 
   const card = el('div', { class: 'admin-panel' });
   const form = el('div', { class: 'admin-form-grid' });
+  const switchList = el('div', { class: 'admin-switch-list' });
   const inputs = {};
 
   const addText = (key, label, options = {}) => {
@@ -46,7 +47,7 @@ async function renderSettings() {
     input.checked = String(settings[key]) === '1' || settings[key] === true;
     inputs[key] = input;
     row.append(text, input);
-    form.append(row);
+    switchList.append(row);
   };
 
   addText('site_name', 'Название сайта', { maxlength: 40 });
@@ -57,6 +58,7 @@ async function renderSettings() {
   addToggle('maintenance_mode', 'Режим обслуживания', 'Сайт доступен только владельцу');
   addToggle('allow_university_requests', 'Заявки на университеты', 'Пользователи смогут предлагать новые университеты');
   card.append(form);
+  card.append(el('h3', { class: 'admin-panel__title', text: 'Доступ и режим' }), switchList);
 
   const welcomeField = el('label', { class: 'field' });
   welcomeField.append(el('span', { class: 'field__label', text: 'Приветственное сообщение' }));
@@ -106,7 +108,7 @@ async function renderLog() {
   let offset = 0;
   const limit = 50;
   const tableWrap = el('div');
-  const toolbar = el('div', { class: 'admin-toolbar' });
+  const toolbar = el('div', { class: 'admin-toolbar admin-toolbar--compact' });
   const search = el('input', { class: 'input', attrs: { type: 'search', placeholder: 'Действие, цель или username' } });
   const exportBtn = button('Экспорт CSV', { variant: 'btn-secondary btn-sm', onClick: () => exportLog() });
   toolbar.append(search, exportBtn);

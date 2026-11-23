@@ -77,7 +77,7 @@ async function renderList({ showUser }) {
   });
   root.append(sectionHead('Пользователи', 'Все аккаунты, фильтры и модерация', exportBtn));
 
-  const toolbar = el('div', { class: 'admin-toolbar' });
+  const toolbar = el('div', { class: 'admin-toolbar admin-toolbar--users' });
   const search = el('input', { class: 'input', attrs: { type: 'search', placeholder: 'ID, username, email, имя, университет, IP' } });
   search.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
@@ -244,7 +244,7 @@ async function renderList({ showUser }) {
     const thSelect = el('th');
     thSelect.append(selectAll);
     headRow.append(thSelect);
-    ['Пользователь', 'Email', 'Возраст', 'Университет', 'Статус', 'Роль', 'Регистрация', 'Вход', ''].forEach((label) =>
+    ['Пользователь', 'Возраст', 'Университет', 'Статус', 'Регистрация', 'Вход', ''].forEach((label) =>
       headRow.append(el('th', { text: label }))
     );
     thead.append(headRow);
@@ -270,12 +270,12 @@ async function renderList({ showUser }) {
       const userText = el('span', { class: 'admin-user-link__text' });
       userText.append(el('span', { text: user.display_name }));
       userText.append(el('span', { class: 'admin-user-link__meta', text: `@${user.username} · #${user.id}` }));
+      userText.append(el('span', { class: 'admin-user-link__meta', text: user.email || 'email не указан' }));
       userButton.append(userText);
       userButton.addEventListener('click', () => showUser(user.id));
       userCell.append(userButton);
       row.append(userCell);
 
-      row.append(el('td', { text: user.email }));
       row.append(el('td', { text: String(user.age ?? '—') }));
       const uniCell = el('td');
       uniCell.append(el('div', { text: user.university ? user.university.short_name : '—' }));
@@ -284,7 +284,6 @@ async function renderList({ showUser }) {
       const statusCell = el('td');
       statusCell.append(statusChips(user));
       row.append(statusCell);
-      row.append(el('td', { text: user.role === 'owner' ? 'Владелец' : 'Пользователь' }));
       row.append(el('td', { text: fmtDate(user.created_at) }));
       row.append(el('td', { text: user.last_login_at ? fmtDate(user.last_login_at) : '—' }));
       const actionCell = el('td');

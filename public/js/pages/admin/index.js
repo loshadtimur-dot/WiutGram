@@ -94,6 +94,15 @@ export default async function AdminPage(ctx) {
     side.append(link);
   }
 
+  // On phones the navigation is a horizontal strip; keep the current section in view.
+  setTimeout(() => {
+    const link = navButtons.get(active);
+    if (link && side.scrollWidth > side.clientWidth + 2) {
+      const delta = link.getBoundingClientRect().left - side.getBoundingClientRect().left;
+      side.scrollTo({ left: Math.max(0, side.scrollLeft + delta - 12), behavior: 'auto' });
+    }
+  }, 80);
+
   // Badges with the number of new advertising and super like requests.
   function setNavBadge(sectionId, count) {
     const link = navButtons.get(sectionId);
@@ -197,11 +206,7 @@ export default async function AdminPage(ctx) {
         content.innerHTML = '';
         content.append(node);
       }
-      if (!userId) {
-        content.scrollIntoView({ block: 'start' });
-      } else {
-        window.scrollTo({ top: 0 });
-      }
+      window.scrollTo({ top: 0 });
       refreshBadges();
     } catch (err) {
       content.innerHTML = '';

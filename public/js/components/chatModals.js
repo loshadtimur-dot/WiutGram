@@ -250,6 +250,7 @@ export async function openGroupInfo(conversationId, options = {}) {
         body.append(el('label', { class: 'field__label', text: 'Пригласить участника' }), addInput, addBox);
       }
 
+      const footerActions = el('div', { class: 'row', style: { marginTop: '16px', justifyContent: 'space-between', flexWrap: 'wrap' } });
       const leave = button('Выйти из группы', {
         variant: 'btn-ghost btn-sm',
         onClick: async () => {
@@ -259,7 +260,16 @@ export async function openGroupInfo(conversationId, options = {}) {
           if (options.onLeave) options.onLeave();
         }
       });
-      body.append(el('div', { style: { marginTop: '16px' } }, [leave]));
+      footerActions.append(leave);
+      if (conversation.role !== 'owner') {
+        footerActions.append(
+          button('Пожаловаться на группу', {
+            variant: 'btn-ghost btn-sm',
+            onClick: () => openGroupReport(conversationId, conversation.title)
+          })
+        );
+      }
+      body.append(footerActions);
     } catch (err) {
       body.innerHTML = '';
       body.append(el('div', { class: 'purchase__note', text: err.message || 'Не удалось загрузить группу' }));
@@ -267,6 +277,39 @@ export async function openGroupInfo(conversationId, options = {}) {
   }
 
   load();
+  return modal;
+}
+
+function openGroupReport(conversationId, title) {
+  const body = el('div', { class: 'col', style: { gap: '10px' } });
+  body.append(el('p', { class: 'field__hint', text: `Расскажите, что не так с группой «${title}». Жалоба уйдёт модераторам.` }));
+  const reason = el('select', { class: 'select' });
+  [
+    ['spam', 'Спам или реклама'],
+    ['harassment', 'Оскорбления и травля'],
+    ['scam', 'Мошенничество'],
+    ['fake', 'Фейковая группа'],
+    ['other', 'Другое']
+  ].forEach(([value, label]) => reason.append(el('option', { text: label, attrs: { value } })));
+  const details = el('textarea', { class: 'textarea', attrs: { rows: '3', maxlength: '1000', placeholder: 'Детали (необязательно)' } });
+  body.append(reason, details);
+  const footer = el('div', { class: 'row' });
+  const modal = openModal({ title: 'Жалоба на группу', body, footer });
+  const send = button('Отправить жалобу', {
+    variant: 'btn-danger',
+    onClick: async () => {
+      send.disabled = true;
+      try {
+        await api.post(`/conversations/${conversationId}/report`, { reason: reason.value, details: details.value.trim() });
+        toast('Жалоба отправлена модераторам', 'success');
+        modal.close();
+      } catch (err) {
+        toast(err.message || 'Не удалось отправить жалобу', 'error');
+        send.disabled = false;
+      }
+    }
+  });
+  footer.append(button('Отмена', { variant: 'btn-secondary', onClick: () => modal.close() }), send);
   return modal;
 }
 

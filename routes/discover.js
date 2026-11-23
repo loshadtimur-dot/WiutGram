@@ -119,6 +119,7 @@ router.get('/explore', (req, res) => {
   const filters = [
     VISIBLE,
     NOT_BLOCKED,
+    'p.is_hidden = 0',
     '(? IS NULL OR u.university_id = ?)',
     '(? IS NULL OR u.course = ?)'
   ];
