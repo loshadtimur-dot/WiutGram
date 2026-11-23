@@ -131,6 +131,7 @@ function openItemModal(item, refresh, prefillRecipient = '') {
   let recipient = null;
   let message = null;
   let anonymous = null;
+  let keepForSelf = null;
   if (item.kind === 'gift') {
     const field = recipientField();
     field.input.value = prefillRecipient;
@@ -138,8 +139,20 @@ function openItemModal(item, refresh, prefillRecipient = '') {
     message = el('textarea', { class: 'input', attrs: { placeholder: 'Подпись к подарку (до 120 символов)', rows: '2', maxlength: '120' } });
     const check = el('input', { attrs: { type: 'checkbox' } });
     anonymous = check;
+    const self = el('input', { attrs: { type: 'checkbox' } });
+    keepForSelf = self;
+    const selfRow = el('label', { class: 'check-row' }, [self, el('span', { text: 'Оставить подарок себе' })]);
+    const selfHint = el('div', {
+      class: 'purchase__note hidden',
+      text: 'Подарок останется в вашей коллекции — его можно будет подарить позже.'
+    });
+    self.addEventListener('change', () => {
+      field.wrap.classList.toggle('hidden', self.checked);
+      selfHint.classList.toggle('hidden', !self.checked);
+    });
     body.append(field.wrap, el('label', { class: 'field__label', text: 'Подпись' }), message);
     body.append(el('label', { class: 'check-row' }, [check, el('span', { text: 'Скрыть отправителя' })]));
+    body.append(selfRow, selfHint);
   }
 
   const footer = el('div', { class: 'row', style: { justifyContent: 'flex-end' } });
@@ -151,7 +164,7 @@ function openItemModal(item, refresh, prefillRecipient = '') {
       button(item.price ? 'Купить' : 'Получить', {
         variant: 'btn-primary',
         onClick: async () => {
-          if (item.kind === 'gift' && !recipient.value.trim()) {
+          if (item.kind === 'gift' && !keepForSelf.checked && !recipient.value.trim()) {
             toast('Укажите получателя', 'error');
             return;
           }
@@ -159,7 +172,7 @@ function openItemModal(item, refresh, prefillRecipient = '') {
             const result = await buyItem({
               api,
               item,
-              recipientUsername: item.kind === 'gift' ? recipient.value.trim() : '',
+              recipientUsername: item.kind === 'gift' ? (keepForSelf.checked ? getState().user.username : recipient.value.trim()) : '',
               message: message ? message.value.trim() : '',
               anonymous: anonymous ? anonymous.checked : false
             });

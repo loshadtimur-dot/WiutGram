@@ -409,6 +409,12 @@ export async function openChatGiftPicker(conversationId, onSent) {
       );
       return modal;
     }
+    body.append(
+      el('div', {
+        class: 'purchase__note',
+        text: 'Подарок перейдёт получателю и исчезнет из вашей коллекции — открыть его сможет только он.'
+      })
+    );
     const grid = el('div', { class: 'shop-grid' });
     for (const gift of gifts) {
       const card = el('button', { class: 'shop-card shop-card--gift', attrs: { type: 'button' } });

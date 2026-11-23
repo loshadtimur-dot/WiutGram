@@ -17,6 +17,7 @@ import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=
 import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=25';
 import { initSocket, onSocket, disconnectSocket } from './socket.js?v=25';
 import { showMatchScreen } from './components/match.js?v=25';
+import { initI18n, setLang, getLang, langToggle, t } from './i18n.js?v=1';
 
 import Landing from './pages/landing.js?v=25';
 import LoginPage from './pages/login.js?v=25';
@@ -121,6 +122,7 @@ function publicShell() {
       <a class="landing__link" href="/advertise" data-link>Реклама</a>
       <a class="landing__link" href="/rules" data-link>Правила</a>
       <a class="landing__link" href="/privacy" data-link>Политика</a>
+      <button class="lang-switch" type="button" data-lang-toggle aria-label="Language">${langToggle()}</button>
       ${authLinks}
     </div>
     <div class="public-view" id="view"></div>
@@ -156,6 +158,7 @@ function appShell() {
       <div class="sidebar__footer">
         <span>${icon('sparkles', { size: 14 })} ${state.site.site_name || 'Wiutgram'}</span>
         <span style="flex:1"></span>
+        <button class="lang-switch" type="button" data-lang-toggle aria-label="Language">${langToggle()}</button>
         <a href="/settings" data-link class="icon-btn-plain" aria-label="Настройки">${icon('sliders', { size: 17 })}</a>
         ${isOwner() ? `<a href="/admin" data-link class="icon-btn-plain" aria-label="Центр управления">${icon('shield', { size: 17 })}</a>` : ''}
       </div>
@@ -173,6 +176,7 @@ function appShell() {
           <a class="btn-icon" id="notification-btn" href="/notifications" data-link aria-label="Уведомления">
             ${icon('bell', { size: 20 })}<span class="tabbar__badge hidden" id="bell-badge"></span>
           </a>
+          <button class="lang-switch" type="button" data-lang-toggle aria-label="Language">${langToggle()}</button>
           <a class="topbar__avatar" href="/profile" data-link aria-label="Мой профиль"><span id="topbar-avatar"></span></a>
         </div>
       </header>
@@ -315,48 +319,51 @@ function updateBadges() {
 }
 
 /* ---------- Sidebar chat previews ---------- */
-function chatPreview(match) {
-  const last = match.last_message;
-  if (!last) return 'Новый матч';
-  if (last.deleted) return 'Сообщение удалено';
-  if (last.type === 'image') return '📷 Фото';
-  if (last.type === 'system') return 'Вы лайкнули друг друга';
-  return last.body || '';
-}
-
 async function loadSidebarChats() {
   const holder = document.getElementById('sidebar-chats');
   if (!holder) return;
   if (!getState().user) return;
   try {
-    const data = await api.get('/matches');
+    const data = await api.get('/conversations');
     holder.innerHTML = '';
-    const matches = data.matches.slice(0, 8);
+    const rows = (data.conversations || []).slice(0, 8);
     sidebarLoaded = true;
-    if (!matches.length) {
+    if (!rows.length) {
       holder.append(
         el('div', {
           class: 'sidebar__chat-preview',
-          text: 'Пока нет матчей — свайпайте и находите взаимность',
+          text: 'Пока нет чатов — найдите людей и начните общение',
           style: { padding: '10px 8px', whiteSpace: 'normal' }
         })
       );
       return;
     }
-    for (const match of matches) {
+    for (const conversation of rows) {
       const row = el('a', {
-        class: `sidebar__chat ${match.unread ? 'is-unread' : ''}`,
-        attrs: { href: `/chat/${match.id}` }
+        class: `sidebar__chat ${conversation.unread ? 'is-unread' : ''}`,
+        attrs: { href: `/chat/${conversation.id}`, 'data-link': '' }
       });
-      row.append(avatarNode(match.user, 'sm'));
+      const peer = conversation.peer || {
+        display_name: conversation.title,
+        avatar_path: conversation.photo,
+        username: conversation.title
+      };
+      row.append(avatarNode(peer, 'sm'));
       const body = el('div', { class: 'sidebar__chat-body' });
       const nameRow = el('div', { class: 'sidebar__chat-name' });
-      nameRow.append(el('span', { text: match.user.display_name }));
-      if (getState().online.get(match.user.id)) nameRow.append(el('span', { class: 'online-dot' }));
+      nameRow.append(el('span', { text: conversation.title }));
+      if (conversation.peer && getState().online.get(conversation.peer.id)) {
+        nameRow.append(el('span', { class: 'online-dot' }));
+      }
       body.append(nameRow);
-      body.append(el('div', { class: 'sidebar__chat-preview', text: chatPreview(match) }));
+      const preview = conversation.last_message
+        ? conversation.last_message.deleted
+          ? 'Сообщение удалено'
+          : conversation.last_message.body || 'Вложение'
+        : 'Нет сообщений';
+      body.append(el('div', { class: 'sidebar__chat-preview', text: preview }));
       row.append(body);
-      if (match.unread) row.append(el('span', { class: 'sidebar__chat-dot' }));
+      if (conversation.unread) row.append(el('span', { class: 'sidebar__chat-dot' }));
       holder.append(row);
     }
   } catch (err) {
@@ -580,7 +587,8 @@ async function render(matched) {
     if (node) view.append(node);
     const site = getState().site.site_name || 'Wiutgram';
     // Avoid titles like "Wiutgram — Wiutgram" when a page has no own heading.
-    document.title = !route.title || route.title === site ? site : `${route.title} — ${site}`;
+    const routeTitle = route.title ? t(route.title) : '';
+    document.title = !routeTitle || routeTitle === site ? site : `${routeTitle} — ${site}`;
     if (route.layout !== 'public') loadSidebarChats();
     return result;
   } catch (err) {
@@ -788,6 +796,13 @@ async function boot() {
 
   defineRoutes(ROUTES);
   setRenderer(render);
+  initI18n();
+  document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-lang-toggle]');
+    if (!toggle) return;
+    event.preventDefault();
+    setLang(getLang() === 'en' ? 'ru' : 'en');
+  });
   startRouter();
   registerServiceWorker();
 }

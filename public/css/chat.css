@@ -382,6 +382,32 @@
   box-shadow: var(--shadow-md);
   z-index: 5;
 }
+.chat-section {
+  padding: 2px 0 4px;
+}
+.chat-section__title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 16px 6px;
+}
+.chat-row--mutual {
+  background: var(--brand-soft);
+  margin: 0 8px 6px;
+  border-radius: 14px;
+}
+.chat-greet-pill {
+  flex: none;
+  align-self: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--brand-gradient, var(--brand-1));
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+}
 .chat-jump:hover {
   border-color: var(--border-strong);
   transform: translateY(-1px);

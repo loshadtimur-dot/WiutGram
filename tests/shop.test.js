@@ -64,7 +64,7 @@ test('order price always comes from the database', async () => {
   assert.equal(order.data.purchase.telegram !== undefined, true);
 });
 
-test('a gift cannot be sent to yourself', async () => {
+test('a gift can be kept for yourself', async () => {
   const buyer = await makeUser('selfgift');
   const catalog = await buyer.get('/api/shop/catalog?kind=gift');
   const gift = catalog.data.items.find((item) => item.kind === 'gift' && item.price > 0);
@@ -72,7 +72,8 @@ test('a gift cannot be sent to yourself', async () => {
     item_id: gift.id,
     recipient_username: 'selfgift'
   });
-  assert.equal(response.status, 400);
+  assert.equal(response.status, 201, JSON.stringify(response.data));
+  assert.equal(response.data.order.recipient.username, 'selfgift');
 });
 
 test('only the owner can fulfil orders, and fulfilment is idempotent', async () => {

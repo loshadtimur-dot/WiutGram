@@ -1,6 +1,7 @@
 import { el, button, openModal, toast } from '../ui.js?v=25';
 import { icon } from '../icons.js?v=25';
 import { giftSvg, money } from './glass.js';
+import { navigate } from '../router.js?v=25';
 
 export function telegramLink(handle, text) {
   const name = String(handle || '').replace(/^@/, '');
@@ -115,7 +116,7 @@ export function openPurchaseWindow({ item, order, purchase, title = 'Почти 
       variant: 'btn-ghost',
       onClick: () => {
         modal.close();
-        window.location.href = '/shop?tab=orders';
+        navigate('/shop?tab=orders');
       }
     }),
     button('Понятно', { variant: 'btn-primary', onClick: () => modal.close() })

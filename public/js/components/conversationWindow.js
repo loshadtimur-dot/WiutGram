@@ -22,7 +22,7 @@ import {
   openChatGiftPicker,
   openEmojiPicker
 } from './chatModals.js?v=25';
-import { openGiftUnbox } from './giftViewer.js?v=25';
+import { openGiftUnbox, openSentGift } from './giftViewer.js?v=25';
 
 const QUICK_REACTIONS = ['❤️', '👍', '😂', '🔥'];
 
@@ -487,12 +487,21 @@ export function createConversationWindow(conversationId, options = {}) {
     card.append(
       el('div', {
         class: 'msg__gift-open',
-        text: message.mine ? 'Открыть подарок' : 'Нажмите, чтобы распаковать'
+        text: message.mine ? 'Подарок отправлен · посмотреть' : 'Нажмите, чтобы распаковать'
       })
     );
     card.addEventListener('click', () => {
       if (!gift) return navigate('/shop?tab=orders');
-      openGiftUnbox(gift, { sender: message.sender, mine: message.mine, createdAt: message.created_at });
+      if (message.mine) {
+        const recipient = conversation && conversation.type === 'group'
+          ? 'участников группы'
+          : conversation && conversation.title
+            ? conversation.title
+            : 'получателя';
+        openSentGift(gift, { recipient });
+        return;
+      }
+      openGiftUnbox(gift, { sender: message.sender, createdAt: message.created_at });
     });
     return card;
   }
@@ -1088,7 +1097,16 @@ export function createConversationWindow(conversationId, options = {}) {
       } catch (err) {
         // Wallpaper is cosmetic.
       }
-      if (conversation.can_write !== false) input.focus({ preventScroll: true });
+      if (conversation.can_write !== false) {
+        const greetKey = `chat:greet:${id}`;
+        const greet = sessionStorage.getItem(greetKey);
+        if (greet) {
+          sessionStorage.removeItem(greetKey);
+          input.value = 'Привет! 👋';
+          autoGrow();
+        }
+        input.focus({ preventScroll: true });
+      }
     } catch (err) {
       messagesEl.innerHTML = '';
       const wrap = el('div', { class: 'empty' });

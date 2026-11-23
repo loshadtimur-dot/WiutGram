@@ -40,9 +40,30 @@ function logGroup(conversationId, actorId, action, meta = null, targetUserId = n
 router.get('/conversations', (req, res) => {
   const filter = String(req.query.filter || 'all');
   const list = chat.listConversations(req.user.id, { filter });
+  // People who follow each other but have no chat yet are shown above the list,
+  // so a mutual follow turns into a conversation instead of staying invisible.
+  const mutuals = filter === 'all'
+    ? db.all(
+        `SELECT u.id, u.username, u.display_name, u.avatar_path
+         FROM follows f1
+         JOIN follows f2 ON f2.follower_id = f1.following_id AND f2.following_id = f1.follower_id
+         JOIN users u ON u.id = f1.following_id
+         WHERE f1.follower_id = ? AND u.is_banned = 0 AND u.is_demo = 0
+           AND NOT EXISTS (
+             SELECT 1 FROM conversations c
+             JOIN conversation_members a ON a.conversation_id = c.id AND a.user_id = ?
+             JOIN conversation_members b ON b.conversation_id = c.id AND b.user_id = u.id
+             WHERE c.type = 'dm' AND c.deleted_at IS NULL
+           )
+         ORDER BY f1.created_at DESC
+         LIMIT 20`,
+        [req.user.id, req.user.id]
+      )
+    : [];
   const settings = db.get('SELECT wallpaper FROM chat_wallpapers WHERE user_id = ?', [req.user.id]);
   res.json({
     conversations: list,
+    mutuals,
     requests: chat.listConversations(req.user.id, { filter: 'requests' }).length,
     wallpaper: settings ? settings.wallpaper : 'paper',
     global_mode: db.getSetting('chat_global_mode', 'requests')

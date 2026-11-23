@@ -310,14 +310,39 @@
   background: var(--surface);
 }
 @media (max-width: 767px) {
+  /* Instagram-style centered header on phones. */
   .profile-header {
-    gap: 16px;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+    padding-top: 0;
+  }
+  .profile-avatar-col {
+    margin-top: -34px;
   }
   .profile-avatar-col .avatar--xxl {
-    width: 88px;
-    height: 88px;
-    font-size: 30px;
+    width: 96px;
+    height: 96px;
+    font-size: 32px;
+    border: 3px solid var(--bg);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  }
+  .profile-info {
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+  }
+  .profile-name-row {
+    justify-content: center;
+  }
+  .profile-stats {
+    justify-content: center;
+    gap: 24px;
+  }
+  .profile-actions {
+    justify-content: center;
+    width: 100%;
   }
   .profile-username {
     font-size: 17px;

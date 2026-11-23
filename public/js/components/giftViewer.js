@@ -82,6 +82,41 @@ function openGiftUnbox(gift, options = {}) {
 
 export { openGiftUnbox };
 
+// Opening a gift you sent only shows what the recipient got. The unbox moment
+// belongs to the recipient, so the sender never sees "Вам подарок".
+export function openSentGift(gift, options = {}) {
+  const body = el('div', { class: 'unbox unbox--sent' });
+  const scene = el('div', { class: `unbox__scene unbox__scene--${gift.rarity || 'common'}` });
+  scene.style.background = UNBOX_SKY[gift.rarity] || UNBOX_SKY.common;
+  scene.append(el('div', { class: 'unbox__halo' }));
+  const art = el('div', { class: 'unbox__art' });
+  art.innerHTML = gift.svg || '';
+  scene.append(art);
+  scene.append(el('div', { class: 'unbox__label', text: 'Подарок отправлен' }));
+  body.append(scene);
+
+  const title = el('div', { class: 'unbox__title' });
+  title.append(el('h2', { text: gift.name }));
+  const meta = el('div', { class: 'unbox__meta' });
+  if (gift.rarity_label) {
+    meta.append(el('span', { class: `rarity-pill rarity-pill--${gift.rarity}`, text: gift.rarity_label }));
+  }
+  meta.append(el('span', { text: options.recipient ? `Получатель: ${options.recipient}` : 'Подарок в чате' }));
+  title.append(meta);
+  body.append(title);
+  body.append(
+    el('div', {
+      class: 'purchase__note',
+      text: 'Подарок уже у получателя: он открывает его сам. В вашей коллекции его больше нет.'
+    })
+  );
+
+  const footer = el('div', { class: 'unbox__actions' });
+  const modal = openModal({ title: 'Подарок отправлен', body, footer, size: 'wide' });
+  footer.append(button('Закрыть', { variant: 'btn-primary', onClick: () => modal.close() }));
+  return modal;
+}
+
 export function openGiftViewer(giftId, options = {}) {
   const body = el('div', { class: 'gift-view' });
   body.append(loadingRow('Открываем подарок…'));

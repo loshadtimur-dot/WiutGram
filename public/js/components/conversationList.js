@@ -129,6 +129,7 @@ export function createConversationList(options = {}) {
 
   const me = getState().user;
   let conversations = [];
+  let mutuals = [];
   let filter = 'all';
   let query = '';
   let loading = true;
@@ -158,7 +159,46 @@ export function createConversationList(options = {}) {
       return;
     }
     const visible = conversations.filter((item) => !query || item.title.toLowerCase().includes(query));
-    if (!visible.length) {
+    const showMutuals = filter === 'all' && !query && mutuals.length > 0;
+    if (showMutuals) {
+      const section = el('div', { class: 'chat-section' });
+      section.append(el('div', { class: 'chat-section__title', text: 'Взаимные подписки' }));
+      for (const person of mutuals) {
+        const row = el('div', {
+          class: 'chat-row chat-row--mutual',
+          attrs: { role: 'button', tabindex: '0', 'aria-label': `Написать ${person.display_name}` }
+        });
+        const avatarWrap = el('div', { class: 'chat-row__avatar' });
+        avatarWrap.append(avatarNode(person, 'md'));
+        row.append(avatarWrap);
+        const body = el('div', { class: 'chat-row__body' });
+        body.append(el('div', { class: 'chat-row__name', text: person.display_name }));
+        body.append(
+          el('div', {
+            class: 'chat-row__preview',
+            text: 'Взаимная подписка'
+          })
+        );
+        row.append(body, el('span', { class: 'chat-greet-pill', text: 'Привет' }));
+        const open = async () => {
+          try {
+            const data = await api.post('/conversations/dm', { username: person.username });
+            sessionStorage.setItem(`chat:greet:${data.conversation.id}`, '1');
+            if (options.onSelect) options.onSelect(data.conversation);
+            else navigate(`/chat/${data.conversation.id}`);
+          } catch (err) {
+            toast(err.message || 'Не удалось открыть чат', 'error');
+          }
+        };
+        row.addEventListener('click', open);
+        row.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') open();
+        });
+        section.append(row);
+      }
+      scroll.append(section);
+    }
+    if (!visible.length && !showMutuals) {
       scroll.append(
         emptyState(
           '💬',
@@ -297,6 +337,7 @@ export function createConversationList(options = {}) {
     try {
       const data = await api.get(`/conversations?filter=${filter}`);
       conversations = data.conversations || [];
+      mutuals = data.mutuals || [];
       loading = false;
       render();
       if (options.onRequests !== undefined) options.onRequests(data.requests || 0);

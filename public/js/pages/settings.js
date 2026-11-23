@@ -15,6 +15,7 @@ import {
 import { icon } from '../icons.js?v=25';
 import { getState, setUser, patchUser, applyTheme, refreshMe } from '../state.js?v=25';
 import { navigate } from '../router.js?v=25';
+import { getLang, setLang } from '../i18n.js?v=1';
 
 function section(iconName, title) {
   const card = el('section', { class: 'settings-section' });
@@ -404,6 +405,24 @@ export default async function SettingsPage() {
     themeOptions.append(option);
   }
   appearance.body.append(themeOptions);
+
+  /* Interface language */
+  const language = section('globe', 'Язык');
+  root.append(language.card);
+  const languageOptions = el('div', { class: 'shop-chips' });
+  for (const [code, label] of [['ru', 'Русский'], ['en', 'English']]) {
+    const option = el('button', {
+      class: `shop-chip ${getLang() === code ? 'is-active' : ''}`,
+      text: label,
+      attrs: { type: 'button' }
+    });
+    option.addEventListener('click', () => {
+      if (getLang() === code) return;
+      setLang(code);
+    });
+    languageOptions.append(option);
+  }
+  language.body.append(languageOptions);
 
   /* Blocked users */
   const blockedSection = section('block', 'Заблокированные пользователи');

@@ -295,7 +295,7 @@ export default async function ProfilePage(ctx) {
   info.append(actions);
 
   const bio = el('div', { class: 'profile-bio' });
-  if (profile.bio) bio.append(el('div', { text: profile.bio }));
+  if (profile.bio) bio.append(el('div', { class: 'profile-bio__text', text: profile.bio }));
   const metaRow = el('div', { class: 'profile-bio__meta' });
   const metaItem = (iconName, text) => {
     const item = el('span');
