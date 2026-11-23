@@ -108,6 +108,10 @@ export function createConversationWindow(conversationId, options = {}) {
   const pinnedBar = el('div', { class: 'chat-pinned-bar hidden' });
   root.append(pinnedBar);
 
+  // A message request can be accepted right here, without leaving the chat.
+  const requestBar = el('div', { class: 'chat-request-bar hidden' });
+  root.append(requestBar);
+
   const messagesEl = el('div', { class: `chat-messages chat-wallpaper-${wallpaper}`, attrs: { role: 'log', 'aria-live': 'polite' } });
   root.append(messagesEl);
   const typingEl = el('div', { class: 'chat-typing' });
@@ -1075,7 +1079,33 @@ export function createConversationWindow(conversationId, options = {}) {
     pinned = data.pinned || [];
     updateHeader();
     renderPinned();
+    renderRequestBar();
     return conversation;
+  }
+
+  function renderRequestBar() {
+    requestBar.innerHTML = '';
+    if (!conversation || !conversation.request_pending || !conversation.request_id) {
+      requestBar.classList.add('hidden');
+      return;
+    }
+    requestBar.classList.remove('hidden');
+    const text = el('div', { class: 'chat-request-bar__text' });
+    text.append(el('strong', { text: 'Запрос на переписку' }));
+    text.append(el('span', { text: 'Примите его, чтобы отвечать без ограничений.' }));
+    const accept = el('button', { class: 'btn btn-primary btn-sm', text: 'Принять', attrs: { type: 'button' } });
+    accept.addEventListener('click', async () => {
+      accept.disabled = true;
+      try {
+        await api.post(`/conversations/requests/${conversation.request_id}/accept`);
+        toast('Запрос принят', 'success');
+        await reloadConversation();
+      } catch (err) {
+        accept.disabled = false;
+        toast(err.message || 'Не удалось принять запрос', 'error');
+      }
+    });
+    requestBar.append(text, accept);
   }
 
   async function init() {

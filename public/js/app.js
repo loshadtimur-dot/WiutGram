@@ -356,11 +356,18 @@ async function loadSidebarChats() {
         nameRow.append(el('span', { class: 'online-dot' }));
       }
       body.append(nameRow);
-      const preview = conversation.last_message
-        ? conversation.last_message.deleted
-          ? 'Сообщение удалено'
-          : conversation.last_message.body || 'Вложение'
-        : 'Нет сообщений';
+      const last = conversation.last_message;
+      let preview = 'Нет сообщений';
+      if (last) {
+        if (last.deleted) preview = 'Сообщение удалено';
+        else if (last.type === 'gift') preview = '🎁 Подарок';
+        else if (last.type === 'image') preview = '📷 Фото';
+        else if (last.type === 'voice') preview = '🎤 Голосовое';
+        else if (last.type === 'poll') preview = '📊 Опрос';
+        else if (last.type === 'post') preview = 'Пост';
+        else if (last.type === 'system') preview = last.body || 'Системное сообщение';
+        else preview = last.body || 'Вложение';
+      }
       body.append(el('div', { class: 'sidebar__chat-preview', text: preview }));
       row.append(body);
       if (conversation.unread) row.append(el('span', { class: 'sidebar__chat-dot' }));

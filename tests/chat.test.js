@@ -269,3 +269,39 @@ test('a recorded voice note uploads through the same field the composer sends', 
   assert.ok(voice, 'the recipient sees the voice note');
   assert.equal(voice.type, 'voice');
 });
+
+test('mutual follows surface in the chat list until a DM exists', async () => {
+  const dave = await makeUser('chatdave');
+  assert.equal((await alice.client.post('/api/follows/chatdave')).status, 200);
+  assert.equal((await dave.client.post('/api/follows/chatalice')).status, 200);
+
+  let list = await alice.client.get('/api/conversations');
+  assert.equal(list.status, 200);
+  assert.equal(list.data.mutuals.some((person) => person.username === 'chatdave'), true);
+
+  const dm = await alice.client.post('/api/conversations/dm', { username: 'chatdave' });
+  assert.equal(dm.status, 200, JSON.stringify(dm.data));
+  list = await alice.client.get('/api/conversations');
+  assert.equal(list.data.mutuals.some((person) => person.username === 'chatdave'), false, 'the DM replaces the suggestion');
+});
+
+test('a message request can be accepted from the chat view', async () => {
+  const erin = await makeUser('chaterin');
+  const dm = await alice.client.post('/api/conversations/dm', { username: 'chaterin' });
+  assert.equal(dm.status, 200, JSON.stringify(dm.data));
+  const conversationId = dm.data.conversation.id;
+  const sent = await alice.client.post(`/api/conversations/${conversationId}/messages`, { body: 'Привет!' });
+  assert.equal(sent.status, 201, JSON.stringify(sent.data));
+
+  const view = await erin.client.get(`/api/conversations/${conversationId}`);
+  assert.equal(view.status, 200, JSON.stringify(view.data));
+  assert.equal(view.data.conversation.request_pending, true);
+  assert.ok(view.data.conversation.request_id, 'the view exposes the request to accept');
+
+  const accepted = await erin.client.post(`/api/conversations/requests/${view.data.conversation.request_id}/accept`);
+  assert.equal(accepted.status, 200, JSON.stringify(accepted.data));
+  const after = await erin.client.get(`/api/conversations/${conversationId}`);
+  assert.equal(after.data.conversation.request_pending, false);
+  const reply = await erin.client.post(`/api/conversations/${conversationId}/messages`, { body: 'Привет!' });
+  assert.equal(reply.status, 201, JSON.stringify(reply.data));
+});

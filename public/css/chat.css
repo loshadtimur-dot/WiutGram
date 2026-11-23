@@ -343,6 +343,28 @@
   background: var(--surface);
   flex: none;
 }
+.chat-request-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--brand-soft);
+  flex: none;
+}
+.chat-request-bar__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.chat-request-bar__text strong {
+  color: var(--text);
+  font-size: 13px;
+}
 .chat-pinned-bar__btn {
   flex: 1;
   min-width: 0;

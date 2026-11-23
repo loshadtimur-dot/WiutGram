@@ -65,7 +65,9 @@ export function initSocket() {
     auth: { token: getToken() },
     reconnection: true,
     reconnectionDelay: 1200,
-    transports: ['websocket', 'polling']
+    // Polling first: blocked WebSocket upgrades fall back cleanly instead of
+    // retrying a refused socket connection on every page.
+    transports: ['polling', 'websocket']
   });
 
   socket.on('connect', () => {

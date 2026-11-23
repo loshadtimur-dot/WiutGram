@@ -184,6 +184,7 @@ export default async function NotificationsPage() {
       offset = items.length;
       total = data.total;
       setCounts({ unread_notifications: data.unread || 0 });
+      readAllBtn.classList.toggle('hidden', !data.unread);
     } catch (err) {
       if (!items.length) {
         list.innerHTML = '';
@@ -202,6 +203,7 @@ export default async function NotificationsPage() {
       await api.post('/notifications/read-all');
       items = items.map((item) => ({ ...item, is_read: true }));
       setCounts({ unread_notifications: 0 });
+      readAllBtn.classList.add('hidden');
       render();
       toast('Все уведомления прочитаны', 'success');
     } catch (err) {

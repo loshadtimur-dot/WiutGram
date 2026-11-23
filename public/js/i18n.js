@@ -685,7 +685,154 @@ const DICT = {
   'Заказ отправлен': 'Order created',
   'Получатель:': 'Recipient:',
   'Итого': 'Total',
-  'Статус заказа': 'Order status'
+  'Статус заказа': 'Order status',
+  'Ваша история': 'Your story',
+  'Добавить историю': 'Add story',
+  'Лента': 'Feed',
+  'Любые интересы': 'Any interests',
+  'WIUT — Вестминстерский международный университет в Ташкенте':
+    'WIUT — Westminster International University in Tashkent',
+  'Находите людей по интересам и университету': 'Find people by interests and university',
+  'Показывать истории': 'Show stories',
+  'Найдите студентов по имени, университету, курсу и интересам. Группы — по названию.':
+    'Find students by name, university, year and interests. Groups — by name.',
+  'Только онлайн': 'Online only',
+  'Все курсы': 'All years',
+  'Люди, которым вы понравились. Взаимный лайк сразу открывает чат.':
+    'People you liked. A mutual like opens a chat right away.',
+  'Лайкнули меня': 'Liked me',
+  'Мои лайки': 'My likes',
+  'Суперлайки выделены синей рамкой — они особенно важны.':
+    'Superlikes have a blue border — they matter most.',
+  'Пока никто не лайкнул': 'No likes yet',
+  'Свайпайте активнее и заполните профиль — так вас чаще показывают другим.':
+    'Keep swiping and complete your profile to be shown more often.',
+  'Перейти к свайпам': 'Go to swipes',
+  'Таблица популярности Wiutgram: чем больше подписчиков, тем выше аура. Подписывайтесь на тех, кто вам интересен.':
+    'Wiutgram popularity table: the more followers you have, the higher your aura. Follow the people you find interesting.',
+  'Таблица популярности по подписчикам. Подписывайтесь, растите ауру и попадайте в топ сообщества.':
+    'A popularity table based on followers. Follow people, grow your aura and reach the top of the community.',
+  'подписчиков': 'followers',
+  'Лайки, матчи, сообщения и всё, что происходит с вашим профилем.':
+    'Likes, matches, messages and everything happening on your profile.',
+  'Прочитать все': 'Mark all as read',
+  'Все уведомления прочитаны': 'All notifications marked as read',
+  'Пока тихо': 'All quiet',
+  'Загружаем уведомления…': 'Loading notifications…',
+  'Здесь появятся лайки, матчи и комментарии. Свайпните пару профилей!':
+    'Likes, matches and comments will appear here. Swipe a few profiles!',
+  'Найдите студентов по имени, университету, курсу и интересам. Группы — по названию и @username.':
+    'Find students by name, university, year and interests. Groups — by title and @username.',
+  'Имя, @username, интересы': 'Name, @username, interests',
+  'подписался(ась) на ваш профиль': 'followed your profile',
+  'написал(а) сообщение': 'sent you a message',
+  'Добро пожаловать в Wiutgram — сообщество студентов WIUT.':
+    'Welcome to Wiutgram — the WIUT student community.',
+  'Суперлайк выделяет вас в лайках и повышает шанс на взаимность. Каждый день доступно 5 бесплатных, а купленный пакет не сгорает.':
+    'A superlike highlights you in likes and raises your chance of a mutual match. You get 5 free every day, and a purchased pack never expires.',
+  'Осталось суперлайков': 'Superlikes left',
+  'Пакет: 100 суперлайков': 'Pack: 100 superlikes',
+  'Переведите сумму на карту и отправьте чек в Telegram. Суперлайки начисляются вручную после проверки оплаты.':
+    'Transfer the amount to the card and send the receipt on Telegram. Superlikes are credited manually after the payment is checked.',
+  '1. Отправьте заявку — мы покажем её код.': '1. Submit a request — we show its code.',
+  '2. Оплатите сумму и напишите владельцу в Telegram.': '2. Pay the amount and message the owner on Telegram.',
+  '3. Владелец проверит оплату и начислит суперлайки на ваш баланс.':
+    '3. The owner verifies the payment and adds superlikes to your balance.',
+  'Контакт для связи': 'Contact',
+  'Отправить заявку': 'Submit request',
+  'Мои заявки': 'My requests',
+  'Заявок пока нет.': 'No requests yet.',
+  'Знакомства': 'Discover',
+  'Свайп вправо — лайк, влево — дальше, вверх — суперлайк':
+    'Swipe right to like, left to skip, up to superlike',
+  'Здесь может быть ваша реклама': 'Your ad could be here',
+  'Студенты Ташкента увидят ваш баннер': 'Tashkent students will see your banner',
+  'НРАВИТСЯ': 'LIKE',
+  'ПРОПУСК': 'PASS',
+  'СУПЕР': 'SUPER',
+  'О человеке': 'About',
+  'дизлайк': 'dislike',
+  'суперлайк': 'superlike',
+  'пробел': 'space',
+  'следующее фото': 'next photo',
+  'вернуть': 'undo',
+  'Чем полнее профиль, тем больше взаимных лайков.':
+    'The fuller your profile, the more mutual likes you get.',
+  'Назад к профилю': 'Back to profile',
+  'До 9 фото. Первое — главное, оно показывается в свайпах. Используйте стрелки, чтобы изменить порядок.':
+    'Up to 9 photos. The first one is your main photo and is shown in swipes. Use the arrows to reorder them.',
+  'Что ищете': 'Looking for',
+  'Алмазарский': 'Almazar',
+  'Бектемирский': 'Bektemir',
+  'Мирабадский': 'Mirabad',
+  'Мирзо-Улугбекский': 'Mirzo-Ulugbek',
+  'Сергелийский': 'Sergeli',
+  'Учтепинский': 'Uchtepa',
+  'Чилансарский': 'Chilanzar',
+  'Шайхантахурский': 'Shaykhantahur',
+  'Юнусабадский': 'Yunusabad',
+  'Яккасарайский': 'Yakkasaray',
+  'Яшнабадский': 'Yashnabad',
+  'Янгихаётский': 'Yangihayot',
+  'Ташкент': 'Tashkent',
+  'Узбекский': 'Uzbek',
+  'Каракалпакский': 'Karakalpak',
+  'Таджикский': 'Tajik',
+  'Турецкий': 'Turkish',
+  'Корейский': 'Korean',
+  'Русский язык': 'Russian',
+  'Английский язык': 'English',
+  'Правила': 'Rules',
+  'Политика': 'Privacy',
+  'К настройкам': 'Settings',
+  'Реклама на Wiutgram': 'Advertise on Wiutgram',
+  'Показывайте рекламу студентам Ташкента': 'Show your ad to Tashkent students',
+  'Время указано по Ташкенту': 'Times are shown in Tashkent time',
+  'Выбрать часы': 'Choose hours',
+  'Отметьте удобные часы в сетке — свободные видны сразу.':
+    'Pick convenient hours in the grid — free slots are shown right away.',
+  'Напишите администратору': 'Message the admin',
+  'Пришлите заявку в Telegram и оплатите удобным способом.':
+    'Send the request on Telegram and pay in the way that suits you.',
+  'Мы разместим ваш баннер': 'We place your banner',
+  'Согласуем макет 1600×400 и покажем его в выбранные часы.':
+    'We approve a 1600×400 creative and show it during the hours you picked.',
+  'Где увидят вашу рекламу': 'Where people see your ad',
+  'Один оплаченный час показывает один баннер сразу в двух местах. Формат 1600×400 px, JPG, PNG или WEBP.':
+    'One paid hour shows one banner in two places at once. Format 1600×400 px, JPG, PNG or WEBP.',
+  'Экран свайпов — над колодой карточек': 'Swipe screen — above the card deck',
+  'Профиль — под шапкой, над вкладками': 'Profile — under the header, above the tabs',
+  'Завтра': 'Tomorrow',
+  'Статистика': 'Stats',
+  'Пока нет подарков. Выберите подарок в магазине — он появится здесь после оплаты.':
+    'No gifts yet. Choose one in the shop — it appears here after payment.',
+  'Поделитесь моментом — пост появится в вашей сетке и в ленте «Обзор».':
+    'Share a moment — your post appears in your grid and in Explore.',
+  'Создайте профиль': 'Create your profile',
+  'сообщества WIUT': 'WIUT community',
+  '8 коротких шагов: контакты, учёба, интересы и фото. Wiutgram создан только для студентов Westminster International University in Tashkent.':
+    '8 short steps: contacts, studies, interests and photos. Wiutgram is only for students of Westminster International University in Tashkent.',
+  'Только студенты WIUT и настоящие люди': 'WIUT students only, real people',
+  'До 9 фото, первое — главное': 'Up to 9 photos, the first one is your main',
+  'Только студенты WIUT': 'WIUT students only',
+  'Создайте аккаунт': 'Create your account',
+  'Email и пароль нужны для входа. Username виден другим.':
+    'Email and password are used to sign in. Your username is visible to others.',
+  'Придумать пароль': 'Create a password',
+  '4–20 символов: латиница, цифры, точка, _': '4–20 characters: latin letters, digits, dot, _',
+  'Уже есть аккаунт?': 'Already have an account?',
+  'Новые за 24 часа': 'New in 24 hours',
+  'Новые за 7 дней': 'New in 7 days',
+  'Жалобы в очереди': 'Reports in queue',
+  'Регистрации': 'Sign-ups',
+  'Запрос на переписку': 'Message request',
+  'Примите его, чтобы отвечать без ограничений.': 'Accept it to reply without limits.',
+  'Принять': 'Accept',
+  'Запрос принят': 'Request accepted',
+  'Не удалось принять запрос': 'Could not accept the request',
+  'Профиль готов. Свайпайте вправо, чтобы найти взаимность — при взаимном лайке сразу откроется чат.':
+    'Your profile is ready. Swipe right to find a mutual like — a chat opens as soon as it happens.',
+  'Начать свайпать': 'Start swiping'
 };
 
 // Short dynamic labels that cannot be listed as exact strings.
@@ -709,13 +856,57 @@ const PATTERNS = [
   [/^Подарки · (\d+)$/, (m) => `Gifts · ${m[1]}`],
   [/^(\d+) человек(а)?$/, (m) => `${m[1]} people`],
   [/^Получатель: (.+)$/, (m) => `Recipient: ${m[1]}`],
-  [/^Тема: (.+)$/, (m) => `Theme: ${m[1]}`]
+  [/^Тема: (.+)$/, (m) => `Theme: ${m[1]}`],
+  [/^от (\d+)$/, (m) => `from ${m[1]}`],
+  [/^до (\d+)$/, (m) => `to ${m[1]}`],
+  [/^(\d+) курс$/, (m) => `Year ${m[1]}`],
+  [/^(\d+) лет$/, (m) => `${m[1]} y.o.`],
+  [/^(\d+) года$/, (m) => `${m[1]} y.o.`],
+  [/^(.*) · (\d+) курс · (\d+) лет$/, (m) => `${m[1]} · Year ${m[2]} · ${m[3]} y.o.`],
+  [/^Ваше место: #(\d+)$/, (m) => `Your place: #${m[1]}`],
+  [/^(\d+) минут[уы]? назад$/, (m) => `${m[1]} min ago`],
+  [/^(\d+) час[а]? назад$/, (m) => `${m[1]} h ago`],
+  [/^(\d+) час[ов]+ назад$/, (m) => `${m[1]} h ago`],
+  [/^(\d+) дн[яей]+ назад$/, (m) => `${m[1]} d ago`],
+  [/^Владелец подарил вам «(.+)»$/, (m) => `The owner sent you “${m[1]}”`],
+  [/^Бесплатных сегодня: (\d+) · купленных: (\d+)$/, (m) => `Free today: ${m[1]} · purchased: ${m[2]}`],
+  [/^([\d\s]+) сум$/, (m) => `${m[1].trim()} UZS`],
+  [/^от ([\d\s]+) сум\/час$/, (m) => `from ${m[1].trim()} UZS/hour`],
+  [/^(.*) · (\d+) курс$/, (m) => `${m[1]} · Year ${m[2]}`],
+  [/^Выбрано (\d+) из (\d+)$/, (m) => `Selected ${m[1]} of ${m[2]}`],
+  [/^(Вс|Пн|Вт|Ср|Чт|Пт|Сб) (\d+) (янв|фев|мар|апр|мая|июн|июл|авг|сен|окт|ноя|дек)$/, (m) => {
+    const days = { Вс: 'Sun', Пн: 'Mon', Вт: 'Tue', Ср: 'Wed', Чт: 'Thu', Пт: 'Fri', Сб: 'Sat' };
+    const months = {
+      янв: 'Jan', фев: 'Feb', мар: 'Mar', апр: 'Apr', мая: 'May', июн: 'Jun',
+      июл: 'Jul', авг: 'Aug', сен: 'Sep', окт: 'Oct', ноя: 'Nov', дек: 'Dec'
+    };
+    return `${days[m[1]]} ${m[2]} ${months[m[3]]}`;
+  }],
+  [/^от ([\d\s]+) сум за час$/, (m) => `from ${m[1].trim()} UZS per hour`],
+  [/^Осталось (\d+) · бесплатных сегодня (\d+) · купленных (\d+)$/,
+    (m) => `${m[1]} left · ${m[2]} free today · ${m[3]} purchased`],
+  [/^Купить (\d+) за ([\d\s]+) сум$/, (m) => `Buy ${m[1]} for ${m[2].trim()} UZS`],
+  [/^Добро пожаловать, (.+)!$/, (m) => `Welcome, ${m[1]}!`],
+  [/^Ташкент, (.+)$/, (m) => {
+    const districts = {
+      'Алмазарский': 'Almazar', 'Бектемирский': 'Bektemir', 'Мирабадский': 'Mirabad',
+      'Мирзо-Улугбекский': 'Mirzo-Ulugbek', 'Сергелийский': 'Sergeli', 'Учтепинский': 'Uchtepa',
+      'Чилансарский': 'Chilanzar', 'Шайхантахурский': 'Shaykhantahur', 'Юнусабадский': 'Yunusabad',
+      'Яккасарайский': 'Yakkasaray', 'Яшнабадский': 'Yashnabad', 'Янгихаётский': 'Yangihayot'
+    };
+    return `Tashkent, ${districts[m[1]] || m[1]}`;
+  }]
 ];
 
 const ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
 const SKIP = [
   '.msg__text',
+  '.msg-post__caption',
   '.post-card__caption',
+  '.top-post__caption',
+  '.comment__body',
+  '.story-viewer__caption',
+  '.gift-caption',
   '.profile-bio__text',
   '.chat-row__name',
   '.unbox__title h2',

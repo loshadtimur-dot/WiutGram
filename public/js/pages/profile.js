@@ -154,7 +154,9 @@ export default async function ProfilePage(ctx) {
     if (profile.university_chip || profile.university) {
       const uniStat = el('div', { class: 'stat' });
       const chipText = profile.university_chip || profile.university.short_name || profile.university.name;
-      uniStat.append(el('div', { class: 'stat__value', text: chipText, style: { fontSize: '15px' } }));
+      // The stat tile is narrow: keep the university name, drop the appended year.
+      const shortName = String(chipText).split(' · ')[0];
+      uniStat.append(el('div', { class: 'stat__value', text: shortName, style: { fontSize: '15px' } }));
       uniStat.append(el('div', { class: 'stat__label', text: 'Университет' }));
       stats.append(uniStat);
     }

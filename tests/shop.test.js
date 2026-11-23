@@ -64,6 +64,36 @@ test('order price always comes from the database', async () => {
   assert.equal(order.data.purchase.telegram !== undefined, true);
 });
 
+test('a gift sent in a chat leaves the sender and reaches the recipient', async () => {
+  const sender = await makeUser('giftsender');
+  const receiver = await makeUser('giftreceiver');
+  const catalog = await sender.get('/api/shop/catalog?kind=gift');
+  const giftItem = catalog.data.items.find((item) => item.kind === 'gift' && item.price > 0);
+  const order = await sender.post('/api/shop/orders', {
+    item_id: giftItem.id,
+    recipient_username: 'giftsender'
+  });
+  assert.equal(order.status, 201, JSON.stringify(order.data));
+  const fulfilled = await owner.post(`/api/admin/shop/orders/${order.data.order.id}/fulfill`);
+  assert.equal(fulfilled.status, 200, JSON.stringify(fulfilled.data));
+
+  const mine = await sender.get('/api/gifts/mine');
+  const owned = mine.data.gifts.find((entry) => entry.name === giftItem.title);
+  assert.ok(owned, 'the sender should own the gift before sending it');
+
+  const dm = await sender.post('/api/conversations/dm', { username: 'giftreceiver' });
+  assert.equal(dm.status, 200, JSON.stringify(dm.data));
+  const sent = await sender.post(`/api/conversations/${dm.data.conversation.id}/gifts`, {
+    gift_id: owned.id
+  });
+  assert.equal(sent.status, 201, JSON.stringify(sent.data));
+
+  const after = await sender.get('/api/gifts/mine');
+  assert.equal(after.data.gifts.some((entry) => entry.name === giftItem.title), false, 'the gift left the sender');
+  const received = await receiver.get('/api/gifts/mine');
+  assert.equal(received.data.gifts.some((entry) => entry.name === giftItem.title), true, 'the recipient owns it');
+});
+
 test('a gift can be kept for yourself', async () => {
   const buyer = await makeUser('selfgift');
   const catalog = await buyer.get('/api/shop/catalog?kind=gift');
