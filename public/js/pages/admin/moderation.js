@@ -1,6 +1,6 @@
-import { api } from '../../api.js?v=25';
-import { el, button, toast, openModal, avatarNode, loadingRow, formatNumber } from '../../ui.js?v=25';
-import { sectionHead, emptyState, fmtDateTime, chip, confirmDialog, reportReason } from './shared.js?v=25';
+import { api } from '../../api.js?v=31';
+import { el, button, toast, openModal, avatarNode, loadingRow, formatNumber } from '../../ui.js?v=31';
+import { sectionHead, emptyState, fmtDateTime, chip, confirmDialog, reportReason } from './shared.js?v=31';
 
 const REPORT_STATUS = {
   new: 'Новая',

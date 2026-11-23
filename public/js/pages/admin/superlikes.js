@@ -1,6 +1,6 @@
-import { api } from '../../api.js?v=25';
-import { el, button, toast, openModal } from '../../ui.js?v=25';
-import { sectionHead, emptyState, fmtDateTime } from './shared.js?v=25';
+import { api } from '../../api.js?v=31';
+import { el, button, toast, openModal } from '../../ui.js?v=31';
+import { sectionHead, emptyState, fmtDateTime } from './shared.js?v=31';
 
 const FILTERS = [
   ['', 'Все'],

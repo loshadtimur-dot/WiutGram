@@ -1,6 +1,6 @@
-import { api, setToken, clearToken } from './api.js?v=25';
-import { storageGet } from './storage.js?v=25';
-import { icon } from './icons.js?v=25';
+import { api, setToken, clearToken } from './api.js?v=31';
+import { storageGet } from './storage.js?v=31';
+import { icon } from './icons.js?v=31';
 import {
   getState,
   setUser,
@@ -10,37 +10,40 @@ import {
   setSite,
   subscribe,
   applyTheme,
+  setTheme,
+  storedTheme,
+  patchUser,
   watchSystemTheme,
   isOwner
-} from './state.js?v=25';
-import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=25';
-import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=25';
-import { initSocket, onSocket, disconnectSocket } from './socket.js?v=25';
-import { showMatchScreen } from './components/match.js?v=25';
-import { initI18n, setLang, getLang, langToggle, t } from './i18n.js?v=1';
+} from './state.js?v=31';
+import { defineRoutes, setRenderer, startRouter, navigate } from './router.js?v=31';
+import { el, avatarNode, toast, loadingRow, button, attachRipples, openModal } from './ui.js?v=31';
+import { initSocket, onSocket, disconnectSocket } from './socket.js?v=31';
+import { showMatchScreen } from './components/match.js?v=31';
+import { initI18n, setLang, getLang, langToggle, t } from './i18n.js?v=31';
 
-import Landing from './pages/landing.js?v=25';
-import LoginPage from './pages/login.js?v=25';
-import RegisterPage from './pages/register.js?v=25';
-import WelcomePage from './pages/welcome.js?v=25';
-import SwipePage from './pages/swipe.js?v=25';
-import LikesPage from './pages/likes.js?v=25';
-import ChatsPage from './pages/chats.js?v=25';
-import ChatPage from './pages/chat.js?v=25';
-import ProfilePage from './pages/profile.js?v=25';
-import EditProfilePage from './pages/edit-profile.js?v=25';
-import ExplorePage from './pages/explore.js?v=25';
-import NotificationsPage from './pages/notifications.js?v=25';
-import SettingsPage from './pages/settings.js?v=25';
-import SuperlikesPage from './pages/superlikes.js?v=25';
-import LegalPage from './pages/legal.js?v=25';
-import AdvertisePage from './pages/advertise.js?v=25';
-import AdReportPage from './pages/ad-report.js?v=25';
-import VerifyEmailPage from './pages/verify.js?v=25';
-import AuraPage from './pages/aura.js?v=25';
-import ShopPage from './pages/shop.js?v=25';
-import PeoplePage from './pages/people.js?v=25';
-import DesignPreviewPage from './pages/design-preview.js?v=25';
+import Landing from './pages/landing.js?v=31';
+import LoginPage from './pages/login.js?v=31';
+import RegisterPage from './pages/register.js?v=31';
+import WelcomePage from './pages/welcome.js?v=31';
+import SwipePage from './pages/swipe.js?v=31';
+import LikesPage from './pages/likes.js?v=31';
+import ChatsPage from './pages/chats.js?v=31';
+import ChatPage from './pages/chat.js?v=31';
+import ProfilePage from './pages/profile.js?v=31';
+import EditProfilePage from './pages/edit-profile.js?v=31';
+import ExplorePage from './pages/explore.js?v=31';
+import NotificationsPage from './pages/notifications.js?v=31';
+import SettingsPage from './pages/settings.js?v=31';
+import SuperlikesPage from './pages/superlikes.js?v=31';
+import LegalPage from './pages/legal.js?v=31';
+import AdvertisePage from './pages/advertise.js?v=31';
+import AdReportPage from './pages/ad-report.js?v=31';
+import VerifyEmailPage from './pages/verify.js?v=31';
+import AuraPage from './pages/aura.js?v=31';
+import ShopPage from './pages/shop.js?v=31';
+import PeoplePage from './pages/people.js?v=31';
+import DesignPreviewPage from './pages/design-preview.js?v=31';
 
 const NAV_ITEMS = [
   { path: '/swipe', label: 'Свайпы', icon: 'layers' },
@@ -80,7 +83,7 @@ const ROUTES = [
   {
     path: '/admin',
     page: async (ctx) => {
-      const module = await import('./pages/admin/index.js?v=25');
+      const module = await import('./pages/admin/index.js?v=31');
       return module.default(ctx);
     },
     auth: true,
@@ -101,6 +104,17 @@ let impersonation = null;
 let lastActivity = Date.now();
 
 /* ---------- Shell ---------- */
+function themeIcon() {
+  return icon(getState().theme === 'dark' ? 'sun' : 'moon', { size: 17 });
+}
+
+function updateThemeButtons() {
+  for (const button of document.querySelectorAll('[data-theme-toggle]')) {
+    button.innerHTML = themeIcon();
+    button.setAttribute('aria-pressed', getState().theme === 'dark' ? 'true' : 'false');
+  }
+}
+
 function publicShell() {
   const app = appRoot();
   const user = getState().user;
@@ -122,6 +136,7 @@ function publicShell() {
       <a class="landing__link" href="/advertise" data-link>Реклама</a>
       <a class="landing__link" href="/rules" data-link>Правила</a>
       <a class="landing__link" href="/privacy" data-link>Политика</a>
+      <button class="theme-switch" type="button" data-theme-toggle aria-label="Тема" aria-pressed="${getState().theme === 'dark'}" title="Светлая или тёмная тема">${themeIcon()}</button>
       <button class="lang-switch" type="button" data-lang-toggle aria-label="Language">${langToggle()}</button>
       ${authLinks}
     </div>
@@ -158,6 +173,7 @@ function appShell() {
       <div class="sidebar__footer">
         <span>${icon('sparkles', { size: 14 })} ${state.site.site_name || 'Wiutgram'}</span>
         <span style="flex:1"></span>
+        <button class="theme-switch" type="button" data-theme-toggle aria-label="Тема" aria-pressed="${getState().theme === 'dark'}" title="Светлая или тёмная тема">${themeIcon()}</button>
         <button class="lang-switch" type="button" data-lang-toggle aria-label="Language">${langToggle()}</button>
         <a href="/settings" data-link class="icon-btn-plain" aria-label="Настройки">${icon('sliders', { size: 17 })}</a>
         ${isOwner() ? `<a href="/admin" data-link class="icon-btn-plain" aria-label="Центр управления">${icon('shield', { size: 17 })}</a>` : ''}
@@ -176,6 +192,7 @@ function appShell() {
           <a class="btn-icon" id="notification-btn" href="/notifications" data-link aria-label="Уведомления">
             ${icon('bell', { size: 20 })}<span class="tabbar__badge hidden" id="bell-badge"></span>
           </a>
+          <button class="theme-switch" type="button" data-theme-toggle aria-label="Тема" aria-pressed="${getState().theme === 'dark'}" title="Светлая или тёмная тема">${themeIcon()}</button>
           <button class="lang-switch" type="button" data-lang-toggle aria-label="Language">${langToggle()}</button>
           <a class="topbar__avatar" href="/profile" data-link aria-label="Мой профиль"><span id="topbar-avatar"></span></a>
         </div>
@@ -769,7 +786,7 @@ function registerServiceWorker() {
 
 async function boot() {
   watchSystemTheme();
-  applyTheme('auto');
+  applyTheme(storedTheme() || 'auto');
   registerGlobalEvents();
   registerRealtime();
 
@@ -804,7 +821,22 @@ async function boot() {
   defineRoutes(ROUTES);
   setRenderer(render);
   initI18n();
+  document.addEventListener('wg:theme', updateThemeButtons);
   document.addEventListener('click', (event) => {
+    const themeToggle = event.target.closest('[data-theme-toggle]');
+    if (themeToggle) {
+      event.preventDefault();
+      const next = getState().theme === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      if (getState().user) {
+        patchUser({ theme: next });
+        api
+          .put('/users/me/settings', { theme: next })
+          .then((data) => data && data.user && patchUser(data.user))
+          .catch(() => {});
+      }
+      return;
+    }
     const toggle = event.target.closest('[data-lang-toggle]');
     if (!toggle) return;
     event.preventDefault();

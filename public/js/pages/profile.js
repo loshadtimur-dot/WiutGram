@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=25';
+import { api, compressImage, toFormData } from '../api.js?v=31';
 import {
   el,
   avatarNode,
@@ -18,21 +18,21 @@ import {
   gradientFor,
   svgIcon,
   plural
-} from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=25';
-import { navigate } from '../router.js?v=25';
-import { openPostModal } from '../components/postModal.js?v=25';
-import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=25';
-import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=25';
-import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=25';
-import { openReportDialog, openBlockConfirm } from '../components/report.js?v=25';
-import { showMatchScreen } from '../components/match.js?v=25';
-import { mountAdBanner } from '../components/adBanner.js?v=25';
-import { badgeNode, applyNameGift } from '../components/cosmetics.js?v=25';
-import { glassSvg } from '../components/glass.js?v=25';
-import { decorPanelNode, bannerNode, bannerPlaceholder, openBannerGallery, openStatusPicker } from '../components/decor.js?v=25';
-import { openGiftViewer } from '../components/giftViewer.js?v=25';
+} from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { getState, patchUser, refreshMe, setCounts } from '../state.js?v=31';
+import { navigate } from '../router.js?v=31';
+import { openPostModal } from '../components/postModal.js?v=31';
+import { openPostCreate, openStoryCreate } from '../components/postCreate.js?v=31';
+import { createStoryRail, openStoryViewer } from '../components/storyViewer.js?v=31';
+import { lineChartNode, barChartNode, legendDot } from '../components/charts.js?v=31';
+import { openReportDialog, openBlockConfirm } from '../components/report.js?v=31';
+import { showMatchScreen } from '../components/match.js?v=31';
+import { mountAdBanner } from '../components/adBanner.js?v=31';
+import { badgeNode, applyNameGift } from '../components/cosmetics.js?v=31';
+import { glassSvg } from '../components/glass.js?v=31';
+import { decorPanelNode, bannerNode, bannerPlaceholder, openBannerGallery, openStatusPicker } from '../components/decor.js?v=31';
+import { openGiftViewer } from '../components/giftViewer.js?v=31';
 
 export default async function ProfilePage(ctx) {
   const me = getState().user;

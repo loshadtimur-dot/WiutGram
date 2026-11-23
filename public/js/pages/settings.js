@@ -1,5 +1,5 @@
-import { api, clearToken } from '../api.js?v=25';
-import { storageGet, storageSet } from '../storage.js?v=25';
+import { api, clearToken } from '../api.js?v=31';
+import { storageGet, storageSet } from '../storage.js?v=31';
 import {
   el,
   button,
@@ -11,11 +11,11 @@ import {
   emptyState,
   passwordField,
   svgIcon
-} from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { getState, setUser, patchUser, applyTheme, refreshMe } from '../state.js?v=25';
-import { navigate } from '../router.js?v=25';
-import { getLang, setLang } from '../i18n.js?v=1';
+} from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { getState, setUser, patchUser, setTheme, refreshMe } from '../state.js?v=31';
+import { navigate } from '../router.js?v=31';
+import { getLang, setLang } from '../i18n.js?v=31';
 
 function section(iconName, title) {
   const card = el('section', { class: 'settings-section' });
@@ -394,7 +394,7 @@ export default async function SettingsPage() {
     option.addEventListener('click', async () => {
       themeOptions.querySelectorAll('.theme-option').forEach((node) => node.classList.remove('is-active'));
       option.classList.add('is-active');
-      applyTheme(value);
+      setTheme(value);
       try {
         await updateSetting({ theme: value });
         toast(`Тема: ${label.toLowerCase()}`, 'success');

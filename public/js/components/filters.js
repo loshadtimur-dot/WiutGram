@@ -1,6 +1,6 @@
-import { api } from '../api.js?v=25';
-import { el, button, openModal, toast } from '../ui.js?v=25';
-import { patchUser, getState } from '../state.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, button, openModal, toast } from '../ui.js?v=31';
+import { patchUser, getState } from '../state.js?v=31';
 
 const COURSE_OPTIONS = [
   ['1', '1 курс'],

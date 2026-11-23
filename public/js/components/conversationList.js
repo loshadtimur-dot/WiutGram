@@ -1,9 +1,9 @@
-import { api } from '../api.js?v=25';
-import { el, avatarNode, button, emptyState, loadingRow, shortTimeAgo, openModal, confirmDialog, toast } from '../ui.js?v=25';
-import { getState } from '../state.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { onSocket } from '../socket.js?v=25';
-import { navigate } from '../router.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, avatarNode, button, emptyState, loadingRow, shortTimeAgo, openModal, confirmDialog, toast } from '../ui.js?v=31';
+import { getState } from '../state.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { onSocket } from '../socket.js?v=31';
+import { navigate } from '../router.js?v=31';
 
 const FILTERS = [
   { key: 'all', label: 'Все' },
@@ -106,11 +106,11 @@ export function createConversationList(options = {}) {
 
   const newBtn = el('button', { class: 'btn-icon', attrs: { type: 'button', title: 'Новый чат', 'aria-label': 'Новый чат' } });
   newBtn.innerHTML = icon('plus', { size: 20 });
-  newBtn.addEventListener('click', () => import('./chatModals.js?v=25').then((mod) => mod.openNewChatModal()));
+  newBtn.addEventListener('click', () => import('./chatModals.js?v=31').then((mod) => mod.openNewChatModal()));
 
   const groupBtn = el('button', { class: 'btn-icon', attrs: { type: 'button', title: 'Создать группу', 'aria-label': 'Создать группу' } });
   groupBtn.innerHTML = icon('users', { size: 18 });
-  groupBtn.addEventListener('click', () => import('./chatModals.js?v=25').then((mod) => mod.openCreateGroupModal()));
+  groupBtn.addEventListener('click', () => import('./chatModals.js?v=31').then((mod) => mod.openCreateGroupModal()));
 
   headActions.append(savedBtn, groupBtn, newBtn);
   head.append(headActions);

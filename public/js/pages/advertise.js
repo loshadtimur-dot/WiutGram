@@ -1,6 +1,6 @@
-import { api } from '../api.js?v=25';
-import { el, button, toast, openModal } from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, button, toast, openModal } from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
 import {
   TASHKENT_OFFSET,
   tashkentParts,
@@ -14,7 +14,7 @@ import {
   groupHours,
   groupLabel,
   copyText
-} from '../ads-utils.js?v=25';
+} from '../ads-utils.js?v=31';
 
 const QUICK_RANGES = [
   { label: 'Утро 08–12', from: 8, to: 12 },

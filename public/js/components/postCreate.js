@@ -1,6 +1,6 @@
-import { api, compressImage, toFormData } from '../api.js?v=25';
-import { el, button, openModal, toast } from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
+import { api, compressImage, toFormData } from '../api.js?v=31';
+import { el, button, openModal, toast } from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
 
 function mediaActions({ onReplace, onRemove }) {
   const row = el('div', { class: 'post-create__actions hidden' });

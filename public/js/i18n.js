@@ -2,6 +2,9 @@
 // The app is written in Russian, so English is applied as a thin layer over
 // text nodes and static attributes. User content is never touched.
 
+import { EN_EXTRA } from './i18n-en-extra.js?v=31';
+import { EN_MODALS } from './i18n-en-modals.js?v=31';
+
 const LANG_KEY = 'wg_lang';
 const DICT = {
   'Отмена': 'Cancel',
@@ -835,6 +838,29 @@ const DICT = {
   'Начать свайпать': 'Start swiping'
 };
 
+Object.assign(DICT, EN_EXTRA, EN_MODALS);
+
+const EN_MONTHS = {
+  янв: 'Jan', фев: 'Feb', мар: 'Mar', апр: 'Apr', мая: 'May', июн: 'Jun',
+  июл: 'Jul', авг: 'Aug', сен: 'Sep', окт: 'Oct', ноя: 'Nov', дек: 'Dec'
+};
+const EN_MONTH_FULL = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const EN_DISTRICTS = {
+  'Алмазарский': 'Almazar', 'Бектемирский': 'Bektemir', 'Мирабадский': 'Mirabad',
+  'Мирзо-Улугбекский': 'Mirzo-Ulugbek', 'Сергелийский': 'Sergeli', 'Учтепинский': 'Uchtepa',
+  'Чилансарский': 'Chilanzar', 'Шайхантахурский': 'Shaykhantahur', 'Юнусабадский': 'Yunusabad',
+  'Яккасарайский': 'Yakkasaray', 'Яшнабадский': 'Yashnabad', 'Янгихаётский': 'Yangihayot'
+};
+
+function translateDate(value) {
+  return String(value || '')
+    .replace(/\b(\d{1,2})\.(\d{2})\.(\d{4})\b/g, (m, day, month, year) => {
+      const name = EN_MONTH_FULL[Number(month) - 1];
+      return name ? `${Number(day)} ${name} ${year}` : m;
+    })
+    .replace(/(янв|фев|мар|апр|мая|июн|июл|авг|сен|окт|ноя|дек)/gi, (m) => EN_MONTHS[m.toLowerCase()] || m);
+}
+
 // Short dynamic labels that cannot be listed as exact strings.
 const PATTERNS = [
   [/^был\(а\) только что$/, () => 'last seen just now'],
@@ -895,7 +921,65 @@ const PATTERNS = [
       'Яккасарайский': 'Yakkasaray', 'Яшнабадский': 'Yashnabad', 'Янгихаётский': 'Yangihayot'
     };
     return `Tashkent, ${districts[m[1]] || m[1]}`;
-  }]
+  }],
+  [/^(\d{1,2}) (янв|фев|мар|апр|мая|июн|июл|авг|сен|окт|ноя|дек)$/, (m) => translateDate(m[0])],
+  [/^(\d{1,2}) (янв|фев|мар|апр|мая|июн|июл|авг|сен|окт|ноя|дек) (\d{2}:\d{2}) — свободно$/,
+    (m) => `${translateDate(`${m[1]} ${m[2]}`)} ${m[3]} — available`],
+  [/^(\d{2}:\d{2})–(\d{2}:\d{2}), (недоступно|свободно|занято|выбрано), (не выбрано|выбрано)$/, (m) => {
+    const status = { недоступно: 'unavailable', свободно: 'available', занято: 'booked', выбрано: 'selected' }[m[3]];
+    return `${m[1]}–${m[2]}, ${status}, ${m[4] === 'выбрано' ? 'selected' : 'not selected'}`;
+  }],
+  [/^(\d+) лайк[а-яё]* · (\d+) комментари[а-яё]* · (\d+) просмотр[а-яё]* · (.+)$/, (m) => {
+    const likes = m[1] === '1' ? 'like' : 'likes';
+    const comments = m[2] === '1' ? 'comment' : 'comments';
+    const views = m[3] === '1' ? 'view' : 'views';
+    return `${m[1]} ${likes} · ${m[2]} ${comments} · ${m[3]} ${views} · ${translateDate(m[4])}`;
+  }],
+  [/^(.+) · активна (.+)$/, (m) => `${m[1]} · active ${translateDate(m[2])}`],
+  [/^@(\S+) · (\d+) участников · жалоб: (\d+)$/, (m) => `@${m[1]} · ${m[2]} members · reports: ${m[3]}`],
+  [/^(\d+) участников · @(\S+)$/, (m) => `${m[1]} members · @${m[2]}`],
+  [/^(\d+) · WIUT · (.+)$/, (m) => `${m[1]} · WIUT · ${EN_DISTRICTS[m[2]] || m[2]}`],
+  [/^(\d+) курс: (\d+)$/, (m) => `Year ${m[1]}: ${m[2]}`],
+  [/^(\d+) на странице$/, (m) => `${m[1]} per page`],
+  [/^(\d+) места? · ряд (\d+)$/, (m) => `${m[1]} ${m[1] === '1' ? 'seat' : 'seats'} · row ${m[2]}`],
+  [/^(\d+) недели?$/, (m) => `${m[1]} ${m[1] === '1' ? 'week' : 'weeks'}`],
+  [/^· (\d+) шт · ([\d\s]+) сум$/, (m) => `· ${m[1]} pcs · ${m[2].trim()} UZS`],
+  [/^Выбрано: (\d+) часа?$/, (m) => `Selected: ${m[1]} ${m[1] === '1' ? 'hour' : 'hours'}`],
+  [/^Часы на (\d{1,2}) (янв|фев|мар|апр|мая|июн|июл|авг|сен|окт|ноя|дек)$/,
+    (m) => `Hours on ${translateDate(`${m[1]} ${m[2]}`)}`],
+  [/^Ожидает: ([\d\s]+) сум$/, (m) => `Pending: ${m[1].trim()} UZS`],
+  [/^От ([\d\s]+) сум за час$/, (m) => `From ${m[1].trim()} UZS per hour`],
+  [/^Показано (\d+) из (\d+)$/, (m) => `Showing ${m[1]} of ${m[2]}`],
+  [/^Новых запросов: (\d+)$/, (m) => `New requests: ${m[1]}`],
+  [/^Мужчины: (\d+)$/, (m) => `Men: ${m[1]}`],
+  [/^Вы: (.+)$/, (m) => `You: ${m[1]}`],
+  [/^Вариант (\d+)$/, (m) => `Option ${m[1]}`],
+  [/^Выбрать (.+)$/, (m) => `Select ${m[1]}`],
+  [/^Фото (.+)$/, (m) => `Photo ${m[1]}`],
+  [/^Аккаунт создан (.+)\. Всего матчей: (.+)\.$/, (m) => `Account created ${translateDate(m[1])}. Total matches: ${m[2]}.`],
+  [/^@(\S+) — (.+)$/, (m) => `@${m[1]} — ${DICT[m[2]] || m[2]}`],
+  [/^(.+) · (Обычный|Редкий|Эпический|Легендарный|Админский)$/, (m) => `${DICT[m[1]] || m[1]} · ${DICT[m[2]] || m[2]}`],
+  [/^Владелец: @(.+)$/, (m) => `Owner: @${m[1]}`],
+  [/^Контакт: @(.+)$/, (m) => `Contact: @${m[1]}`],
+  [/^Связь: @(.+)$/, (m) => `Contact: @${m[1]}`],
+  [/^Покупатель: @(.+)$/, (m) => `Buyer: @${m[1]}`],
+  [/^Статус: (.+)$/, (m) => `Status: ${DICT[m[1]] || m[1]}`],
+  [/^От @(\S+) · (.+) · (.+)$/, (m) => `From @${m[1]} · ${DICT[m[2]] || m[2]} · ${translateDate(m[3])}`],
+  [/^Новая заявка на рекламу (\S+): (\d+) ч · ([\d\s]+) сум$/,
+    (m) => `New ad request ${m[1]}: ${m[2]} h · ${m[3].trim()} UZS`],
+  [/^Новая заявка на суперлайки (\S+): (\d+) шт · ([\d\s]+) сум$/,
+    (m) => `New superlike request ${m[1]}: ${m[2]} pcs · ${m[3].trim()} UZS`],
+  [/^Жалоба на группу «(.+)»: (.+)$/, (m) => {
+    const reason = m[2].charAt(0).toUpperCase() + m[2].slice(1);
+    return `Report against group “${m[1]}”: ${DICT[m[2]] || DICT[reason] || m[2]}`;
+  }],
+  [/^Добавлены участники: (\d+)$/, (m) => `Members added: ${m[1]}`],
+  [/^Комментарий: (.+)$/, (m) => `Comment: ${m[1]}`],
+  [/^Подпись: «(.+)»$/, (m) => `Caption: “${m[1]}”`],
+  [/^Новые · (.+) · (.+)$/, (m) => `New · ${m[1].replace(/сум/g, 'UZS')} · ${translateDate(m[2])}`],
+  [/^#(\d+) · (.+)$/, (m) => `#${m[1]} · ${m[2]}`],
+  [/^([\d.]+) КБ$/, (m) => `${m[1]} KB`],
+  [/^([\d.]+) МБ$/, (m) => `${m[1]} MB`]
 ];
 
 const ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
@@ -911,6 +995,18 @@ const SKIP = [
   '.chat-row__name',
   '.unbox__title h2',
   '.sidebar__profile-name',
+  '.avatar',
+  '.group-card__avatar',
+  '.sidebar__chat-name',
+  '.swipe-card__name',
+  '.explore-tile',
+  '.msg__sender',
+  '.story-bubble__name',
+  '.people-card__name',
+  '.aura-podium__item',
+  '.aura-row__name',
+  '.profile-username',
+  'noscript',
   '[data-no-i18n]',
   'script',
   'style'

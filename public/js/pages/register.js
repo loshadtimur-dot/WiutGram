@@ -1,8 +1,8 @@
-import { api, compressImage, setToken } from '../api.js?v=25';
-import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=25';
-import { setUser } from '../state.js?v=25';
-import { navigate } from '../router.js?v=25';
-import { icon } from '../icons.js?v=25';
+import { api, compressImage, setToken } from '../api.js?v=31';
+import { el, button, passwordField, toast, svgIcon } from '../ui.js?v=31';
+import { setUser } from '../state.js?v=31';
+import { navigate } from '../router.js?v=31';
+import { icon } from '../icons.js?v=31';
 
 const FALLBACK_DISTRICTS = [
   'Алмазарский', 'Бектемирский', 'Мирабадский', 'Мирзо-Улугбекский', 'Сергелийский', 'Учтепинский',

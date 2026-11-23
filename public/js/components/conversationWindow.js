@@ -1,4 +1,4 @@
-import { api, compressImage, toFormData } from '../api.js?v=25';
+import { api, compressImage, toFormData } from '../api.js?v=31';
 import {
   el,
   avatarNode,
@@ -9,11 +9,11 @@ import {
   formatTime,
   formatDayLabel,
   lastSeenLabel
-} from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { getState } from '../state.js?v=25';
-import { onSocket, emitConversationTyping } from '../socket.js?v=25';
-import { navigate } from '../router.js?v=25';
+} from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { getState } from '../state.js?v=31';
+import { onSocket, emitConversationTyping } from '../socket.js?v=31';
+import { navigate } from '../router.js?v=31';
 import {
   openGroupInfo,
   openWallpaperPicker,
@@ -21,8 +21,8 @@ import {
   openForwardModal,
   openChatGiftPicker,
   openEmojiPicker
-} from './chatModals.js?v=25';
-import { openGiftUnbox, openSentGift } from './giftViewer.js?v=25';
+} from './chatModals.js?v=31';
+import { openGiftUnbox, openSentGift } from './giftViewer.js?v=31';
 
 const QUICK_REACTIONS = ['❤️', '👍', '😂', '🔥'];
 
@@ -92,6 +92,14 @@ export function createConversationWindow(conversationId, options = {}) {
   const statusRow = el('div', { class: 'chat-window__status' });
   nameBlock.append(nameRow, statusRow);
   userBlock.append(avatarHolder, nameBlock);
+  userBlock.addEventListener('click', () => {
+    if (!conversation) return;
+    if (conversation.type === 'group') {
+      openGroupInfo(id, { onLeave: () => navigate('/chats'), onChanged: () => reloadConversation().catch(() => {}) });
+    } else if (conversation.peer) {
+      navigate(`/u/${conversation.peer.username}`);
+    }
+  });
   header.append(userBlock);
 
   const actions = el('div', { class: 'chat-window__actions' });

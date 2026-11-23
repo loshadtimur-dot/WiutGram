@@ -1,4 +1,4 @@
-import { icon } from './icons.js?v=25';
+import { icon } from './icons.js?v=31';
 
 // Element factory: el('div', 'class', {attrs}) or el('button', {class, text, onclick})
 export function el(tag, options = null, children = null) {

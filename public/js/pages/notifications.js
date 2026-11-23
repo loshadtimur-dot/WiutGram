@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=25';
+import { api } from '../api.js?v=31';
 import {
   el,
   avatarNode,
@@ -8,11 +8,11 @@ import {
   formatDayLabel,
   timeAgo,
   toast
-} from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { setCounts, getState } from '../state.js?v=25';
-import { onSocket } from '../socket.js?v=25';
-import { navigate } from '../router.js?v=25';
+} from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { setCounts, getState } from '../state.js?v=31';
+import { onSocket } from '../socket.js?v=31';
+import { navigate } from '../router.js?v=31';
 
 const ICONS = {
   like: 'heart',

@@ -1,4 +1,4 @@
-import { api } from '../api.js?v=25';
+import { api } from '../api.js?v=31';
 import {
   el,
   button,
@@ -12,12 +12,12 @@ import {
   emptyState,
   passwordField,
   ruleBadges
-} from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { getState, isOwner, patchUser } from '../state.js?v=25';
-import { lineChartNode, barChartNode } from '../components/charts.js?v=25';
-import { openReportDialog } from '../components/report.js?v=25';
-import { navigate } from '../router.js?v=25';
+} from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { getState, isOwner, patchUser } from '../state.js?v=31';
+import { lineChartNode, barChartNode } from '../components/charts.js?v=31';
+import { openReportDialog } from '../components/report.js?v=31';
+import { navigate } from '../router.js?v=31';
 
 const TABS = [
   { id: 'dashboard', label: 'Дашборд', icon: 'chart' },

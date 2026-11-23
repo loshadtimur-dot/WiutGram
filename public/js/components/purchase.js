@@ -1,7 +1,7 @@
-import { el, button, openModal, toast } from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
+import { el, button, openModal, toast } from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
 import { giftSvg, money } from './glass.js';
-import { navigate } from '../router.js?v=25';
+import { navigate } from '../router.js?v=31';
 
 export function telegramLink(handle, text) {
   const name = String(handle || '').replace(/^@/, '');

@@ -1,7 +1,7 @@
-import { api } from '../api.js?v=25';
-import { el, button, avatarNode, openModal, toast, loadingRow, emptyState } from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { navigate } from '../router.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, button, avatarNode, openModal, toast, loadingRow, emptyState } from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { navigate } from '../router.js?v=31';
 
 async function searchPeople(query) {
   if (!query || query.trim().length < 2) return [];

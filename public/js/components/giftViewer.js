@@ -1,5 +1,5 @@
-import { api } from '../api.js?v=25';
-import { el, button, avatarNode, openModal, toast, loadingRow } from '../ui.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, button, avatarNode, openModal, toast, loadingRow } from '../ui.js?v=31';
 import { tashkentDate, money } from './glass.js';
 import { buyItem } from './purchase.js';
 

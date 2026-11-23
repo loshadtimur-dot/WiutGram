@@ -1,8 +1,8 @@
-import { api } from '../api.js?v=25';
-import { el, button } from '../ui.js?v=25';
-import { getState } from '../state.js?v=25';
-import { navigate } from '../router.js?v=25';
-import { glassSvg } from '../components/glass.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, button } from '../ui.js?v=31';
+import { getState } from '../state.js?v=31';
+import { navigate } from '../router.js?v=31';
+import { glassSvg } from '../components/glass.js?v=31';
 
 export default async function DesignPreviewPage() {
   const me = getState().user;

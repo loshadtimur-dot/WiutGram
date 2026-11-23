@@ -1,8 +1,8 @@
-import { api } from '../api.js?v=25';
-import { el, toast, initials, gradientFor, svgIcon, ruleBadges, looksForLabel } from '../ui.js?v=25';
-import { icon } from '../icons.js?v=25';
-import { navigate } from '../router.js?v=25';
-import { openReportDialog, openBlockConfirm } from './report.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, toast, initials, gradientFor, svgIcon, ruleBadges, looksForLabel } from '../ui.js?v=31';
+import { icon } from '../icons.js?v=31';
+import { navigate } from '../router.js?v=31';
+import { openReportDialog, openBlockConfirm } from './report.js?v=31';
 
 const INTEREST_LABELS = {
   travel: ['Путешествия', '✈️'], music: ['Музыка', '🎧'], movies: ['Кино', '🎬'], sport: ['Спорт', '🏋️'],

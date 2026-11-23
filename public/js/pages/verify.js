@@ -1,5 +1,5 @@
-import { api } from '../api.js?v=25';
-import { el, toast } from '../ui.js?v=25';
+import { api } from '../api.js?v=31';
+import { el, toast } from '../ui.js?v=31';
 
 // Landing page for the confirmation link from the email.
 export default function VerifyEmailPage(ctx) {

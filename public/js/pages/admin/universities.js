@@ -1,6 +1,6 @@
-import { api } from '../../api.js?v=25';
-import { el, button, toast, openModal } from '../../ui.js?v=25';
-import { sectionHead, emptyState, fmtDate, chip, sudoConfirm } from './shared.js?v=25';
+import { api } from '../../api.js?v=31';
+import { el, button, toast, openModal } from '../../ui.js?v=31';
+import { sectionHead, emptyState, fmtDate, chip, sudoConfirm } from './shared.js?v=31';
 
 export default async function universitiesSection() {
   const root = el('div', { class: 'col', style: { gap: '16px' } });

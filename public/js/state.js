@@ -1,4 +1,4 @@
-import { api } from './api.js?v=25';
+import { api } from './api.js?v=31';
 
 const listeners = new Set();
 
@@ -50,7 +50,7 @@ export function setUser(user) {
   state.user = user;
   if (user) {
     state.online.set(user.id, true);
-    applyTheme(user.theme || 'auto');
+    applyTheme(user.theme && user.theme !== 'auto' ? user.theme : storedTheme() || 'auto');
   }
   notifyState({ type: 'user' });
 }
@@ -100,15 +100,39 @@ export async function refreshMe() {
   }
 }
 
+const THEME_KEY = 'wg_theme';
+
+// A guest theme choice survives reloads; a saved account theme still wins.
+export function storedTheme() {
+  try {
+    const value = localStorage.getItem(THEME_KEY);
+    return value === 'light' || value === 'dark' ? value : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+export function setTheme(theme) {
+  try {
+    if (theme === 'light' || theme === 'dark') localStorage.setItem(THEME_KEY, theme);
+    else localStorage.removeItem(THEME_KEY);
+  } catch (err) {
+    // Private mode can block localStorage; the theme still applies for this page.
+  }
+  applyTheme(theme);
+}
+
 // Applies light/dark theme, resolving "auto" against the OS preference.
 export function applyTheme(theme = 'auto') {
   const stored = theme || 'auto';
   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const resolved = stored === 'auto' ? (prefersDark ? 'dark' : 'light') : stored;
   document.documentElement.setAttribute('data-theme', resolved);
+  document.documentElement.style.colorScheme = resolved;
   state.theme = resolved;
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', resolved === 'dark' ? '#111418' : '#FD267A');
+  document.dispatchEvent(new CustomEvent('wg:theme', { detail: { theme: resolved } }));
 }
 
 export function watchSystemTheme() {

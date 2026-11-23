@@ -1,7 +1,7 @@
-import { api } from '../../api.js?v=25';
-import { el, button, openModal, toast, formatNumber } from '../../ui.js?v=25';
-import { icon } from '../../icons.js?v=25';
-import { sectionHead, emptyState, sudoConfirm, fmtDateTime } from './shared.js?v=25';
+import { api } from '../../api.js?v=31';
+import { el, button, openModal, toast, formatNumber } from '../../ui.js?v=31';
+import { icon } from '../../icons.js?v=31';
+import { sectionHead, emptyState, sudoConfirm, fmtDateTime } from './shared.js?v=31';
 
 const KINDS = {
   gift: 'Подарки',
